@@ -1,0 +1,65 @@
+window.auth = {
+  async register(email, password, name) {
+    const { data, error } = await window.supabase.auth.signUp({
+      email, password
+    });
+    if (error) return { error };
+    if (data?.user) {
+      const { error: profileError } = await window.supabase
+        .from('profiles')
+        .upsert({ id: data.user.id, name });
+      if (profileError) console.error('Profile error:', profileError);
+    }
+    return { data };
+  },
+
+  async login(email, password) {
+    const { data, error } = await window.supabase.auth.signInWithPassword({
+      email, password
+    });
+    return { data, error };
+  },
+
+  async logout() {
+    await window.supabase.auth.signOut();
+    window.location.href = 'index.html';
+  },
+
+  async getUser() {
+    const { data: { user } } = await window.supabase.auth.getUser();
+    return user;
+  },
+
+  async getSession() {
+    const { data: { session } } = await window.supabase.auth.getSession();
+    return session;
+  },
+
+  async getProfile(userId) {
+    const { data, error } = await window.supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    if (error) return null;
+    return data;
+  },
+
+  async updateProfile(userId, updates) {
+    const { data, error } = await window.supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', userId);
+    return { data, error };
+  },
+
+  async logActivity(spaceId, userId, type, text, module) {
+    try {
+      await window.supabase
+        .from('activity')
+        .insert({ space_id: spaceId, user_id: userId, type, text, module });
+    } catch (e) {
+      console.error('Activity log error:', e);
+    }
+  }
+};

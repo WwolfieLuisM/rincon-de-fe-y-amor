@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Vincular — Rincón de Fe y Amor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="auth-page" id="app">
+    <div class="auth-logo">
+      <div class="logo-icon">💑</div>
+      <h1>Tu espacio espiritual</h1>
+      <p>Elige cómo quieres empezar</p>
+    </div>
+    <div class="auth-form" id="authForm">
+      <div class="link-card">
+        <div class="link-icon">🙋</div>
+        <h3>Modo Solo</h3>
+        <p>Empieza tu viaje espiritual personal. Lleva registro de tus oraciones, gratitud y metas.</p>
+        <button class="btn-primary w-full" id="soloBtn">Comenzar solo</button>
+      </div>
+
+      <div class="auth-divider">O</div>
+
+      <div class="link-card">
+        <div class="link-icon">💞</div>
+        <h3>Crear espacio en pareja</h3>
+        <p>Crea un espacio para ti y tu pareja. Recibirás un código para compartir.</p>
+        <input class="input-field" type="text" id="spaceNameInput" placeholder="Nombre de la pareja (ej. Luismi & Lía)" style="margin-bottom:10px">
+        <button class="btn-primary w-full" id="createCoupleBtn">Crear espacio</button>
+      </div>
+
+      <div class="link-card">
+        <div class="link-icon">🔗</div>
+        <h3>Unirme a mi pareja</h3>
+        <p>¿Tu pareja ya creó el espacio? Ingresa el código para unirte.</p>
+        <input class="input-field" type="text" id="codeInput" placeholder="Código de 6 letras" style="margin-bottom:10px;text-transform:uppercase;letter-spacing:2px" maxlength="6">
+        <button class="btn-primary w-full" id="joinBtn">Unirme</button>
+      </div>
+
+      <div id="hasSpaceBtn" style="display:none" class="auth-link">
+        <button class="btn-primary w-full" id="goDashboardBtn">Ir al dashboard</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/pages/link.js"></script>
+</body>
+</html>

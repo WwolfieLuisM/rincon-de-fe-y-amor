@@ -1,0 +1,1278 @@
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text-1);
+  max-width: 390px;
+  margin: 0 auto;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+:root {
+  --bg: #0a0a0a;
+  --surface: #111111;
+  --surface-2: #1a1a1a;
+  --border: #1e1e1e;
+  --border-2: #2a2a2a;
+  --accent: #e8547a;
+  --accent-dark: #c73f63;
+  --text-1: #f0f0f0;
+  --text-2: #888888;
+  --text-3: #444444;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-full: 100px;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  outline: none;
+}
+
+/* ============ HEADER ============ */
+.header {
+  height: 56px;
+  background: #0d0d0d;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+#menuBtn {
+  background: none;
+  border: none;
+  color: var(--text-2);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+.header-center {
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  flex: 1;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notification-bell {
+  position: relative;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.notification-dot {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+.avatar-small {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e8547a, #c73f63);
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ============ CARDS ============ */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 16px;
+}
+
+/* ============ ACTIVITY CARDS ============ */
+.activity-card {
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.activity-card:active {
+  background: #161616;
+}
+
+.activity-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.activity-icon.prayer {
+  background: #e8547a22;
+  color: #e8547a;
+}
+
+.activity-icon.gratitude {
+  background: #e8547a15;
+  color: #f472b6;
+}
+
+.activity-icon.message {
+  background: #7c3aed22;
+  color: #a78bfa;
+}
+
+.activity-icon.goal {
+  background: #dc262622;
+  color: #f87171;
+}
+
+.activity-icon.date {
+  background: #2563eb22;
+  color: #60a5fa;
+}
+
+.activity-icon.streak {
+  background: #e8547a22;
+  color: #e8547a;
+}
+
+.activity-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-info .activity-name {
+  font-weight: 700;
+  color: #fff;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.activity-info .activity-text {
+  color: #e0e0e0;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activity-time {
+  color: var(--text-3);
+  font-size: 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ============ ALERTS ============ */
+.alert-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.alert-card .alert-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.alert-card .alert-text {
+  flex: 1;
+  font-size: 13px;
+  color: #e0e0e0;
+  line-height: 1.4;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 14px 24px;
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.btn-primary:active {
+  background: var(--accent-dark);
+  transform: scale(0.98);
+}
+
+.btn-soft {
+  background: #1e1e1e;
+  color: var(--accent);
+  border: 1px solid #e8547a33;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* ============ PRAYER STREAK BUTTON ============ */
+.btn-pray {
+  width: calc(100% - 32px);
+  margin: 16px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 12px;
+  padding: 15px;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-pray:active {
+  background: var(--accent-dark);
+}
+
+.btn-pray.done {
+  background: #1e1e1e;
+  color: var(--success);
+  border: 1px solid #4ade8033;
+  cursor: default;
+}
+
+/* ============ STREAK WIDGET ============ */
+.streak-widget {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.streak-number {
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.streak-label {
+  font-size: 14px;
+  color: var(--text-2);
+  margin-top: 2px;
+}
+
+.streak-hearts {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 20px;
+}
+
+.streak-hearts .heart-inactive {
+  opacity: 0.4;
+}
+
+.streak-verse {
+  color: var(--text-3);
+  font-style: italic;
+  font-size: 13px;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+.streak-link {
+  color: var(--accent);
+  font-size: 13px;
+  display: inline-block;
+  margin-top: 6px;
+}
+
+/* ============ VERSE OF THE DAY ============ */
+.verse-card {
+  position: relative;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 24px 20px;
+  overflow: hidden;
+}
+
+.verse-quote {
+  font-size: 64px;
+  color: var(--accent);
+  opacity: 0.12;
+  position: absolute;
+  top: 4px;
+  left: 12px;
+  font-family: Georgia, serif;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.verse-text {
+  font-style: italic;
+  font-size: 15px;
+  color: #e0e0e0;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+}
+
+.verse-ref {
+  text-align: right;
+  color: var(--accent);
+  font-size: 13px;
+  margin-top: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ============ SECTION LABEL ============ */
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 0 16px;
+  margin: 16px 0 10px;
+}
+
+/* ============ SIDEBAR ============ */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 399;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sidebar {
+  width: 280px;
+  background: #0d0d0d;
+  border-right: 1px solid var(--border);
+  position: fixed;
+  top: 0;
+  left: -280px;
+  height: 100vh;
+  z-index: 400;
+  transition: left 0.3s cubic-bezier(0.4,0,0.2,1);
+  overflow-y: auto;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar-header {
+  padding: 24px 20px;
+}
+
+.sidebar-avatars {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.sidebar-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e8547a, #c73f63);
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-names {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+
+.sidebar-days {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.sidebar-code {
+  display: inline-block;
+  background: var(--surface-2);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--text-2);
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-top: 10px;
+}
+
+.sidebar-nav {
+  padding: 8px 0;
+}
+
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  margin: 2px 8px;
+  color: var(--text-1);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.sidebar-nav a:active {
+  background: rgba(255,255,255,0.05);
+}
+
+.sidebar-nav a.active {
+  background: rgba(232,84,122,0.12);
+  color: var(--accent);
+}
+
+.sidebar-nav a .nav-icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+
+.sidebar-logout {
+  padding: 12px 20px;
+  border-radius: 10px;
+  margin: 2px 8px;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 500;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: calc(100% - 16px);
+  cursor: pointer;
+}
+
+.sidebar-logout:active {
+  background: rgba(232,84,122,0.08);
+}
+
+/* ============ INPUTS ============ */
+.input-group {
+  margin-bottom: 16px;
+}
+
+.input-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.input-field {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  color: var(--text-1);
+  font-size: 15px;
+  transition: border-color 0.15s;
+}
+
+.input-field:focus {
+  border-color: var(--accent);
+}
+
+.input-field::placeholder {
+  color: var(--text-3);
+}
+
+textarea.input-field {
+  resize: none;
+  min-height: 80px;
+}
+
+/* ============ BOTTOM SHEET MODAL ============ */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 300;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(100%);
+  width: 100%;
+  max-width: 390px;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  padding: 24px;
+  max-height: 85vh;
+  overflow-y: auto;
+  z-index: 301;
+  transition: transform 0.3s ease;
+}
+
+.modal-overlay.open .modal-sheet {
+  transform: translateX(-50%) translateY(0);
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* ============ CHAT BUBBLES ============ */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+}
+
+.chat-bubble {
+  max-width: 80%;
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.chat-bubble.mine {
+  background: rgba(232,84,122,0.12);
+  border: 1px solid rgba(232,84,122,0.25);
+  border-radius: 18px 18px 4px 18px;
+  align-self: flex-end;
+}
+
+.chat-bubble.mine.encouragement {
+  background: rgba(124,58,237,0.12);
+  border-color: rgba(124,58,237,0.25);
+}
+
+.chat-bubble.other {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px 18px 18px 4px;
+  align-self: flex-start;
+}
+
+.chat-meta {
+  font-size: 11px;
+  color: var(--text-2);
+  margin-top: 4px;
+}
+
+/* ============ TOAST ============ */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-2);
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.toast.show {
+  opacity: 1;
+}
+
+.toast.success {
+  border: 1px solid var(--success);
+  color: var(--success);
+}
+
+.toast.error {
+  border: 1px solid #f87171;
+  color: #f87171;
+}
+
+/* ============ PROGRESS BAR ============ */
+.progress-bar {
+  height: 6px;
+  background: var(--surface-2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #e8547a, #ff8fab);
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+}
+
+/* ============ AVATARS ============ */
+.avatar {
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e8547a, #c73f63);
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ============ FAB ============ */
+.fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 24px;
+  border: none;
+  box-shadow: 0 4px 20px rgba(232,84,122,0.4);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s;
+}
+
+.fab:active {
+  transform: scale(0.92);
+  background: var(--accent-dark);
+}
+
+/* ============ EMPTY STATE ============ */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 48px;
+  opacity: 0.15;
+}
+
+.empty-title {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.empty-subtitle {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+/* ============ AUTH PAGES ============ */
+.auth-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 40px 24px 24px;
+}
+
+.auth-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.auth-logo .logo-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.auth-logo h1 {
+  font-size: 22px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #e8547a, #ff8fab);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.auth-logo p {
+  color: var(--text-2);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.auth-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-form .btn-primary {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.auth-link {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--text-2);
+}
+
+.auth-link a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: var(--text-3);
+  font-size: 12px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ============ UTILITY ============ */
+.page-content {
+  padding: 16px;
+}
+
+.page-content-no-pad {
+  padding: 0;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-8 {
+  gap: 8px;
+}
+
+.gap-12 {
+  gap: 12px;
+}
+
+.gap-16 {
+  gap: 16px;
+}
+
+.mt-8 {
+  margin-top: 8px;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+.mb-16 {
+  margin-bottom: 16px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-2);
+  margin-top: 4px;
+}
+
+/* ============ TABS ============ */
+.tabs {
+  display: flex;
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  margin-bottom: 16px;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  border: none;
+  background: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tab.active {
+  background: var(--surface);
+  color: var(--text-1);
+}
+
+/* ============ BADGE ============ */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.badge-today {
+  background: rgba(232,84,122,0.15);
+  color: var(--accent);
+}
+
+.badge-soon {
+  background: rgba(251,191,36,0.15);
+  color: var(--warning);
+}
+
+/* ============ CHAT INPUT ============ */
+.chat-input-bar {
+  position: sticky;
+  bottom: 0;
+  background: #0d0d0d;
+  border-top: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.chat-input-bar input {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  color: var(--text-1);
+  font-size: 14px;
+}
+
+.chat-input-bar input:focus {
+  border-color: var(--accent);
+}
+
+.chat-input-bar button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ============ PRAYER CARD ============ */
+.prayer-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.prayer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.prayer-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.prayer-icon.faith { background: #e8547a22; color: #e8547a; }
+.prayer-icon.family { background: #7c3aed22; color: #a78bfa; }
+.prayer-icon.health { background: #4ade8022; color: #4ade80; }
+.prayer-icon.work { background: #fbbf2422; color: #fbbf24; }
+.prayer-icon.general { background: #2563eb22; color: #60a5fa; }
+
+.prayer-title {
+  font-weight: 600;
+  font-size: 14px;
+  flex: 1;
+}
+
+.prayer-progress-text {
+  font-size: 12px;
+  color: var(--text-2);
+  margin-top: 6px;
+}
+
+.prayer-today {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-2);
+  margin-top: 8px;
+}
+
+.prayer-today .prayed { color: var(--success); }
+.prayer-today .not-prayed { color: var(--text-3); }
+
+.prayer-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* ============ GOAL CARD ============ */
+.goal-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.goal-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.goal-date {
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.goal-progress-btns {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.goal-progress-btns button {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-10 { background: #e8547a22; color: var(--accent); }
+.btn-25 { background: #7c3aed22; color: #a78bfa; }
+.btn-complete { background: #4ade8022; color: var(--success); }
+
+/* ============ DATE CARD ============ */
+.date-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.date-info {
+  flex: 1;
+}
+
+.date-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.date-type {
+  font-size: 12px;
+  color: var(--text-2);
+  margin-top: 2px;
+}
+
+/* ============ LINK PAGE ============ */
+.link-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.link-card .link-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.link-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.link-card p {
+  font-size: 13px;
+  color: var(--text-2);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+/* ============ PROFILE ============ */
+.profile-header {
+  text-align: center;
+  padding: 24px 16px;
+}
+
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e8547a, #c73f63);
+  color: #fff;
+  font-weight: 700;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+}
+
+.profile-name {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.profile-email {
+  font-size: 13px;
+  color: var(--text-2);
+  margin-top: 4px;
+}
+
+/* ============ MORE PAGE ============ */
+.more-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.more-item:active {
+  background: #161616;
+}
+
+.more-item .more-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.more-item .more-text {
+  font-size: 14px;
+  font-weight: 500;
+  flex: 1;
+}
+
+.more-item .more-arrow {
+  color: var(--text-3);
+  font-size: 14px;
+}
+
+/* ============ LOADING ============ */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  color: var(--text-3);
+  font-size: 14px;
+}
+
+.loading::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-left: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============ PRAYER ANSWER ============ */
+.answer-section {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.answer-section .section-label {
+  padding: 0;
+}

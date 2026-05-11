@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Rincón de Fe y Amor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="auth-page" id="app">
+    <div class="auth-logo">
+      <div class="logo-icon">🙏</div>
+      <h1>Rincón de Fe y Amor</h1>
+      <p>Un espacio para crecer juntos en oración</p>
+    </div>
+    <div class="auth-form" id="authForm">
+      <div class="input-group">
+        <label class="input-label">Correo electrónico</label>
+        <input class="input-field" type="email" id="emailInput" placeholder="tu@correo.com" autocomplete="email">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Contraseña</label>
+        <input class="input-field" type="password" id="passwordInput" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn-primary w-full" id="loginBtn">Iniciar sesión</button>
+      <div class="auth-link">
+        ¿No tienes cuenta? <a href="register.html">Regístrate</a>
+      </div>
+      <div class="auth-link">
+        <a href="recover.html">¿Olvidaste tu contraseña?</a>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/pages/login.js"></script>
+</body>
+</html>
