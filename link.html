@@ -4,20 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Vincular — Rincón de Fe y Amor</title>
+  <meta name="theme-color" content="#e8547a">
+  <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <div class="auth-page" id="app">
     <div class="auth-logo">
-      <div class="logo-icon">💑</div>
+      <div class="logo-icon"><i class="ti ti-heart-handshake"></i></div>
       <h1>Tu espacio espiritual</h1>
       <p>Elige cómo quieres empezar</p>
     </div>
     <div class="auth-form" id="authForm">
       <div class="link-card">
-        <div class="link-icon">🙋</div>
+        <div class="link-icon"><i class="ti ti-user-plus"></i></div>
         <h3>Modo Solo</h3>
         <p>Empieza tu viaje espiritual personal. Lleva registro de tus oraciones, gratitud y metas.</p>
         <button class="btn-primary w-full" id="soloBtn">Comenzar solo</button>
@@ -26,7 +29,7 @@
       <div class="auth-divider">O</div>
 
       <div class="link-card">
-        <div class="link-icon">💞</div>
+        <div class="link-icon"><i class="ti ti-hearts"></i></div>
         <h3>Crear espacio en pareja</h3>
         <p>Crea un espacio para ti y tu pareja. Recibirás un código para compartir.</p>
         <input class="input-field" type="text" id="spaceNameInput" placeholder="Nombre de la pareja (ej. Luismi & Lía)" style="margin-bottom:10px">
@@ -34,7 +37,7 @@
       </div>
 
       <div class="link-card">
-        <div class="link-icon">🔗</div>
+        <div class="link-icon"><i class="ti ti-link"></i></div>
         <h3>Unirme a mi pareja</h3>
         <p>¿Tu pareja ya creó el espacio? Ingresa el código para unirte.</p>
         <input class="input-field" type="text" id="codeInput" placeholder="Código de 6 letras" style="margin-bottom:10px;text-transform:uppercase;letter-spacing:2px" maxlength="6">

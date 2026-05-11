@@ -53,7 +53,7 @@ const VERSES = [
 
 function showToast(msg, type) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
+  t.innerHTML = msg;
   t.className = 'toast ' + type + ' show';
   setTimeout(() => t.classList.remove('show'), 2500);
 }
@@ -77,17 +77,17 @@ function timeAgo(dateStr) {
 
 function getActivityIcon(type) {
   const map = {
-    prayer: { icon: '🙏', cls: 'prayer' },
-    gratitude: { icon: '✨', cls: 'gratitude' },
-    encouragement: { icon: '💬', cls: 'message' },
-    message: { icon: '💬', cls: 'message' },
-    goal: { icon: '🎯', cls: 'goal' },
-    date: { icon: '📅', cls: 'date' },
-    streak: { icon: '🔥', cls: 'streak' },
-    space_created: { icon: '💑', cls: 'date' },
-    space_joined: { icon: '🔗', cls: 'date' }
+    prayer: { icon: '<i class="ti ti-heart"></i>', cls: 'prayer' },
+    gratitude: { icon: '<i class="ti ti-star"></i>', cls: 'gratitude' },
+    encouragement: { icon: '<i class="ti ti-message-2"></i>', cls: 'message' },
+    message: { icon: '<i class="ti ti-message-2"></i>', cls: 'message' },
+    goal: { icon: '<i class="ti ti-target"></i>', cls: 'goal' },
+    date: { icon: '<i class="ti ti-calendar"></i>', cls: 'date' },
+    streak: { icon: '<i class="ti ti-flame"></i>', cls: 'streak' },
+    space_created: { icon: '<i class="ti ti-hearts"></i>', cls: 'date' },
+    space_joined: { icon: '<i class="ti ti-link"></i>', cls: 'date' }
   };
-  return map[type] || { icon: '📌', cls: 'prayer' };
+  return map[type] || { icon: '<i class="ti ti-pin"></i>', cls: 'prayer' };
 }
 
 function getTodayStr() {
@@ -137,7 +137,7 @@ async function loadPage(userId, space) {
   const todayDate = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
   document.getElementById('headerDate').textContent = todayDate.charAt(0).toUpperCase() + todayDate.slice(1);
 
-  let html = '';
+  let html = '<h2 class="sr-only">Dashboard — actividad reciente, racha de oración y versículo del día</h2>';
 
   if (verse) {
     html += `
@@ -163,12 +163,15 @@ async function loadPage(userId, space) {
           </div>
           <div style="flex:1"></div>
           <div class="streak-hearts">
-            <span${!todayMark ? ' class="heart-inactive"' : ''}>❤️</span>
-            ${space.mode === 'couple' ? `<span${!partnerMarked ? ' class="heart-inactive"' : ''}>❤️</span>` : ''}
+            <span${!todayMark ? ' class="heart-inactive"' : ''}><i class="ti ti-heart" style="font-size:22px"></i></span>
+            ${space.mode === 'couple' ? `<span${!partnerMarked ? ' class="heart-inactive"' : ''}><i class="ti ti-heart" style="font-size:22px"></i></span>` : ''}
+            <span class="separator">·</span>
+            <span class="check-icon">${todayMark ? '<i class="ti ti-check" style="color:var(--success)"></i>' : '<i class="ti ti-clock"></i>'}</span>
           </div>
         </div>
-        ${space.mode === 'couple' ? `<div style="font-size:12px;color:var(--text-3);margin-top:4px">${userName} ${todayMark ? '✅' : '⏳'} & ${partnerName} ${partnerMarked ? '✅' : '⏳'}</div>` : ''}
-        <div class="streak-verse">"El amor es paciente, es bondadoso..." — 1 Corintios 13:4</div>
+        ${space.mode === 'couple' ? `<div style="font-size:12px;color:var(--text-3);margin-top:4px">${userName} ${todayMark ? '<i class="ti ti-check" style="color:var(--success)"></i>' : '<i class="ti ti-clock"></i>'} & ${partnerName} ${partnerMarked ? '<i class="ti ti-check" style="color:var(--success)"></i>' : '<i class="ti ti-clock"></i>'}</div>` : ''}
+        <div class="streak-verse">— 1 Corintios 13:4 · El amor es paciente, es bondadoso...</div>
+        <a href="https://www.biblegateway.com/passage/?search=1+Corintios+13&version=RVR1960" target="_blank" class="streak-link">Leer capítulo completo <i class="ti ti-arrow-right" style="font-size:11px"></i></a>
       </div>
     </div>
   `;
@@ -177,7 +180,7 @@ async function loadPage(userId, space) {
 
   html += `
     <button class="btn-pray ${prayedToday ? 'done' : ''}" id="prayBtn" ${prayedToday ? 'disabled' : ''}>
-      ${prayedToday ? '🙏 Ya oraste hoy 👏' : '❤️ Oramos hoy'}
+      ${prayedToday ? '<i class="ti ti-check" style="font-size:18px"></i> Ya oraste hoy <i class="ti ti-celebration"></i>' : '<i class="ti ti-heart" style="font-size:18px"></i> Oramos hoy'}
     </button>
   `;
 
@@ -187,10 +190,13 @@ async function loadPage(userId, space) {
     alertCount++;
     html += `
       <div style="padding:0 16px;margin-bottom:8px">
-        <div class="alert-card">
-          <div class="alert-icon">🙏</div>
-          <div class="alert-text">Aún no has marcado tu oración de hoy</div>
-          <button class="btn-soft" id="alertPrayBtn">Orar ahora</button>
+        <div class="alert-refined">
+          <div class="alert-icon" style="background:#e8547a22;color:#e8547a"><i class="ti ti-bell"></i></div>
+          <div class="alert-body">
+            <div class="alert-title">¡No has orado hoy!</div>
+            <div class="alert-sub">Mantén tu racha activa</div>
+          </div>
+          <button class="btn-soft" id="alertPrayBtn">ORAR AHORA</button>
         </div>
       </div>
     `;
@@ -212,13 +218,16 @@ async function loadPage(userId, space) {
     let next = new Date(today2.getFullYear(), dateObj.getMonth(), dateObj.getDate());
     if (next <= today2) next.setFullYear(today2.getFullYear() + 1);
     const diff = Math.ceil((next - today2) / 86400000);
-    const text = diff === 0 ? '🎉 ¡Hoy!' : `📅 En ${diff} días`;
+    const text = diff === 0 ? '<i class="ti ti-celebration"></i> ¡Hoy!' : `<i class="ti ti-calendar"></i> En ${diff} días`;
     html += `
       <div style="padding:0 16px;margin-bottom:8px">
-        <div class="alert-card">
-          <div class="alert-icon">📅</div>
-          <div class="alert-text"><strong>${d.title}</strong> ${text}</div>
-          <a href="dates.html" class="btn-soft">Ver</a>
+        <div class="alert-refined">
+          <div class="alert-icon" style="background:#fbbf2422;color:#fbbf24"><i class="ti ti-cake"></i></div>
+          <div class="alert-body">
+            <div class="alert-title">${d.title}</div>
+            <div class="alert-sub">${text} · Planifica algo especial</div>
+          </div>
+          <a href="dates.html" class="btn-soft">VER</a>
         </div>
       </div>
     `;
@@ -235,7 +244,7 @@ async function loadPage(userId, space) {
       html += `
         <div style="padding:0 16px;margin-bottom:8px">
           <div class="activity-card" onclick="window.location.href='gratitude.html'">
-            <div class="activity-icon gratitude">✨</div>
+            <div class="activity-icon gratitude"><i class="ti ti-star"></i></div>
             <div class="activity-info">
               <div class="activity-name">${isMine ? 'Tú' : partnerName}</div>
               <div class="activity-text">${g.text}</div>
@@ -279,7 +288,7 @@ async function loadPage(userId, space) {
   if (activities.length === 0 && gratitudes.length === 0) {
     html += `
       <div class="empty-state">
-        <div class="empty-icon">🌱</div>
+        <div class="empty-icon"><i class="ti ti-seedling" style="font-size:48px;opacity:0.15"></i></div>
         <div class="empty-title">Comienza tu viaje espiritual</div>
         <div class="empty-subtitle">Empieza registrando tus oraciones y gratitudes</div>
       </div>
@@ -340,7 +349,7 @@ async function loadPage(userId, space) {
         }
       }
 
-      showToast('¡Oración registrada! 🙏', 'success');
+      showToast('¡Oración registrada!', 'success');
       await loadPage(userId, space);
     });
   }

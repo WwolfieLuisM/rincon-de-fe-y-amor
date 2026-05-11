@@ -1,16 +1,16 @@
 function showToast(msg, type) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
+  t.innerHTML = msg;
   t.className = 'toast ' + type + ' show';
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
 const CATEGORY_ICONS = {
-  faith: '✝️',
-  family: '👨‍👩‍👧‍👦',
-  health: '💪',
-  work: '💼',
-  general: '🙏'
+  faith: '<i class="ti ti-cross"></i>',
+  family: '<i class="ti ti-users"></i>',
+  health: '<i class="ti ti-heart-plus"></i>',
+  work: '<i class="ti ti-briefcase"></i>',
+  general: '<i class="ti ti-pray"></i>'
 };
 
 const CATEGORY_LABELS = {
@@ -198,11 +198,11 @@ async function loadPage(userId, space) {
           <div class="prayer-progress-text">${progress} / ${p.days_goal} días (${pct}%)</div>
           <div class="prayer-today">
             <span>Hoy:</span>
-            <span class="${todayMark ? 'prayed' : 'not-prayed'}">${todayMark ? '✅ Oraste' : '⏳ Pendiente'}</span>
+            <span class="${todayMark ? 'prayed' : 'not-prayed'}">${todayMark ? '<i class="ti ti-check"></i> Oraste' : '<i class="ti ti-clock"></i> Pendiente'}</span>
           </div>
           <div class="prayer-actions">
             <button class="btn-soft prayer-mark-btn" data-id="${p.id}" ${todayMark ? 'disabled style="opacity:0.4"' : ''}>
-              ${todayMark ? '✓ Oraste hoy' : 'Orar hoy 🙏'}
+              ${todayMark ? '<i class="ti ti-check"></i> Oraste hoy' : 'Orar hoy <i class="ti ti-heart"></i>'}
             </button>
           </div>
         </div>
@@ -221,7 +221,7 @@ async function loadPage(userId, space) {
             <div class="prayer-title" style="text-decoration:line-through;opacity:0.6">${p.title}</div>
           </div>
           ${p.answer_note ? `<div style="font-size:13px;color:var(--text-2);margin-top:6px;font-style:italic">"${p.answer_note}"</div>` : ''}
-          <div style="font-size:12px;color:var(--success);margin-top:6px">✅ Completada</div>
+          <div style="font-size:12px;color:var(--success);margin-top:6px"><i class="ti ti-check"></i> Completada</div>
         </div>
       `;
     });

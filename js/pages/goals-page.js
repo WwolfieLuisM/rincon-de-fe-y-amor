@@ -1,6 +1,6 @@
 function showToast(msg, type) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
+  t.innerHTML = msg;
   t.className = 'toast ' + type + ' show';
   setTimeout(() => t.classList.remove('show'), 2500);
 }
@@ -152,7 +152,7 @@ function renderGoals(goals, userId, space) {
         <div style="display:flex;align-items:flex-start;justify-content:space-between">
           <div>
             <div class="goal-title">${g.title}</div>
-            ${g.target_date ? `<div class="goal-date">📅 ${formatDate(g.target_date)}</div>` : ''}
+            ${g.target_date ? `<div class="goal-date"><i class="ti ti-calendar"></i> ${formatDate(g.target_date)}</div>` : ''}
           </div>
           ${!g.completed ? `<button class="btn-soft goal-del-btn" data-id="${g.id}" style="color:#f87171;border-color:#f8717133">✕</button>` : ''}
         </div>
@@ -169,7 +169,7 @@ function renderGoals(goals, userId, space) {
             <button class="btn-complete goal-complete-btn" data-id="${g.id}">Completar</button>
           </div>
         ` : `
-          <div style="font-size:12px;color:var(--success);margin-top:6px">✅ Completada</div>
+          <div style="font-size:12px;color:var(--success);margin-top:6px"><i class="ti ti-check"></i> Completada</div>
         `}
       </div>
     `;

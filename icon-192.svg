@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="32" fill="#0a0a0a"/>
+  <path d="M96 156s-48-32-48-64c0-16 12-28 28-28 10 0 20 6 20 6s10-6 20-6c16 0 28 12 28 28 0 32-48 64-48 64z" fill="#e8547a"/>
+  <text x="96" y="172" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#888">Rincón de Fe y Amor</text>
+</svg>

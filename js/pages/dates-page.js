@@ -1,6 +1,6 @@
 function showToast(msg, type) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
+  t.innerHTML = msg;
   t.className = 'toast ' + type + ' show';
   setTimeout(() => t.classList.remove('show'), 2500);
 }
@@ -122,7 +122,7 @@ async function loadPage(userId, space) {
   if (items.length === 0) {
     html += `
       <div class="empty-state">
-        <div class="empty-icon">📅</div>
+        <div class="empty-icon"><i class="ti ti-calendar" style="font-size:48px;opacity:0.15"></i></div>
         <div class="empty-title">No hay fechas especiales</div>
         <div class="empty-subtitle">Agrega aniversarios, cumpleaños y más</div>
       </div>
@@ -132,7 +132,7 @@ async function loadPage(userId, space) {
       const days = daysUntilNext(d.date);
       let badge = '';
       if (days === 0) {
-        badge = '<span class="badge badge-today">🎉 ¡Hoy!</span>';
+        badge = '<span class="badge badge-today"><i class="ti ti-celebration"></i> ¡Hoy!</span>';
       } else {
         badge = `<span class="badge badge-soon">En ${days} días</span>`;
       }

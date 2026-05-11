@@ -1,6 +1,6 @@
 function showToast(msg, type) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
+  t.innerHTML = msg;
   t.className = 'toast ' + type + ' show';
   setTimeout(() => t.classList.remove('show'), 2500);
 }
@@ -14,24 +14,24 @@ async function loadPage(userId, space) {
   let html = `
     <div class="page-content">
       <div class="more-item" id="aboutBtn">
-        <div class="more-icon" style="background:#e8547a22;color:#e8547a">🙏</div>
+        <div class="more-icon" style="background:#e8547a22;color:#e8547a"><i class="ti ti-heart"></i></div>
         <div class="more-text">Acerca de</div>
-        <div class="more-arrow">›</div>
+        <div class="more-arrow"><i class="ti ti-chevron-right"></i></div>
       </div>
       <div class="more-item" id="donateBtn">
-        <div class="more-icon" style="background:#fbbf2422;color:#fbbf24">❤️</div>
+        <div class="more-icon" style="background:#fbbf2422;color:#fbbf24"><i class="ti ti-gift"></i></div>
         <div class="more-text">Donativos</div>
-        <div class="more-arrow">›</div>
+        <div class="more-arrow"><i class="ti ti-chevron-right"></i></div>
       </div>
       <div class="more-item" id="shareBtn">
-        <div class="more-icon" style="background:#2563eb22;color:#60a5fa">📤</div>
+        <div class="more-icon" style="background:#2563eb22;color:#60a5fa"><i class="ti ti-share"></i></div>
         <div class="more-text">Compartir app</div>
-        <div class="more-arrow">›</div>
+        <div class="more-arrow"><i class="ti ti-chevron-right"></i></div>
       </div>
       <div class="more-item" id="contactBtn">
-        <div class="more-icon" style="background:#7c3aed22;color:#a78bfa">✉️</div>
+        <div class="more-icon" style="background:#7c3aed22;color:#a78bfa"><i class="ti ti-mail"></i></div>
         <div class="more-text">Contacto</div>
-        <div class="more-arrow">›</div>
+        <div class="more-arrow"><i class="ti ti-chevron-right"></i></div>
       </div>
 
       <div style="text-align:center;margin-top:32px;color:var(--text-3);font-size:12px">

@@ -1,6 +1,6 @@
 function showToast(msg, type) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
+  t.innerHTML = msg;
   t.className = 'toast ' + type + ' show';
   setTimeout(() => t.classList.remove('show'), 2500);
 }
@@ -40,7 +40,7 @@ async function loadPage(userId, space) {
       <div class="profile-avatar">${initial}</div>
       <div class="profile-name">
         <span id="profileNameDisplay">${userName}</span>
-        <button id="editNameBtn" style="background:none;border:none;color:var(--accent);font-size:14px;margin-left:8px;cursor:pointer">✏️</button>
+        <button id="editNameBtn" style="background:none;border:none;color:var(--accent);font-size:14px;margin-left:8px;cursor:pointer" aria-label="Editar nombre"><i class="ti ti-edit"></i></button>
       </div>
       <div class="profile-email">${email}</div>
     </div>
@@ -59,19 +59,19 @@ async function loadPage(userId, space) {
       <div class="grid-2">
         <div class="stat-card">
           <div class="stat-number">${streakCount}</div>
-          <div class="stat-label">Racha 🔥</div>
+          <div class="stat-label"><i class="ti ti-flame"></i> Racha</div>
         </div>
         <div class="stat-card">
           <div class="stat-number">${prayerCount}</div>
-          <div class="stat-label">Oraciones 🙏</div>
+          <div class="stat-label"><i class="ti ti-heart"></i> Oraciones</div>
         </div>
         <div class="stat-card">
           <div class="stat-number">${gratitudeCount}</div>
-          <div class="stat-label">Gratitudes ✨</div>
+          <div class="stat-label"><i class="ti ti-star"></i> Gratitudes</div>
         </div>
         <div class="stat-card">
           <div class="stat-number">${space.mode === 'couple' ? daysTogether : '-'}</div>
-          <div class="stat-label">${space.mode === 'couple' ? 'Días juntos 💑' : 'Modo Solo'}</div>
+          <div class="stat-label">${space.mode === 'couple' ? '<i class="ti ti-hearts"></i> Días juntos' : '<i class="ti ti-user"></i> Modo Solo'}</div>
         </div>
       </div>
 

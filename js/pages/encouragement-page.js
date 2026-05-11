@@ -1,6 +1,6 @@
 function showToast(msg, type) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
+  t.innerHTML = msg;
   t.className = 'toast ' + type + ' show';
   setTimeout(() => t.classList.remove('show'), 2500);
 }
@@ -26,7 +26,7 @@ async function loadPage(userId, space) {
   if (items.length === 0) {
     html += `
       <div class="empty-state">
-        <div class="empty-icon">💬</div>
+        <div class="empty-icon"><i class="ti ti-message-2" style="font-size:48px;opacity:0.15"></i></div>
         <div class="empty-title">Comparte ánimo</div>
         <div class="empty-subtitle">Envía palabras de aliento a tu pareja</div>
       </div>

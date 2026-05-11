@@ -4,8 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Gratitud — Rincón de Fe y Amor</title>
+  <meta name="theme-color" content="#e8547a">
+  <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -19,7 +22,7 @@
   <div id="app" style="padding-bottom:80px"></div>
   <div class="chat-input-bar">
     <input id="gratitudeInput" placeholder="Escribe algo por lo que agradeces..." autocomplete="off">
-    <button id="sendBtn">✈️</button>
+    <button id="sendBtn" aria-label="Enviar"><i class="ti ti-send"></i></button>
   </div>
   <div class="toast" id="toast"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

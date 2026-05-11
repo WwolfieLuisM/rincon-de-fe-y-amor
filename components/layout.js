@@ -45,14 +45,14 @@ window.initLayout = async function () {
   const days = getDaysSince(space.created_at);
 
   const navItems = [
-    { icon: '📊', label: 'Dashboard', href: 'dashboard.html' },
-    { icon: '🙏', label: 'Oraciones', href: 'prayers.html' },
-    { icon: '✨', label: 'Gratitud', href: 'gratitude.html' },
-    { icon: '💬', label: 'Ánimo', href: 'encouragement.html' },
-    { icon: '🎯', label: 'Metas', href: 'goals.html' },
-    { icon: '📅', label: 'Fechas', href: 'dates.html' },
-    { icon: '👤', label: 'Perfil', href: 'profile.html' },
-    { icon: '⚙️', label: 'Más', href: 'more.html' }
+    { icon: '<i class="ti ti-dashboard"></i>', label: 'Dashboard', href: 'dashboard.html' },
+    { icon: '<i class="ti ti-heart"></i>', label: 'Oraciones', href: 'prayers.html' },
+    { icon: '<i class="ti ti-star"></i>', label: 'Gratitud', href: 'gratitude.html' },
+    { icon: '<i class="ti ti-message-2"></i>', label: 'Ánimo', href: 'encouragement.html' },
+    { icon: '<i class="ti ti-target"></i>', label: 'Metas', href: 'goals.html' },
+    { icon: '<i class="ti ti-calendar"></i>', label: 'Fechas', href: 'dates.html' },
+    { icon: '<i class="ti ti-user"></i>', label: 'Perfil', href: 'profile.html' },
+    { icon: '<i class="ti ti-settings"></i>', label: 'Más', href: 'more.html' }
   ];
 
   const currentPath = window.location.pathname.split('/').pop() || 'dashboard.html';
@@ -76,12 +76,12 @@ window.initLayout = async function () {
           ${space.mode === 'couple' ? `<div class="sidebar-avatar">${getInitialsFromName(partnerName)}</div>` : ''}
         </div>
         <div class="sidebar-names">${space.mode === 'couple' ? `${userName} & ${partnerName}` : userName}</div>
-        <div class="sidebar-days">${space.mode === 'couple' ? `🔥 ${days} días juntos` : 'Modo Solo'}</div>
+        <div class="sidebar-days">${space.mode === 'couple' ? `<i class="ti ti-flame" style="font-size:13px"></i> ${days} días juntos` : 'Modo Solo'}</div>
         ${codeHtml}
       </div>
       <div class="sidebar-nav">${navHtml}</div>
       <button class="sidebar-logout" id="logoutBtn">
-        <span class="nav-icon">🚪</span>Cerrar sesión
+        <span class="nav-icon"><i class="ti ti-logout"></i></span>Cerrar sesión
       </button>
     </div>
   `;
