@@ -25,7 +25,14 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   const pendingName = localStorage.getItem('pending_name');
   if (pendingName) {
-    await window.supabase.from('profiles').upsert({ id: userId, name: pendingName });
+    const { data: existingProfile } = await window.supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', userId)
+      .maybeSingle();
+    if (!existingProfile) {
+      await window.supabase.from('profiles').upsert({ id: userId, name: pendingName });
+    }
     localStorage.removeItem('pending_name');
     localStorage.removeItem('pending_email');
   }
@@ -37,10 +44,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     .maybeSingle();
 
   if (existingSpace) {
-    document.getElementById('hasSpaceBtn').style.display = 'block';
-    document.getElementById('goDashboardBtn').addEventListener('click', () => {
-      window.location.href = 'dashboard.html';
-    });
+    window.location.href = 'dashboard.html';
+    return;
   }
 
   document.getElementById('soloBtn').addEventListener('click', async () => {
