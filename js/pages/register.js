@@ -16,6 +16,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const emailInput = document.getElementById('emailInput');
   const passwordInput = document.getElementById('passwordInput');
   const registerBtn = document.getElementById('registerBtn');
+  const magicSentMsg = document.getElementById('magicSentMsg');
 
   registerBtn.addEventListener('click', async () => {
     const name = nameInput.value.trim();
@@ -32,32 +33,23 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
     registerBtn.disabled = true;
-    registerBtn.textContent = 'Creando cuenta...';
+    registerBtn.textContent = 'Enviando enlace...';
 
-    const { data, error } = await window.auth.register(email, password, name);
+    localStorage.setItem('pending_name', name);
+    localStorage.setItem('pending_email', email);
+    localStorage.setItem('pending_password', password);
+
+    const { error } = await window.auth.signInWithMagicLink(email);
     if (error) {
-      console.error('Register error:', error);
+      console.error('Magic link error:', error);
       showToast('Error: ' + (error.message || JSON.stringify(error)), 'error');
       registerBtn.disabled = false;
       registerBtn.textContent = 'Crear cuenta';
       return;
     }
 
-    if (!data?.user) {
-      showToast('Error: No se pudo crear el usuario.', 'error');
-      registerBtn.disabled = false;
-      registerBtn.textContent = 'Crear cuenta';
-      return;
-    }
-
-    if (data?.user?.identities?.length === 0) {
-      showToast('Este correo ya está registrado. Inicia sesión.', 'error');
-      registerBtn.disabled = false;
-      registerBtn.textContent = 'Crear cuenta';
-      return;
-    }
-
-    window.location.href = 'link.html';
+    magicSentMsg.style.display = 'block';
+    showToast('Enlace enviado ✨ revisa tu correo', 'success');
   });
 
   passwordInput.addEventListener('keydown', (e) => {
