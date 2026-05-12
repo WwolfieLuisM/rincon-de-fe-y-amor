@@ -37,9 +37,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (!existingProfile) {
       await window.supabase.from('profiles').upsert({ id: userId, name: pendingName || 'Usuario' });
     }
-    localStorage.removeItem('pending_name');
-    localStorage.removeItem('pending_email');
-    localStorage.removeItem('pending_password');
+
   }
 
   const { data: existingSpace } = await window.supabase
