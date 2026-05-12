@@ -31,7 +31,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   const magicLinkBtn = document.getElementById('magicLinkBtn');
   const magicSentMsg = document.getElementById('magicSentMsg');
 
-  magicLinkBtn.addEventListener('click', async () => {
+  if (!magicLinkBtn) {
+    document.querySelector('.auth-divider')?.remove();
+  } else magicLinkBtn.addEventListener('click', async () => {
     const email = emailInput.value.trim();
     if (!email) {
       showToast('Ingresa tu correo primero', 'error');
