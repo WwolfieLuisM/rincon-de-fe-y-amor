@@ -28,6 +28,21 @@ window.addEventListener('DOMContentLoaded', async () => {
   const loginBtn = document.getElementById('loginBtn');
   const emailInput = document.getElementById('emailInput');
   const passwordInput = document.getElementById('passwordInput');
+  const googleBtn = document.getElementById('googleBtn');
+
+  googleBtn.addEventListener('click', async () => {
+    googleBtn.disabled = true;
+    const { error } = await window.supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: 'https://wwolfieluism.github.io/rincon-de-fe-y-amor'
+      }
+    });
+    if (error) {
+      showToast('Error: ' + error.message, 'error');
+      googleBtn.disabled = false;
+    }
+  });
 
   loginBtn.addEventListener('click', async () => {
     const email = emailInput.value.trim();
