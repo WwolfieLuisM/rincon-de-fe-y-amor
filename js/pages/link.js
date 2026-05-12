@@ -24,17 +24,22 @@ window.addEventListener('DOMContentLoaded', async () => {
   const userId = session.user.id;
 
   const pendingName = localStorage.getItem('pending_name');
-  if (pendingName) {
+  const pendingPassword = localStorage.getItem('pending_password');
+  if (pendingName || pendingPassword) {
+    if (pendingPassword) {
+      await window.supabase.auth.updateUser({ password: pendingPassword });
+    }
     const { data: existingProfile } = await window.supabase
       .from('profiles')
       .select('id')
       .eq('id', userId)
       .maybeSingle();
     if (!existingProfile) {
-      await window.supabase.from('profiles').upsert({ id: userId, name: pendingName });
+      await window.supabase.from('profiles').upsert({ id: userId, name: pendingName || 'Usuario' });
     }
     localStorage.removeItem('pending_name');
     localStorage.removeItem('pending_email');
+    localStorage.removeItem('pending_password');
   }
 
   const { data: existingSpace } = await window.supabase
