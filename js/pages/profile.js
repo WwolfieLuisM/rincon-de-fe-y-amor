@@ -116,48 +116,7 @@ async function loadPage(userId, space) {
     loadPage(userId, space);
   });
 
-  document.getElementById('changePasswordBtn').addEventListener('click', () => {
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay open';
-    overlay.innerHTML = `
-      <div class="modal-sheet">
-        <div class="modal-title">Cambiar contraseña</div>
-        <div class="input-group">
-          <label class="input-label">Nueva contraseña (mín. 6 caracteres)</label>
-          <input class="input-field" type="password" id="newPasswordInput" placeholder="••••••••">
-        </div>
-        <button class="btn-primary w-full" id="savePasswordBtn">Actualizar contraseña</button>
-        <button class="btn-primary w-full" style="background:var(--surface-2);color:var(--text-2);margin-top:8px" id="cancelPasswordBtn">Cancelar</button>
-      </div>
-    `;
-
-    document.body.appendChild(overlay);
-    const sheet = overlay.querySelector('.modal-sheet');
-    setTimeout(() => sheet.style.transform = 'translateX(-50%) translateY(0)', 10);
-
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) overlay.remove();
-    });
-
-    document.getElementById('cancelPasswordBtn').addEventListener('click', () => overlay.remove());
-
-    document.getElementById('savePasswordBtn').addEventListener('click', async () => {
-      const newPassword = document.getElementById('newPasswordInput').value;
-      if (!newPassword || newPassword.length < 6) {
-        showToast('La contraseña debe tener al menos 6 caracteres', 'error');
-        return;
-      }
-
-      const { error } = await window.supabase.auth.updateUser({ password: newPassword });
-      if (error) {
-        showToast('Error: ' + error.message, 'error');
-        return;
-      }
-
-      showToast('Contraseña actualizada ✓', 'success');
-      overlay.remove();
-    });
-  });
+  document.getElementById('changePasswordBtn').addEventListener('click', openChangePasswordModal);
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -168,9 +127,62 @@ window.addEventListener('DOMContentLoaded', async () => {
     .from('spaces')
     .select('*')
     .or(`created_by.eq.${session.user.id},partner_id.eq.${session.user.id}`)
-    .single();
-  if (!space) { window.location.href = 'link.html'; return; }
+    .maybeSingle();
 
-  await initLayout();
-  await loadPage(session.user.id, space);
+  if (space) {
+    await initLayout();
+    await loadPage(session.user.id, space);
+  } else {
+    showPageSlim(session.user.id, session.user.email);
+  }
 });
+
+async function showPageSlim(userId, email) {
+  if (window.initLayout) await initLayout();
+  const avatar = document.getElementById('headerAvatar');
+  if (avatar) avatar.textContent = '?';
+  document.getElementById('app').innerHTML = `
+    <div class="page-content" style="padding-top:80px;text-align:center">
+      <div class="profile-avatar" style="margin:0 auto 12px">?</div>
+      <div style="color:var(--text-2);margin-bottom:24px;font-size:13px">${email}</div>
+      <p style="color:var(--text-3);font-size:13px;margin-bottom:24px">Aún no tienes un espacio. Puedes cambiar tu contraseña y luego crear tu espacio.</p>
+      <div class="more-item" id="changePwSlim" style="margin-bottom:0">
+        <div class="more-icon" style="background:#2563eb22;color:#60a5fa"><i class="ti ti-key"></i></div>
+        <div class="more-text">Cambiar contraseña</div>
+        <div class="more-arrow">›</div>
+      </div>
+      <button class="btn-primary w-full" id="goCreateSpace" style="margin-top:24px">Crear mi espacio</button>
+    </div>
+  `;
+  document.getElementById('changePwSlim').addEventListener('click', () => openChangePasswordModal());
+  document.getElementById('goCreateSpace').addEventListener('click', () => { window.location.href = 'link.html'; });
+}
+
+function openChangePasswordModal() {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay open';
+  overlay.innerHTML = `
+    <div class="modal-sheet">
+      <div class="modal-title">Cambiar contraseña</div>
+      <div class="input-group">
+        <label class="input-label">Nueva contraseña (mín. 6 caracteres)</label>
+        <input class="input-field" type="password" id="newPasswordInput" placeholder="••••••••">
+      </div>
+      <button class="btn-primary w-full" id="savePasswordBtn">Actualizar contraseña</button>
+      <button class="btn-primary w-full" style="background:var(--surface-2);color:var(--text-2);margin-top:8px" id="cancelPasswordBtn">Cancelar</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  const sheet = overlay.querySelector('.modal-sheet');
+  setTimeout(() => sheet.style.transform = 'translateX(-50%) translateY(0)', 10);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+  document.getElementById('cancelPasswordBtn').addEventListener('click', () => overlay.remove());
+  document.getElementById('savePasswordBtn').addEventListener('click', async () => {
+    const pwd = document.getElementById('newPasswordInput').value;
+    if (!pwd || pwd.length < 6) { showToast('Mínimo 6 caracteres', 'error'); return; }
+    const { error } = await window.supabase.auth.updateUser({ password: pwd });
+    if (error) { showToast('Error: ' + error.message, 'error'); return; }
+    showToast('Contraseña actualizada ✓', 'success');
+    overlay.remove();
+  });
+}

@@ -9,21 +9,25 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/styles.css?v=2">
 </head>
 <body>
   <div class="auth-page" id="app">
     <div class="auth-logo">
       <div class="logo-icon"><i class="ti ti-lock"></i></div>
       <h1>Recuperar contraseña</h1>
-      <p>Te enviaremos un enlace para restablecerla</p>
+      <p>Te enviaremos un enlace mágico para acceder y cambiarla</p>
     </div>
     <div class="auth-form" id="authForm">
       <div class="input-group">
         <label class="input-label">Correo electrónico</label>
         <input class="input-field" type="email" id="emailInput" placeholder="tu@correo.com" autocomplete="email">
       </div>
-      <button class="btn-primary w-full" id="recoverBtn">Enviar enlace</button>
+      <button class="btn-primary w-full" id="recoverBtn">Enviar enlace mágico</button>
+      <p id="recoverySentMsg" style="display:none;text-align:center;color:var(--text-3);font-size:13px;margin-top:8px">
+        <i class="ti ti-mail-check" style="color:var(--accent);font-size:16px;vertical-align:middle;margin-right:4px"></i>
+        Revisa tu correo — al hacer clic irás a tu perfil para cambiar la contraseña
+      </p>
       <div class="auth-link">
         <a href="index.html">Volver al inicio de sesión</a>
       </div>
@@ -31,8 +35,8 @@
   </div>
   <div class="toast" id="toast"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="js/supabase.js?v=2"></script>
+  <script src="js/auth.js?v=2"></script>
   <script>
     function showToast(msg, type) {
       const t = document.getElementById('toast');
@@ -44,6 +48,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       const emailInput = document.getElementById('emailInput');
       const recoverBtn = document.getElementById('recoverBtn');
+      const recoverySentMsg = document.getElementById('recoverySentMsg');
 
       recoverBtn.addEventListener('click', async () => {
         const email = emailInput.value.trim();
@@ -55,19 +60,18 @@
         recoverBtn.disabled = true;
         recoverBtn.textContent = 'Enviando...';
 
-        const { error } = await window.supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: window.location.origin + '/index.html'
-        });
+        const { error } = await window.auth.sendRecoveryLink(email);
 
         if (error) {
           showToast('Error: ' + error.message, 'error');
           recoverBtn.disabled = false;
-          recoverBtn.textContent = 'Enviar enlace';
+          recoverBtn.textContent = 'Enviar enlace mágico';
           return;
         }
 
-        showToast('Enlace enviado ✓ Revisa tu correo', 'success');
-        recoverBtn.textContent = 'Enviar enlace';
+        recoverySentMsg.style.display = 'block';
+        showToast('Enlace enviado ✓ revisa tu correo', 'success');
+        recoverBtn.textContent = 'Enviar enlace mágico';
         recoverBtn.disabled = false;
       });
 

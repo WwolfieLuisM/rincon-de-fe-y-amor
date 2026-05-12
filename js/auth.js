@@ -35,6 +35,17 @@ window.auth = {
     return { data, error };
   },
 
+  async sendRecoveryLink(email) {
+    const { data, error } = await window.supabase.auth.signInWithOtp({
+      email,
+      options: {
+        shouldCreateUser: false,
+        emailRedirectTo: 'https://wwolfieluism.github.io/rincon-de-fe-y-amor/profile.html'
+      }
+    });
+    return { data, error };
+  },
+
   async logout() {
     await window.supabase.auth.signOut();
     window.location.href = 'index.html';
