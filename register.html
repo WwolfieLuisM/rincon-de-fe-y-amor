@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
-  <link rel="stylesheet" href="css/styles.css?v=2">
+  <link rel="stylesheet" href="css/styles.css?v=3">
 </head>
 <body>
   <div class="auth-page" id="app">
@@ -36,11 +36,23 @@
         ¿Ya tienes cuenta? <a href="index.html">Inicia sesión</a>
       </div>
     </div>
+    <div class="auth-form" id="successMessage" style="display:none">
+      <div style="text-align:center;padding:2rem 0">
+        <div style="font-size:4rem;margin-bottom:1rem;color:var(--primary)"><i class="ti ti-mail-check"></i></div>
+        <h2>¡Casi listo!</h2>
+        <p style="color:var(--text-secondary);line-height:1.6">
+          Te enviamos un enlace de confirmación a <strong id="successEmail"></strong>.<br><br>
+          Revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta.<br><br>
+          <small style="color:var(--text-muted)">¿No lo encuentras? Revisa la bandeja de spam o correo no deseado.</small>
+        </p>
+      </div>
+      <a href="index.html" class="btn-primary w-full" style="text-align:center;display:block;text-decoration:none">Ir a iniciar sesión</a>
+    </div>
   </div>
   <div class="toast" id="toast"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase.js?v=2"></script>
-  <script src="js/auth.js?v=2"></script>
-  <script src="js/pages/register.js?v=2"></script>
+  <script src="js/supabase.js?v=3"></script>
+  <script src="js/auth.js?v=3"></script>
+  <script src="js/pages/register.js?v=3"></script>
 </body>
 </html>

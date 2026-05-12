@@ -4,17 +4,11 @@ window.auth = {
       email,
       password,
       options: {
+        data: { name },
         emailRedirectTo: 'https://wwolfieluism.github.io/rincon-de-fe-y-amor/link.html'
       }
     });
-    if (error) return { error };
-    if (data?.user) {
-      const { error: profileError } = await window.supabase
-        .from('profiles')
-        .upsert({ id: data.user.id, name });
-      if (profileError) console.error('Profile error:', profileError);
-    }
-    return { data };
+    return { data, error };
   },
 
   async login(email, password) {

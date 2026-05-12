@@ -35,32 +35,18 @@ window.addEventListener('DOMContentLoaded', async () => {
     registerBtn.textContent = 'Creando cuenta...';
 
     const { data, error } = await window.auth.register(email, password, name);
+    registerBtn.disabled = false;
+    registerBtn.textContent = 'Crear cuenta';
+
     if (error) {
-      console.error('Register error:', error);
-      showToast('Error: ' + (error.message || JSON.stringify(error)), 'error');
-      registerBtn.disabled = false;
-      registerBtn.textContent = 'Crear cuenta';
+      showToast('Error: ' + (error.message || 'No se pudo crear la cuenta'), 'error');
       return;
     }
 
-    if (!data?.user) {
-      showToast('Error: No se pudo crear el usuario.', 'error');
-      registerBtn.disabled = false;
-      registerBtn.textContent = 'Crear cuenta';
-      return;
-    }
-
-    if (data?.user?.identities?.length === 0) {
-      showToast('Este correo ya está registrado. Inicia sesión.', 'error');
-      registerBtn.disabled = false;
-      registerBtn.textContent = 'Crear cuenta';
-      return;
-    }
-
-    window.auth.signInWithMagicLink(email).catch(() => {});
-
-    showToast('Cuenta creada ✓', 'success');
-    window.location.href = 'link.html';
+    localStorage.setItem('pendingName', name);
+    document.getElementById('successEmail').textContent = email;
+    document.getElementById('authForm').style.display = 'none';
+    document.getElementById('successMessage').style.display = 'block';
   });
 
   passwordInput.addEventListener('keydown', (e) => {

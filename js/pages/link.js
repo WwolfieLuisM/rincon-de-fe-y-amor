@@ -14,30 +14,20 @@ function generateCode() {
   return code;
 }
 
-window.addEventListener('DOMContentLoaded', async () => {
-  const session = await window.auth.getSession();
-  if (!session) {
-    window.location.href = 'index.html';
-    return;
-  }
-
+async function handleAuthenticated(session) {
   const userId = session.user.id;
 
-  const pendingName = localStorage.getItem('pending_name');
-  const pendingPassword = localStorage.getItem('pending_password');
-  if (pendingName || pendingPassword) {
-    if (pendingPassword) {
-      await window.supabase.auth.updateUser({ password: pendingPassword });
-    }
+  const pendingName = localStorage.getItem('pendingName');
+  if (pendingName) {
     const { data: existingProfile } = await window.supabase
       .from('profiles')
       .select('id')
       .eq('id', userId)
       .maybeSingle();
     if (!existingProfile) {
-      await window.supabase.from('profiles').upsert({ id: userId, name: pendingName || 'Usuario' });
+      await window.supabase.from('profiles').upsert({ id: userId, name: pendingName });
     }
-
+    localStorage.removeItem('pendingName');
   }
 
   const { data: existingSpace } = await window.supabase
@@ -142,4 +132,26 @@ window.addEventListener('DOMContentLoaded', async () => {
     showToast('Te has unido ✓', 'success');
     window.location.href = 'dashboard.html';
   });
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await window.supabase.auth.getSession();
+
+  if (session) {
+    await handleAuthenticated(session);
+    return;
+  }
+
+  window.supabase.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      await handleAuthenticated(session);
+    }
+  });
+
+  setTimeout(async () => {
+    const { data: { session } } = await window.supabase.auth.getSession();
+    if (!session) {
+      window.location.href = 'index.html';
+    }
+  }, 2000);
 });

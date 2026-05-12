@@ -42,7 +42,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     const { data, error } = await window.auth.login(email, password);
     if (error) {
-      showToast('Error: ' + error.message, 'error');
+      showToast('Correo o contraseña incorrectos', 'error');
       loginBtn.disabled = false;
       loginBtn.textContent = 'Iniciar sesión';
       return;
