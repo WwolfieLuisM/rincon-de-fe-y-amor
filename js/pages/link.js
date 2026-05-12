@@ -23,6 +23,13 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   const userId = session.user.id;
 
+  const pendingName = localStorage.getItem('pending_name');
+  if (pendingName) {
+    await window.supabase.from('profiles').upsert({ id: userId, name: pendingName });
+    localStorage.removeItem('pending_name');
+    localStorage.removeItem('pending_email');
+  }
+
   const { data: existingSpace } = await window.supabase
     .from('spaces')
     .select('*')
