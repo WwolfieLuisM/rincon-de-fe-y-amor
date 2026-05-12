@@ -28,20 +28,26 @@ window.addEventListener('DOMContentLoaded', async () => {
   const loginBtn = document.getElementById('loginBtn');
   const emailInput = document.getElementById('emailInput');
   const passwordInput = document.getElementById('passwordInput');
-  const googleBtn = document.getElementById('googleBtn');
+  const magicLinkBtn = document.getElementById('magicLinkBtn');
+  const magicSentMsg = document.getElementById('magicSentMsg');
 
-  googleBtn.addEventListener('click', async () => {
-    googleBtn.disabled = true;
-    const { error } = await window.supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: 'https://wwolfieluism.github.io/rincon-de-fe-y-amor'
-      }
-    });
+  magicLinkBtn.addEventListener('click', async () => {
+    const email = emailInput.value.trim();
+    if (!email) {
+      showToast('Ingresa tu correo primero', 'error');
+      return;
+    }
+    magicLinkBtn.disabled = true;
+    magicLinkBtn.innerHTML = '<i class="ti ti-loader" style="font-size:18px"></i> Enviando...';
+    const { error } = await window.auth.signInWithMagicLink(email);
     if (error) {
       showToast('Error: ' + error.message, 'error');
-      googleBtn.disabled = false;
+      magicLinkBtn.disabled = false;
+      magicLinkBtn.innerHTML = '<i class="ti ti-mail" style="font-size:18px"></i> Enviar enlace mágico';
+      return;
     }
+    magicSentMsg.style.display = 'block';
+    showToast('Enlace enviado ✨ revisa tu correo', 'success');
   });
 
   loginBtn.addEventListener('click', async () => {
