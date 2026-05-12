@@ -28,29 +28,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   const loginBtn = document.getElementById('loginBtn');
   const emailInput = document.getElementById('emailInput');
   const passwordInput = document.getElementById('passwordInput');
-  const magicLinkBtn = document.getElementById('magicLinkBtn');
-  const magicSentMsg = document.getElementById('magicSentMsg');
-
-  if (!magicLinkBtn) {
-    document.querySelector('.auth-divider')?.remove();
-  } else magicLinkBtn.addEventListener('click', async () => {
-    const email = emailInput.value.trim();
-    if (!email) {
-      showToast('Ingresa tu correo primero', 'error');
-      return;
-    }
-    magicLinkBtn.disabled = true;
-    magicLinkBtn.innerHTML = '<i class="ti ti-loader" style="font-size:18px"></i> Enviando...';
-    const { error } = await window.auth.signInWithMagicLink(email);
-    if (error) {
-      showToast('Error: ' + error.message, 'error');
-      magicLinkBtn.disabled = false;
-      magicLinkBtn.innerHTML = '<i class="ti ti-mail" style="font-size:18px"></i> Enviar enlace mágico';
-      return;
-    }
-    magicSentMsg.style.display = 'block';
-    showToast('Enlace enviado ✨ revisa tu correo', 'success');
-  });
 
   loginBtn.addEventListener('click', async () => {
     const email = emailInput.value.trim();
