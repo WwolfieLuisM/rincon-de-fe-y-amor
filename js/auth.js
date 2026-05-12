@@ -1,7 +1,11 @@
 window.auth = {
   async register(email, password, name) {
     const { data, error } = await window.supabase.auth.signUp({
-      email, password
+      email,
+      password,
+      options: {
+        emailRedirectTo: 'https://wwolfieluism.github.io/rincon-de-fe-y-amor/link.html'
+      }
     });
     if (error) return { error };
     if (data?.user) {

@@ -37,7 +37,16 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     const { data, error } = await window.auth.register(email, password, name);
     if (error) {
-      showToast('Error: ' + error.message, 'error');
+      console.error('Register error:', error);
+      showToast('Error: ' + (error.message || JSON.stringify(error)), 'error');
+      registerBtn.disabled = false;
+      registerBtn.textContent = 'Crear cuenta';
+      return;
+    }
+
+    if (!data?.user) {
+      showToast('Error: No se pudo crear el usuario. Revisa consola.', 'error');
+      console.error('Register no user:', JSON.stringify(data));
       registerBtn.disabled = false;
       registerBtn.textContent = 'Crear cuenta';
       return;
