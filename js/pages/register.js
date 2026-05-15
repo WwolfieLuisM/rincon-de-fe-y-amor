@@ -8,42 +8,33 @@ function showToast(msg, type) {
 window.addEventListener('DOMContentLoaded', async () => {
   const session = await window.auth.getSession();
   if (session) {
-    window.location.href = 'link.html';
-    return;
+    await window.supabase.auth.signOut();
   }
 
   const nameInput = document.getElementById('nameInput');
   const emailInput = document.getElementById('emailInput');
-  const passwordInput = document.getElementById('passwordInput');
   const registerBtn = document.getElementById('registerBtn');
 
   registerBtn.addEventListener('click', async () => {
     const name = nameInput.value.trim();
     const email = emailInput.value.trim();
-    const password = passwordInput.value;
 
-    if (!name || !email || !password) {
+    if (!name || !email) {
       showToast('Completa todos los campos', 'error');
-      return;
-    }
-    if (password.length < 6) {
-      showToast('La contraseña debe tener al menos 6 caracteres', 'error');
       return;
     }
 
     registerBtn.disabled = true;
-    registerBtn.textContent = 'Creando cuenta...';
+    registerBtn.textContent = 'Enviando enlace...';
 
-    const { data, error } = await window.auth.register(email, password, name);
+    const { error } = await window.auth.registerViaMagicLink(email, name);
     registerBtn.disabled = false;
-    registerBtn.textContent = 'Crear cuenta';
+    registerBtn.textContent = 'Registrarme';
 
     if (error) {
       showToast('Error: ' + (error.message || 'No se pudo crear la cuenta'), 'error');
       return;
     }
-
-    try { await window.supabase.auth.signOut(); } catch (_) {}
 
     localStorage.setItem('pendingName', name);
     localStorage.setItem('pendingEmail', email);
@@ -52,9 +43,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('confirmationScreen').style.display = 'block';
   });
 
-  passwordInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') registerBtn.click();
-  });
   emailInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') registerBtn.click();
   });

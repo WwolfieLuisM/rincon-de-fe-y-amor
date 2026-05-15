@@ -17,7 +17,7 @@ function generateCode() {
 async function handleAuthenticated(session) {
   const userId = session.user.id;
 
-  const pendingName = localStorage.getItem('pendingName');
+  const pendingName = localStorage.getItem('pendingName') || session.user?.user_metadata?.name;
   if (pendingName) {
     const { data: existingProfile } = await window.supabase
       .from('profiles')
@@ -42,17 +42,24 @@ async function handleAuthenticated(session) {
   }
 
   document.getElementById('soloBtn').addEventListener('click', async () => {
-    const code = generateCode();
-    const { data, error } = await window.supabase
-      .from('spaces')
-      .insert({
-        mode: 'solo',
-        name: 'Espacio Personal',
-        created_by: userId,
-        code: code
-      })
-      .select()
-      .single();
+    let data, error;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const code = generateCode();
+      const result = await window.supabase
+        .from('spaces')
+        .insert({
+          mode: 'solo',
+          name: 'Espacio Personal',
+          created_by: userId,
+          code: code
+        })
+        .select()
+        .single();
+      data = result.data;
+      error = result.error;
+      if (!error) break;
+      if (error.code !== '23505') break;
+    }
 
     if (error) {
       showToast('Error: ' + error.message, 'error');
@@ -70,18 +77,24 @@ async function handleAuthenticated(session) {
       return;
     }
 
-    const code = generateCode();
-
-    const { data, error } = await window.supabase
-      .from('spaces')
-      .insert({
-        mode: 'couple',
-        name: name,
-        created_by: userId,
-        code: code
-      })
-      .select()
-      .single();
+    let data, error;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const code = generateCode();
+      const result = await window.supabase
+        .from('spaces')
+        .insert({
+          mode: 'couple',
+          name: name,
+          created_by: userId,
+          code: code
+        })
+        .select()
+        .single();
+      data = result.data;
+      error = result.error;
+      if (!error) break;
+      if (error.code !== '23505') break;
+    }
 
     if (error) {
       showToast('Error: ' + error.message, 'error');

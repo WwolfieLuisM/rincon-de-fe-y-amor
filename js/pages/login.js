@@ -27,41 +27,34 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   const loginBtn = document.getElementById('loginBtn');
   const emailInput = document.getElementById('emailInput');
-  const passwordInput = document.getElementById('passwordInput');
+  const magicLinkSent = document.getElementById('magicLinkSent');
 
   loginBtn.addEventListener('click', async () => {
     const email = emailInput.value.trim();
-    const password = passwordInput.value;
-    if (!email || !password) {
-      showToast('Completa todos los campos', 'error');
+    if (!email) {
+      showToast('Ingresa tu correo', 'error');
       return;
     }
 
     loginBtn.disabled = true;
-    loginBtn.textContent = 'Iniciando...';
+    loginBtn.textContent = 'Enviando...';
 
-    const { data, error } = await window.auth.login(email, password);
+    const { error } = await window.auth.sendMagicLink(email);
+
     if (error) {
-      showToast('Correo o contraseña incorrectos', 'error');
+      showToast('Error: ' + error.message, 'error');
       loginBtn.disabled = false;
-      loginBtn.textContent = 'Iniciar sesión';
+      loginBtn.textContent = 'Enviar enlace mágico';
       return;
     }
 
-    const { data: space } = await window.supabase
-      .from('spaces')
-      .select('id')
-      .or(`created_by.eq.${data.user.id},partner_id.eq.${data.user.id}`)
-      .maybeSingle();
-
-    if (space) {
-      window.location.href = 'dashboard.html';
-    } else {
-      window.location.href = 'link.html';
-    }
+    magicLinkSent.style.display = 'block';
+    showToast('Enlace enviado ✓ revisa tu correo', 'success');
+    loginBtn.textContent = 'Enviar enlace mágico';
+    loginBtn.disabled = false;
   });
 
-  passwordInput.addEventListener('keydown', (e) => {
+  emailInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') loginBtn.click();
   });
 });

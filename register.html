@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
-  <link rel="stylesheet" href="css/styles.css?v=3">
+  <link rel="stylesheet" href="css/styles.css?v=6">
 </head>
 <body>
   <div class="auth-page" id="app">
@@ -27,11 +27,7 @@
         <label class="input-label">Correo electrónico</label>
         <input class="input-field" type="email" id="emailInput" placeholder="tu@correo.com" autocomplete="email">
       </div>
-      <div class="input-group">
-        <label class="input-label">Contraseña (mín. 6 caracteres)</label>
-        <input class="input-field" type="password" id="passwordInput" placeholder="••••••••" autocomplete="new-password">
-      </div>
-      <button class="btn-primary w-full" id="registerBtn">Crear cuenta</button>
+      <button class="btn-primary w-full" id="registerBtn">Registrarme</button>
       <div class="auth-link">
         ¿Ya tienes cuenta? <a href="index.html">Inicia sesión</a>
       </div>
@@ -41,18 +37,17 @@
         <div style="font-size:4rem;margin-bottom:1rem;color:var(--primary)"><i class="ti ti-mail-check"></i></div>
         <h2>¡Revisa tu correo!</h2>
         <p style="color:var(--text-secondary);line-height:1.6">
-          Enviamos un enlace de confirmación a <strong id="confirmEmail"></strong>.<br><br>
-          Haz clic en él para activar tu cuenta y continuar.<br><br>
+          Enviamos un enlace mágico a <strong id="confirmEmail"></strong>.<br><br>
+          Haz clic en él para acceder a tu espacio.<br><br>
           <small style="color:var(--text-muted)">Si no lo ves, revisa la carpeta de spam.</small>
         </p>
       </div>
-      <a href="index.html" class="btn-primary w-full" style="text-align:center;display:block;text-decoration:none">Ir a iniciar sesión</a>
     </div>
   </div>
   <div class="toast" id="toast"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase.js?v=3"></script>
-  <script src="js/auth.js?v=3"></script>
-  <script src="js/pages/register.js?v=3"></script>
+  <script src="js/supabase.js?v=6"></script>
+  <script src="js/auth.js?v=6"></script>
+  <script src="js/pages/register.js?v=6"></script>
 </body>
 </html>

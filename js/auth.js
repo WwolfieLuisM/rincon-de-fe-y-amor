@@ -1,9 +1,9 @@
 window.auth = {
-  async register(email, password, name) {
-    const { data, error } = await window.supabase.auth.signUp({
+  async registerViaMagicLink(email, name) {
+    const { data, error } = await window.supabase.auth.signInWithOtp({
       email,
-      password,
       options: {
+        shouldCreateUser: true,
         data: { name },
         emailRedirectTo: 'https://wwolfieluism.github.io/rincon-de-fe-y-amor/link.html'
       }
@@ -11,18 +11,10 @@ window.auth = {
     return { data, error };
   },
 
-  async login(email, password) {
-    const { data, error } = await window.supabase.auth.signInWithPassword({
-      email, password
-    });
-    return { data, error };
-  },
-
-  async signInWithMagicLink(email) {
+  async sendMagicLink(email) {
     const { data, error } = await window.supabase.auth.signInWithOtp({
       email,
       options: {
-        shouldCreateUser: true,
         emailRedirectTo: 'https://wwolfieluism.github.io/rincon-de-fe-y-amor/link.html'
       }
     });

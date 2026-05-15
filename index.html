@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
-  <link rel="stylesheet" href="css/styles.css?v=3">
+  <link rel="stylesheet" href="css/styles.css?v=6">
 </head>
 <body>
   <div class="auth-page" id="app">
@@ -23,23 +23,20 @@
         <label class="input-label">Correo electrónico</label>
         <input class="input-field" type="email" id="emailInput" placeholder="tu@correo.com" autocomplete="email">
       </div>
-      <div class="input-group">
-        <label class="input-label">Contraseña</label>
-        <input class="input-field" type="password" id="passwordInput" placeholder="••••••••" autocomplete="current-password">
-      </div>
-      <button class="btn-primary w-full" id="loginBtn">Iniciar sesión</button>
+      <button class="btn-primary w-full" id="loginBtn">Enviar enlace mágico</button>
+      <p id="magicLinkSent" style="display:none;text-align:center;color:var(--text-secondary);font-size:13px;margin-top:12px;line-height:1.5">
+        <i class="ti ti-mail-check" style="color:var(--primary);font-size:18px;vertical-align:middle;margin-right:4px"></i>
+        Revisa tu correo — al hacer clic en el enlace accederás a tu espacio
+      </p>
       <div class="auth-link">
         ¿No tienes cuenta? <a href="register.html">Regístrate</a>
-      </div>
-      <div class="auth-link">
-        <a href="recover.html">¿Olvidaste tu contraseña?</a>
       </div>
     </div>
   </div>
   <div class="toast" id="toast"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase.js?v=3"></script>
-  <script src="js/auth.js?v=3"></script>
-  <script src="js/pages/login.js?v=3"></script>
+  <script src="js/supabase.js?v=6"></script>
+  <script src="js/auth.js?v=6"></script>
+  <script src="js/pages/login.js?v=6"></script>
 </body>
 </html>
