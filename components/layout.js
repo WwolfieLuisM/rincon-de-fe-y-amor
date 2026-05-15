@@ -1,3 +1,11 @@
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.innerHTML = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
 function getDaysSince(createdAt) {
   const s = new Date(createdAt);
   const start = Date.UTC(s.getUTCFullYear(), s.getUTCMonth(), s.getUTCDate());
@@ -62,9 +70,20 @@ window.initLayout = async function () {
     return `<a href="${item.href}" class="${active}"><span class="nav-icon">${item.icon}</span>${item.label}</a>`;
   }).join('');
 
-  let codeHtml = '';
-  if (space.mode === 'couple' && !space.partner_id) {
-    codeHtml = `<div class="sidebar-code">Código: ${space.code}</div>`;
+  let inviteHtml = '';
+  if (!space.partner_id && space.code) {
+    const shareUrl = `https://wwolfieluism.github.io/rincon-de-fe-y-amor/link.html?code=${space.code}`;
+    inviteHtml = `
+      <div class="sidebar-invite">
+        <div class="sidebar-invite-title"><i class="ti ti-user-plus"></i> Invitar a mi pareja</div>
+        <div class="sidebar-invite-code" onclick="navigator.clipboard?.writeText('${space.code}');showToast('Código copiado','success')">
+          Código: <strong>${space.code}</strong> <i class="ti ti-copy"></i>
+        </div>
+        <button class="sidebar-invite-btn" onclick="navigator.clipboard?.writeText('${shareUrl}');showToast('Enlace copiado ✓','success')">
+          <i class="ti ti-share"></i> Compartir enlace
+        </button>
+        <div class="sidebar-invite-hint">Comparte este código con tu pareja para que se una</div>
+      </div>`;
   }
 
   const sidebarHtml = `
@@ -77,7 +96,7 @@ window.initLayout = async function () {
         </div>
         <div class="sidebar-names">${space.mode === 'couple' ? `${userName} & ${partnerName}` : userName}</div>
         <div class="sidebar-days">${space.mode === 'couple' ? `<i class="ti ti-flame" style="font-size:13px"></i> ${days} días juntos` : 'Modo Solo'}</div>
-        ${codeHtml}
+        ${inviteHtml}
       </div>
       <div class="sidebar-nav">${navHtml}</div>
       <button class="sidebar-logout" id="logoutBtn">

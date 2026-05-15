@@ -44,9 +44,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
     localStorage.setItem('pendingName', name);
-    document.getElementById('successEmail').textContent = email;
-    document.getElementById('authForm').style.display = 'none';
-    document.getElementById('successMessage').style.display = 'block';
+    localStorage.setItem('pendingEmail', email);
+    document.getElementById('confirmEmail').textContent = email;
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('confirmationScreen').style.display = 'block';
   });
 
   passwordInput.addEventListener('keydown', (e) => {

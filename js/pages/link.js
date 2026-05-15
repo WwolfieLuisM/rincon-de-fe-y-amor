@@ -42,12 +42,14 @@ async function handleAuthenticated(session) {
   }
 
   document.getElementById('soloBtn').addEventListener('click', async () => {
+    const code = generateCode();
     const { data, error } = await window.supabase
       .from('spaces')
       .insert({
         mode: 'solo',
         name: 'Espacio Personal',
-        created_by: userId
+        created_by: userId,
+        code: code
       })
       .select()
       .single();
@@ -118,9 +120,11 @@ async function handleAuthenticated(session) {
       return;
     }
 
+    const updates = { partner_id: userId };
+    if (space.mode === 'solo') updates.mode = 'couple';
     const { error: updateError } = await window.supabase
       .from('spaces')
-      .update({ partner_id: userId })
+      .update(updates)
       .eq('id', space.id);
 
     if (updateError) {
