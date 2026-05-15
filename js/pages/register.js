@@ -43,6 +43,8 @@ window.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
+    try { await window.supabase.auth.signOut(); } catch (_) {}
+
     localStorage.setItem('pendingName', name);
     localStorage.setItem('pendingEmail', email);
     document.getElementById('confirmEmail').textContent = email;
