@@ -12,17 +12,7 @@ if ('serviceWorker' in navigator) {
 window.addEventListener('DOMContentLoaded', async () => {
   const session = await window.auth.getSession();
   if (session) {
-    const { data: space } = await window.supabase
-      .from('spaces')
-      .select('id')
-      .or(`created_by.eq.${session.user.id},partner_id.eq.${session.user.id}`)
-      .maybeSingle();
-    if (space) {
-      window.location.href = 'dashboard.html';
-    } else {
-      window.location.href = 'link.html';
-    }
-    return;
+    await window.supabase.auth.signOut();
   }
 
   const loginBtn = document.getElementById('loginBtn');
