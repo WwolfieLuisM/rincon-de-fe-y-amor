@@ -6,30 +6,40 @@ window.Devotional = {
     const diff = new Date() - dayStart;
     const dayOfYear = Math.floor(diff / 86400000);
 
-    let { data } = await window.supabase
+    let { data: devotional } = await window.supabase
       .from('devotionals')
-      .select('*, verses(*)')
+      .select('*')
       .eq('is_shared', isShared)
       .eq('day_of_year', dayOfYear);
 
-    if (!isShared && data && data.length > 0) {
-      data = data.find(d => d.time_of_day === timeOfDay) || null;
+    if (!isShared && devotional && devotional.length > 0) {
+      devotional = devotional.find(d => d.time_of_day === timeOfDay) || null;
     } else if (!isShared) {
-      data = null;
+      devotional = null;
     }
 
-    if (!data) {
+    if (!devotional) {
       const { data: fallback } = await window.supabase
         .from('devotionals')
-        .select('*, verses(*)')
+        .select('*')
         .eq('is_shared', isShared)
         .is('day_of_year', null)
         .eq('time_of_day', isShared ? 'any' : timeOfDay)
         .limit(1)
         .maybeSingle();
-      return fallback || null;
+      devotional = fallback || null;
     }
-    return data || null;
+
+    if (devotional && devotional.verse_id) {
+      const { data: verse } = await window.supabase
+        .from('verses')
+        .select('*')
+        .eq('id', devotional.verse_id)
+        .maybeSingle();
+      if (verse) devotional.verses = verse;
+    }
+
+    return devotional || null;
   },
 
   async markAsRead(userId, devotionalId) {
@@ -54,11 +64,22 @@ window.Devotional = {
   async getHistory(userId, limit = 5) {
     const { data } = await window.supabase
       .from('devotional_reads')
-      .select('*, devotionals!inner(*, verses(*))')
+      .select('*, devotionals!inner(*)')
       .eq('user_id', userId)
       .order('read_at', { ascending: false })
       .limit(limit);
-    return data || [];
+    const result = data || [];
+    for (const item of result) {
+      if (item.devotionals && item.devotionals.verse_id) {
+        const { data: verse } = await window.supabase
+          .from('verses')
+          .select('*')
+          .eq('id', item.devotionals.verse_id)
+          .maybeSingle();
+        if (verse) item.devotionals.verses = verse;
+      }
+    }
+    return result;
   },
 
   getTimeLabel() {
