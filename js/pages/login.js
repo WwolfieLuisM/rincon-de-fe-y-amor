@@ -32,7 +32,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const { error } = await window.auth.sendMagicLink(email);
 
     if (error) {
-      showToast('❌ Este correo no está registrado. Regístrate primero', 'error');
+      showToast('❌ ' + error.message, 'error');
       loginBtn.disabled = false;
       loginBtn.textContent = 'Iniciar sesión';
       return;
