@@ -5,10 +5,6 @@ function showToast(msg, type) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
-}
-
 window.addEventListener('DOMContentLoaded', async () => {
   const session = await window.auth.getSession();
   if (session) {

@@ -1,3 +1,7 @@
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
 window.auth = {
   async registerViaMagicLink(email, name) {
     const { data, error } = await window.supabase.auth.signInWithOtp({
