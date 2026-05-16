@@ -52,23 +52,18 @@
           <p>Un espacio para crecer juntos en oración</p>
         </div>
         <div class="auth-form" id="authForm">
-          <div class="testament-tabs" style="margin-bottom:16px">
-            <button class="active" id="loginTabMagic">Enlace mágico</button>
-            <button id="loginTabPw">Contraseña</button>
-          </div>
           <div class="input-group">
             <label class="input-label">Correo electrónico</label>
             <input class="input-field" type="email" id="emailInput" placeholder="tu@correo.com" autocomplete="email">
           </div>
-          <div class="input-group" id="pwGroupLogin" style="display:none">
+          <div class="input-group">
             <label class="input-label">Contraseña</label>
             <input class="input-field" type="password" id="passwordInput" placeholder="••••••••" autocomplete="current-password">
           </div>
           <button class="btn-primary w-full" id="loginBtn">Iniciar sesión</button>
-          <p id="magicLinkSent" style="display:none;text-align:center;color:var(--text-secondary);font-size:13px;margin-top:12px;line-height:1.5">
-            <i class="ti ti-mail-check" style="color:var(--primary);font-size:18px;vertical-align:middle;margin-right:4px"></i>
-            Revisa tu correo — al hacer clic en el enlace accederás a tu espacio
-          </p>
+          <div class="auth-link">
+            <a href="recover.html">¿Olvidaste tu contraseña?</a>
+          </div>
           <div class="auth-link">
             ¿No tienes cuenta? <a href="register.html">Regístrate</a>
           </div>
@@ -86,6 +81,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js?v=7"></script>
   <script src="js/auth.js?v=9"></script>
-  <script src="js/pages/login.js?v=11"></script>
+  <script src="js/pages/login.js?v=12"></script>
 </body>
 </html>
