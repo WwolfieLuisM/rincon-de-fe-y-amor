@@ -36,13 +36,13 @@ window.addEventListener('DOMContentLoaded', async () => {
         || error.code === 'user_not_found';
       showToast(notFound ? '❌ Este correo no está registrado. Regístrate primero' : 'Error: ' + error.message, 'error');
       loginBtn.disabled = false;
-      loginBtn.textContent = 'Enviar enlace mágico';
+      loginBtn.textContent = 'Iniciar sesión';
       return;
     }
 
     magicLinkSent.style.display = 'block';
     showToast('Enlace enviado ✓ revisa tu correo', 'success');
-    loginBtn.textContent = 'Enviar enlace mágico';
+    loginBtn.textContent = 'Iniciar sesión';
     loginBtn.disabled = false;
   });
 
