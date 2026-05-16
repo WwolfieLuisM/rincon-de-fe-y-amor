@@ -776,6 +776,20 @@ textarea.input-field {
   background: url('../img/login-bg.png') center / cover no-repeat;
 }
 
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: url('../img/dashboard-bg.png') center / cover no-repeat;
+}
+
+.app-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.55);
+}
+
 /* ============ AUTH PAGES ============ */
 .auth-page {
   position: relative;

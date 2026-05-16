@@ -25,6 +25,8 @@ function getInitialsFromName(name) {
 }
 
 window.initLayout = async function () {
+  (document.querySelector('.app-bg') || document.body.insertAdjacentHTML('afterbegin', '<div class="app-bg"></div>'));
+
   const session = await window.auth.getSession();
   if (!session) return;
 
