@@ -124,29 +124,16 @@ window.streakService = {
   },
 
   async getSharedVerse() {
-    const day = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
     const { data: dbVerses } = await window.supabase
       .from('verses')
-      .select('*');
+      .select('*')
+      .eq('mood', 'positive');
     if (dbVerses && dbVerses.length > 0) {
+      const day = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
       const idx = day % dbVerses.length;
       return dbVerses[idx];
     }
-    try {
-      const idxRes = await fetch('data/biblia/index.json');
-      const index = await idxRes.json();
-      const book = index[day % index.length];
-      const bkRes = await fetch('data/biblia/' + book.key + '.json');
-      const chapters = await bkRes.json();
-      const ch = chapters[day % chapters.length];
-      const v = ch[day % ch.length];
-      return {
-        reference: book.shortTitle + ' ' + (day % chapters.length + 1) + ':' + (day % ch.length + 1),
-        text: v
-      };
-    } catch (e) {
-      return null;
-    }
+    return null;
   },
 
   calculateShields(count) {

@@ -53,7 +53,6 @@ async function loadPage(userId, space) {
   const shieldsAtLevel = window.streakService.calculateShields(count);
   const userMarked = todayMarks.includes(userId);
   const partnerMarked = space.mode === 'couple' ? todayMarks.length >= 2 : true;
-  const anyMarked = todayMarks.length > 0;
 
   const nextMilestone = [7, 30, 100, 365, 1000].find(m => count < m) || count + 1;
   const progressToNext = count > 0 ? (count / nextMilestone) * 100 : 0;
@@ -103,42 +102,40 @@ async function loadPage(userId, space) {
     for (let i = 0; i < usedShields; i++) shieldIcons.push('<span class="shield-icon shield-used">🛡️</span>');
     const nextLevel = shieldsAtLevel === 0 ? 10 : shieldsAtLevel === 1 ? 100 : shieldsAtLevel === 5 ? 1000 : null;
 
-    html += `
+    html += `<div class="section-label">Escudos</div>
       <div style="padding:0 16px;margin-bottom:12px">
-        <div class="streak-section-card">
-          <div class="streak-section-title">🛡️ Escudos disponibles</div>
+        <div class="activity-card">
           <div class="streak-shields">${shieldIcons.length > 0 ? shieldIcons.join('') : '<span style="color:var(--text-3);font-size:14px">Sin escudos aún</span>'}</div>
-          ${nextLevel ? `<div class="streak-section-sub">Siguiente nivel en ${nextLevel} días</div>` : '<div class="streak-section-sub">¡Nivel máximo! 🏆</div>'}
+          ${nextLevel ? `<div style="font-size:12px;color:var(--text-3);margin-top:6px">Siguiente nivel en ${nextLevel} días</div>` : '<div style="font-size:12px;color:var(--text-3);margin-top:6px">¡Nivel máximo! 🏆</div>'}
         </div>
       </div>
     `;
 
-    html += `
+    html += `<div class="section-label">Mejor racha</div>
       <div style="padding:0 16px;margin-bottom:12px">
-        <div class="streak-section-card">
-          <div class="streak-section-title">🏆 Mejor racha histórica</div>
+        <div class="activity-card">
           <div class="streak-best-number">${best} <span class="streak-best-label">días</span></div>
         </div>
       </div>
     `;
 
-    html += `
+    html += `<div class="section-label">Devocional compartido</div>
       <div style="padding:0 16px;margin-bottom:12px">
-        <div class="streak-section-card">
-          <div class="streak-section-title">📖 Devocional compartido</div>
+        <div class="activity-card">
           ${verse ? `
-            <div class="streak-verse-text">${verse.text}</div>
-            <div class="streak-verse-ref">— ${verse.reference}</div>
-          ` : '<div class="streak-section-sub">Cargando...</div>'}
+            <div style="display:flex;flex-direction:column;gap:4px;width:100%">
+              <div style="font-size:14px;color:var(--accent);font-weight:500">${verse.reference}</div>
+              <div style="font-size:14px;color:rgba(255,255,255,0.75);line-height:1.6;font-style:italic">"${verse.text}"</div>
+            </div>
+          ` : '<div style="font-size:13px;color:var(--text-3)">Cargando...</div>'}
         </div>
       </div>
     `;
   }
 
-  html += `
+  html += `<div class="section-label">Historial (7 días)</div>
     <div style="padding:0 16px;margin-bottom:12px">
-      <div class="streak-section-card">
-        <div class="streak-section-title">📅 Historial (7 días)</div>
+      <div class="activity-card">
         <div class="streak-history-grid">
           ${history.map(h => {
             const dayName = new Date(h.date + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'short' }).charAt(0).toUpperCase() + new Date(h.date + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'short' }).slice(1,3);

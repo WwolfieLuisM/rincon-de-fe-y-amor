@@ -102,7 +102,8 @@ async function loadVerse() {
 
   const { data: dbVerses } = await window.supabase
     .from('verses')
-    .select('*');
+    .select('*')
+    .eq('mood', 'positive');
   if (dbVerses && dbVerses.length > 0) {
     const idx = day % dbVerses.length;
     return dbVerses[idx];
