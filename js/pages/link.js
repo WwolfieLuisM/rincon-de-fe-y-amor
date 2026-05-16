@@ -77,9 +77,9 @@ async function handleAuthenticated(session) {
       return;
     }
 
-    let data, error;
+    let data, error, code;
     for (let attempt = 0; attempt < 5; attempt++) {
-      const code = generateCode();
+      code = generateCode();
       const result = await window.supabase
         .from('spaces')
         .insert({
