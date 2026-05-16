@@ -2231,7 +2231,7 @@ textarea.input-field {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: url('../img/palabra-bg.png') center / cover no-repeat;
+  background: url('../img/devocional-bg.png') center / cover no-repeat;
 }
 
 .devocional-bg::after {
