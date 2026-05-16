@@ -85,7 +85,8 @@ function getActivityIcon(type) {
     date: { icon: '<i class="ti ti-calendar"></i>', cls: 'date' },
     streak: { icon: '<i class="ti ti-flame"></i>', cls: 'streak' },
     space_created: { icon: '<i class="ti ti-hearts"></i>', cls: 'date' },
-    space_joined: { icon: '<i class="ti ti-link"></i>', cls: 'date' }
+    space_joined: { icon: '<i class="ti ti-link"></i>', cls: 'date' },
+    bible_read: { icon: '<i class="ti ti-book"></i>', cls: 'message' }
   };
   return map[type] || { icon: '<i class="ti ti-pin"></i>', cls: 'prayer' };
 }
@@ -269,6 +270,7 @@ async function loadPage(userId, space) {
       else if (a.module === 'encouragement') link = 'encouragement.html';
       else if (a.module === 'goals') link = 'goals.html';
       else if (a.module === 'dates') link = 'dates.html';
+      else if (a.module === 'bible') link = 'palabra.html';
 
       html += `
         <div style="padding:0 16px;margin-bottom:8px">

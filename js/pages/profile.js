@@ -24,15 +24,19 @@ async function loadPage(userId, space) {
   const userName = window.currentUser?.name || 'Usuario';
   const initial = userName.charAt(0).toUpperCase();
 
-  const [streakRes, prayerMarksRes, gratitudeRes] = await Promise.all([
+  const [streakRes, prayerMarksRes, gratitudeRes, bibleProgressRes, bibleFavRes] = await Promise.all([
     window.supabase.from('streak').select('count').eq('space_id', space.id).maybeSingle(),
     window.supabase.from('prayer_marks').select('id', { count: 'exact' }).eq('user_id', userId),
-    window.supabase.from('gratitude').select('id', { count: 'exact' }).eq('user_id', userId)
+    window.supabase.from('gratitude').select('id', { count: 'exact' }).eq('user_id', userId),
+    window.supabase.from('reading_progress').select('id', { count: 'exact' }).eq('user_id', userId).eq('space_id', space.id),
+    window.supabase.from('bible_favorites').select('id', { count: 'exact' }).eq('user_id', userId).eq('space_id', space.id)
   ]);
 
   const streakCount = streakRes.data?.count || 0;
   const prayerCount = prayerMarksRes.count || 0;
   const gratitudeCount = gratitudeRes.count || 0;
+  const bibleReadCount = bibleProgressRes.count || 0;
+  const bibleFavCount = bibleFavRes.count || 0;
   const daysTogether = space.mode === 'couple' ? getDaysSince(space.created_at) : 0;
 
   let html = `
@@ -87,12 +91,17 @@ async function loadPage(userId, space) {
       </div>
       ` : ''}
 
-      <div class="section-label" style="padding:0;margin-top:24px">Cuenta</div>
-      <div class="more-item" id="changePasswordBtn" style="margin-bottom:0">
+      <div class="section-label" style="padding:0;margin-top:24px">La Palabra</div>
+      <div style="padding:0 0 4px;font-size:13px;color:var(--text-2)">${bibleReadCount} capítulos leídos</div>
+      <div style="padding:0 0 8px;font-size:13px;color:var(--text-2)">${bibleFavCount} favoritos</div>
+      <a href="palabra.html" class="btn-primary w-full" style="display:block;text-align:center;padding:10px;text-decoration:none;margin-bottom:12px"><i class="ti ti-book"></i> Leer la Biblia</a>
+
+      <!-- div class="section-label" style="padding:0;margin-top:24px">Cuenta</div -->
+      <!-- div class="more-item" id="changePasswordBtn" style="margin-bottom:0">
         <div class="more-icon" style="background:#2563eb22;color:#60a5fa">🔑</div>
         <div class="more-text">Cambiar contraseña</div>
         <div class="more-arrow">›</div>
-      </div>
+      </div -->
     </div>
   `;
 
@@ -128,7 +137,7 @@ async function loadPage(userId, space) {
     loadPage(userId, space);
   });
 
-  document.getElementById('changePasswordBtn').addEventListener('click', openChangePasswordModal);
+  // document.getElementById('changePasswordBtn').addEventListener('click', openChangePasswordModal);
 
   const joinBtn = document.getElementById('joinPartnerBtn');
   const joinInput = document.getElementById('joinCodeInput');
@@ -241,16 +250,16 @@ async function showPageSlim(userId, email) {
     <div class="page-content" style="padding-top:80px;text-align:center">
       <div class="profile-avatar" style="margin:0 auto 12px">?</div>
       <div style="color:var(--text-2);margin-bottom:24px;font-size:13px">${email}</div>
-      <p style="color:var(--text-3);font-size:13px;margin-bottom:24px">Aún no tienes un espacio. Puedes cambiar tu contraseña y luego crear tu espacio.</p>
-      <div class="more-item" id="changePwSlim" style="margin-bottom:0">
+      <p style="color:var(--text-3);font-size:13px;margin-bottom:24px">Aún no tienes un espacio. Crea tu espacio para comenzar.</p>
+      <!-- div class="more-item" id="changePwSlim" style="margin-bottom:0">
         <div class="more-icon" style="background:#2563eb22;color:#60a5fa"><i class="ti ti-key"></i></div>
         <div class="more-text">Cambiar contraseña</div>
         <div class="more-arrow">›</div>
-      </div>
+      </div -->
       <button class="btn-primary w-full" id="goCreateSpace" style="margin-top:24px">Crear mi espacio</button>
     </div>
   `;
-  document.getElementById('changePwSlim').addEventListener('click', () => openChangePasswordModal());
+  // document.getElementById('changePwSlim').addEventListener('click', () => openChangePasswordModal());
   document.getElementById('goCreateSpace').addEventListener('click', () => { window.location.href = 'link.html'; });
 }
 
