@@ -447,4 +447,46 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   await initLayout();
   await loadPage(session.user.id, space);
+  initInstallBanner();
+});
+
+// PWA Install Banner
+let deferredPrompt = null;
+
+function initInstallBanner() {
+  if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+    document.getElementById('installBanner').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('installBtn').addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      document.getElementById('installBanner').style.display = 'none';
+      localStorage.setItem('pwa_installed', 'true');
+      showToast('¡App instalada! 🎉 Ábrela desde tu pantalla de inicio', 'success');
+    }
+    deferredPrompt = null;
+  });
+
+  document.getElementById('dismissInstall').addEventListener('click', () => {
+    document.getElementById('installBanner').style.display = 'none';
+    localStorage.setItem('pwa_dismissed', 'true');
+  });
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  const dismissed = localStorage.getItem('pwa_dismissed');
+  const installed = localStorage.getItem('pwa_installed');
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone;
+
+  if (!dismissed && !installed && !isStandalone) {
+    document.getElementById('installBanner').style.display = 'block';
+  }
 });

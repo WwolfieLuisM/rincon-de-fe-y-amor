@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
-  <link rel="stylesheet" href="css/styles.css?v=15">
+  <link rel="stylesheet" href="css/styles.css?v=16">
   <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 </head>
 <body>
@@ -23,12 +23,25 @@
   </div>
   <div id="app"></div>
   <div class="toast" id="toast"></div>
+  <div id="installBanner" class="install-banner" style="display:none">
+    <div class="install-banner-content">
+      <div class="install-banner-left">
+        <div class="install-icon">📲</div>
+        <div>
+          <div class="install-title">Instalar app</div>
+          <div class="install-sub">Accede más rápido desde tu pantalla de inicio</div>
+        </div>
+      </div>
+      <button id="installBtn" class="install-btn">Instalar</button>
+      <button id="dismissInstall" class="install-dismiss">✕</button>
+    </div>
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js?v=5"></script>
   <script src="js/auth.js?v=11"></script>
   <script src="js/devotional.js?v=1"></script>
   <script src="js/streak.js?v=2"></script>
   <script src="components/layout.js?v=11"></script>
-  <script src="js/pages/dashboard.js?v=10"></script>
+  <script src="js/pages/dashboard.js?v=11"></script>
 </body>
 </html>
