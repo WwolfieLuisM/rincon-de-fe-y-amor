@@ -779,7 +779,7 @@ textarea.input-field {
 .app-bg {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: -1;
   background: url('../img/dashboard-bg.png') center / cover no-repeat;
 }
 
@@ -883,6 +883,62 @@ textarea.input-field {
   flex: 1;
   height: 1px;
   background: var(--border);
+}
+
+/* ============ WELCOME ============ */
+.welcome-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.welcome-text {
+  color: var(--text-2);
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.welcome-features {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.welcome-feature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-2);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.welcome-feature i {
+  color: var(--accent);
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.welcome-credit {
+  color: var(--text-3);
+  font-size: 12px;
+  text-align: center;
+}
+
+.welcome-body .btn-primary {
+  margin-top: 4px;
+}
+
+#loginScreen {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ============ UTILITY ============ */
