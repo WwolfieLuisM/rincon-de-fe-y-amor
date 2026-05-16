@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>La Palabra — Rincón de Fe y Amor</title>
+  <meta name="theme-color" content="#e8547a">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="css/styles.css?v=3">
+  <style>
+    .palabra-bg {
+      position: fixed; top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: url('img/palabra-bg.png') center/cover no-repeat;
+      z-index: -1;
+    }
+    .reader-card {
+      background: rgba(10,10,10,0.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 20px;
+      margin: 0 16px 80px;
+      max-width: 600px;
+    }
+    .reader-card .book-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .reader-card .book-selector select {
+      flex: 1;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      appearance: none;
+      cursor: pointer;
+    }
+    .reader-card .book-selector select option {
+      background: #1a1a2e;
+      color: #fff;
+    }
+    .reader-card .chapter-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .reader-card .chapter-nav select {
+      flex: 1;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      appearance: none;
+      cursor: pointer;
+    }
+    .reader-card .chapter-nav select option {
+      background: #1a1a2e;
+      color: #fff;
+    }
+    .reader-card .chapter-nav button {
+      background: rgba(232,84,122,0.2);
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #e8547a;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .reader-card .chapter-nav button:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+    .reader-card .chapter-nav button:not(:disabled):hover {
+      background: rgba(232,84,122,0.35);
+    }
+    .reader-card .chapter-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .reader-card .progress-bar-wrap {
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      height: 6px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .reader-card .progress-bar-fill {
+      height: 100%;
+      background: #e8547a;
+      border-radius: 10px;
+      transition: width 0.3s;
+    }
+    .reader-card .progress-text {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .reader-card .verse {
+      padding: 8px 12px;
+      border-radius: 10px;
+      margin-bottom: 4px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      transition: background 0.2s;
+    }
+    .reader-card .verse:hover {
+      background: rgba(255,255,255,0.05);
+    }
+    .reader-card .verse-num {
+      font-size: 11px;
+      font-weight: 600;
+      color: #e8547a;
+      min-width: 24px;
+      text-align: right;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .reader-card .verse-text {
+      font-size: 15px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.9);
+      flex: 1;
+    }
+    .reader-card .verse-fav {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.25);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 2px 4px;
+      transition: color 0.2s;
+      flex-shrink: 0;
+    }
+    .reader-card .verse-fav:hover {
+      color: #e8547a;
+    }
+    .reader-card .verse-fav.favorited {
+      color: #e8547a;
+    }
+    .reader-card .mark-read-btn {
+      display: block;
+      width: 100%;
+      background: rgba(232,84,122,0.2);
+      border: 1px solid rgba(232,84,122,0.3);
+      border-radius: 12px;
+      padding: 12px;
+      color: #e8547a;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: background 0.2s;
+      text-align: center;
+      font-family: inherit;
+    }
+    .reader-card .mark-read-btn:hover {
+      background: rgba(232,84,122,0.35);
+    }
+    .reader-card .mark-read-btn.done {
+      background: rgba(34,197,94,0.2);
+      border-color: rgba(34,197,94,0.3);
+      color: #22c55e;
+    }
+    .reader-card .empty-select {
+      text-align: center;
+      padding: 40px 0;
+      color: rgba(255,255,255,0.4);
+      font-size: 14px;
+    }
+    .testament-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .testament-tabs button {
+      flex: 1;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 10px;
+      color: rgba(255,255,255,0.5);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .testament-tabs button.active {
+      background: rgba(232,84,122,0.2);
+      border-color: rgba(232,84,122,0.3);
+      color: #e8547a;
+    }
+    .reader-card .welcome-msg {
+      text-align: center;
+      padding: 30px 0;
+    }
+    .reader-card .welcome-msg .icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.3;
+    }
+    .reader-card .welcome-msg .title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .reader-card .welcome-msg .sub {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="palabra-bg"></div>
+  <div class="header">
+    <button id="menuBtn">☰</button>
+    <div class="header-center">La Palabra</div>
+    <div class="header-right">
+      <div class="avatar-small" id="headerAvatar">?</div>
+    </div>
+  </div>
+  <div id="app" style="padding-top:80px;display:flex;flex-direction:column;align-items:center"></div>
+  <div class="toast" id="toast"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js?v=8"></script>
+  <script src="components/layout.js?v=8"></script>
+  <script src="js/pages/palabra-page.js?v=1"></script>
+</body>
+</html>
