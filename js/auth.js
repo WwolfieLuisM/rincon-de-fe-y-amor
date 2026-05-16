@@ -15,6 +15,7 @@ window.auth = {
     const { data, error } = await window.supabase.auth.signInWithOtp({
       email,
       options: {
+        shouldCreateUser: false,
         emailRedirectTo: 'https://wwolfieluism.github.io/rincon-de-fe-y-amor/link.html'
       }
     });
