@@ -75,6 +75,18 @@ async function loadPage(userId, space) {
         </div>
       </div>
 
+      ${space.mode === 'solo' && !space.partner_id && space.code ? `
+      <div class="section-label" style="padding:0;margin-top:24px">Espacio</div>
+      <div style="padding:0 0 8px;font-size:13px;color:var(--text-2)">Modo Solo · Código: <strong style="letter-spacing:2px;color:var(--accent)">${space.code}</strong> <i class="ti ti-copy" style="cursor:pointer;font-size:14px" onclick="navigator.clipboard.writeText('${space.code}');showToast('Código copiado','success')"></i></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text-1)">¿Unirte a tu pareja?</div>
+        <div class="input-group">
+          <input class="input-field" id="joinCodeInput" placeholder="Código de 6 letras" style="text-transform:uppercase;letter-spacing:2px" maxlength="6">
+        </div>
+        <button class="btn-primary w-full" id="joinPartnerBtn">Unirme</button>
+      </div>
+      ` : ''}
+
       <div class="section-label" style="padding:0;margin-top:24px">Cuenta</div>
       <div class="more-item" id="changePasswordBtn" style="margin-bottom:0">
         <div class="more-icon" style="background:#2563eb22;color:#60a5fa">🔑</div>
@@ -117,6 +129,90 @@ async function loadPage(userId, space) {
   });
 
   document.getElementById('changePasswordBtn').addEventListener('click', openChangePasswordModal);
+
+  const joinBtn = document.getElementById('joinPartnerBtn');
+  const joinInput = document.getElementById('joinCodeInput');
+  if (joinBtn && joinInput) {
+    joinBtn.addEventListener('click', async () => {
+      const code = joinInput.value.trim().toUpperCase();
+      if (!code || code.length !== 6) {
+        showToast('Ingresa un código válido de 6 letras', 'error');
+        return;
+      }
+
+      joinBtn.disabled = true;
+      joinBtn.textContent = 'Buscando...';
+
+      const { data: targetSpace, error: findError } = await window.supabase
+        .from('spaces')
+        .select('*')
+        .eq('code', code)
+        .maybeSingle();
+
+      if (findError || !targetSpace) {
+        showToast('Código inválido. Verifica e intenta de nuevo.', 'error');
+        joinBtn.disabled = false;
+        joinBtn.textContent = 'Unirme';
+        return;
+      }
+
+      if (targetSpace.partner_id) {
+        showToast('Este espacio ya tiene pareja', 'error');
+        joinBtn.disabled = false;
+        joinBtn.textContent = 'Unirme';
+        return;
+      }
+
+      if (targetSpace.id === space.id) {
+        showToast('Este es tu propio espacio', 'error');
+        joinBtn.disabled = false;
+        joinBtn.textContent = 'Unirme';
+        return;
+      }
+
+      joinBtn.textContent = 'Eliminando espacio actual...';
+      await window.supabase.from('activity').delete().eq('space_id', space.id);
+      await window.supabase.from('prayer_marks').delete().eq('space_id', space.id);
+      await window.supabase.from('prayers').delete().eq('space_id', space.id);
+      await window.supabase.from('streak_marks').delete().eq('space_id', space.id);
+      await window.supabase.from('streak').delete().eq('space_id', space.id);
+      await window.supabase.from('gratitude').delete().eq('space_id', space.id);
+      await window.supabase.from('encouragement').delete().eq('space_id', space.id);
+      await window.supabase.from('goals').delete().eq('space_id', space.id);
+      await window.supabase.from('special_dates').delete().eq('space_id', space.id);
+      const { error: delError } = await window.supabase.from('spaces').delete().eq('id', space.id);
+
+      if (delError) {
+        showToast('Error al eliminar espacio: ' + delError.message, 'error');
+        joinBtn.disabled = false;
+        joinBtn.textContent = 'Unirme';
+        return;
+      }
+
+      joinBtn.textContent = 'Uniéndote...';
+      const updates = { partner_id: userId };
+      if (targetSpace.mode === 'solo') updates.mode = 'couple';
+      const { error: updateError } = await window.supabase
+        .from('spaces')
+        .update(updates)
+        .eq('id', targetSpace.id);
+
+      if (updateError) {
+        showToast('Error al unirte: ' + updateError.message, 'error');
+        joinBtn.disabled = false;
+        joinBtn.textContent = 'Unirme';
+        return;
+      }
+
+      await window.auth.logActivity(targetSpace.id, userId, 'space_joined', 'Se unió al espacio', 'profile');
+      showToast('Te has unido ✓', 'success');
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+    });
+
+    joinInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') joinBtn.click();
+    });
+  }
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
