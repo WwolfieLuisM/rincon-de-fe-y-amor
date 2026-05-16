@@ -1,4 +1,4 @@
-const CACHE = 'rincon-fe-v4';
+const CACHE = 'rincon-fe-v5';
 const STATIC = [
   '/rincon-de-fe-y-amor/',
   '/rincon-de-fe-y-amor/index.html',
