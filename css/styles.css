@@ -1717,6 +1717,8 @@ textarea.input-field {
   background: var(--accent);
   color: #fff;
   border: none;
+  -webkit-appearance: none;
+  appearance: none;
   font-size: 22px;
   display: flex;
   align-items: center;

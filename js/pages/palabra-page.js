@@ -234,12 +234,6 @@ async function onBookSelect(key, goTo) {
   html += '<div id="versesContainer"></div>';
   html += '<button class="mark-read-btn" id="markReadBtn">Marcar como leído</button>';
   html += '</div>';
-  html += '<div id="selectBar" class="select-bar" style="display:none">';
-  html += '<span id="selectCount">0 seleccionados</span>';
-  html += '<div style="display:flex;gap:8px">';
-  html += '<button id="copySelectedBtn" class="btn-soft"><i class="ti ti-copy"></i> Copiar</button>';
-  html += '<button id="cancelSelectBtn" class="btn-soft" style="background:transparent;border:1px solid var(--border)">Cancelar</button>';
-  html += '</div></div>';
 
   document.getElementById('app').innerHTML = html;
 
