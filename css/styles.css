@@ -819,6 +819,20 @@ textarea.input-field {
   background: rgba(10, 10, 10, 0.55);
 }
 
+.goals-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: url('../img/goals-bg.png') center / cover no-repeat;
+}
+
+.goals-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.55);
+}
+
 /* ============ AUTH PAGES ============ */
 .auth-page {
   position: relative;
