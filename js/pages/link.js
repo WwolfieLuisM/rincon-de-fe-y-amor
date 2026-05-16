@@ -39,8 +39,9 @@ async function handleAuthenticated(session) {
 
   const { data: existingSpace } = await window.supabase
     .from('spaces')
-    .select('*')
+    .select('id')
     .or(`created_by.eq.${userId},partner_id.eq.${userId}`)
+    .limit(1)
     .maybeSingle();
 
   if (existingSpace) {
@@ -48,7 +49,19 @@ async function handleAuthenticated(session) {
     return;
   }
 
+  async function checkExistingAndRedirect() {
+    const { data: s } = await window.supabase
+      .from('spaces')
+      .select('id')
+      .or(`created_by.eq.${userId},partner_id.eq.${userId}`)
+      .limit(1)
+      .maybeSingle();
+    if (s) { window.location.href = 'dashboard.html'; return true; }
+    return false;
+  }
+
   document.getElementById('soloBtn').addEventListener('click', async () => {
+    if (await checkExistingAndRedirect()) return;
     let data, error;
     for (let attempt = 0; attempt < 5; attempt++) {
       const code = generateCode();
@@ -83,6 +96,7 @@ async function handleAuthenticated(session) {
   });
 
   document.getElementById('createCoupleBtn').addEventListener('click', async () => {
+    if (await checkExistingAndRedirect()) return;
     const name = document.getElementById('spaceNameInput').value.trim();
     if (!name) {
       showToast('Ingresa un nombre para la pareja', 'error');

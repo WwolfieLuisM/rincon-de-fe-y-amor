@@ -38,6 +38,8 @@ window.initLayout = async function () {
     .from('spaces')
     .select('*')
     .or(`created_by.eq.${userId},partner_id.eq.${userId}`)
+    .order('created_at', { ascending: false })
+    .limit(1)
     .maybeSingle();
   if (!space) return;
   window.currentSpace = space;

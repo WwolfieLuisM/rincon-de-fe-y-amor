@@ -384,6 +384,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     .from('spaces')
     .select('*')
     .or(`created_by.eq.${session.user.id},partner_id.eq.${session.user.id}`)
+    .order('created_at', { ascending: false })
+    .limit(1)
     .maybeSingle();
   if (!space) { window.location.href = 'link.html'; return; }
 
