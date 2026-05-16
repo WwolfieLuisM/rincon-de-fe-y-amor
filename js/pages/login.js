@@ -32,7 +32,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     const { error } = await window.auth.sendMagicLink(email);
 
     if (error) {
-      showToast('Error: ' + error.message, 'error');
+      const notFound = error.message?.toLowerCase().includes('not found')
+        || error.code === 'user_not_found';
+      showToast(notFound ? '❌ Este correo no está registrado. Regístrate primero' : 'Error: ' + error.message, 'error');
       loginBtn.disabled = false;
       loginBtn.textContent = 'Enviar enlace mágico';
       return;
