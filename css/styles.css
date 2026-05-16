@@ -1459,3 +1459,167 @@ textarea.input-field {
 .activity-info .activity-name {
   display: inline;
 }
+
+/* ============ BIBLE READER (LA PALABRA) ============ */
+.reader-card {
+  padding: 20px 16px;
+}
+
+.reader-card .chapter-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.reader-card .chapter-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.reader-card .chapter-nav select {
+  flex: 1;
+  background: var(--surface);
+  color: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+  appearance: auto;
+}
+
+.reader-card .chapter-nav button {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.reader-card .chapter-nav button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.reader-card .chapter-nav button:not(:disabled):hover {
+  border-color: var(--accent);
+}
+
+.reader-card .verse {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.reader-card .verse:last-child {
+  border-bottom: none;
+}
+
+.reader-card .verse-num {
+  font-size: 11px;
+  color: var(--accent);
+  opacity: 0.6;
+  min-width: 22px;
+  text-align: right;
+  padding-top: 3px;
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+.reader-card .verse .verse-text {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.85);
+  font-style: normal;
+}
+
+.reader-card .verse-fav {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.2);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 4px;
+  flex-shrink: 0;
+  transition: color 0.15s, transform 0.15s;
+  line-height: 1;
+}
+
+.reader-card .verse-fav:hover {
+  color: #e8547a;
+  transform: scale(1.15);
+}
+
+.reader-card .verse-fav.favorited {
+  color: #e8547a;
+}
+
+.reader-card .mark-read-btn {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 10px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.reader-card .mark-read-btn:hover {
+  opacity: 0.85;
+}
+
+.reader-card .mark-read-btn.done {
+  background: #2a5a3a;
+  opacity: 0.8;
+  cursor: default;
+}
+
+.reader-card .mark-read-btn:active {
+  transform: scale(0.98);
+}
+
+.reader-card .search-input-wrap {
+  margin-bottom: 12px;
+}
+
+.reader-card .search-input-wrap input {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.reader-card .search-input-wrap input::placeholder {
+  color: rgba(255,255,255,0.3);
+}
+
+.reader-card .search-input-wrap input:focus {
+  border-color: var(--accent);
+}
+
+.reader-card .search-count {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 8px;
+}

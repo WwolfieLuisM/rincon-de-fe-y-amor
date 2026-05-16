@@ -98,13 +98,31 @@ function getTodayStr() {
 
 async function loadVerse() {
   const day = getDayOfYear();
+
   const { data: dbVerses } = await window.supabase
     .from('verses')
     .select('*');
+  if (dbVerses && dbVerses.length > 0) {
+    const idx = day % dbVerses.length;
+    return dbVerses[idx];
+  }
 
-  let verses = dbVerses && dbVerses.length > 0 ? dbVerses : VERSES;
-  const idx = day % verses.length;
-  return verses[idx];
+  try {
+    const idxRes = await fetch('data/biblia/index.json');
+    const index = await idxRes.json();
+    const book = index[day % index.length];
+    const bkRes = await fetch('data/biblia/' + book.key + '.json');
+    const chapters = await bkRes.json();
+    const ch = chapters[day % chapters.length];
+    const v = ch[day % ch.length];
+    return {
+      reference: book.shortTitle + ' ' + (day % chapters.length + 1) + ':' + (day % ch.length + 1),
+      text: v
+    };
+  } catch (e) {
+    const idx = day % VERSES.length;
+    return { reference: VERSES[idx].ref, text: VERSES[idx].text };
+  }
 }
 
 async function loadPage(userId, space) {

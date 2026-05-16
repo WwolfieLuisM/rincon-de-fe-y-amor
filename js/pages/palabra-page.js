@@ -2,6 +2,8 @@ let bibleIndex = [];
 let currentBook = null;
 let currentChapters = [];
 let currentChapter = 0;
+let currentVerses = [];
+let searchTerm = '';
 let readMap = {};
 let favSet = new Set();
 let userId = null;
@@ -157,6 +159,8 @@ async function onBookSelect(key) {
   html += '<button id="nextChapBtn"' + (chapterCount <= 1 ? ' disabled' : '') + '><i class="ti ti-chevron-right"></i></button>';
   html += '</div>';
 
+  html += '<div class="search-input-wrap"><input type="text" id="searchInput" placeholder="Buscar en este capítulo..."></div>';
+  html += '<div class="search-count" id="searchCount"></div>';
   html += '<div id="versesContainer"></div>';
   html += '<button class="mark-read-btn" id="markReadBtn">Marcar como leído</button>';
   html += '</div>';
@@ -165,20 +169,24 @@ async function onBookSelect(key) {
 
   document.getElementById('chapterSelect').addEventListener('change', (e) => {
     currentChapter = parseInt(e.target.value);
+    searchTerm = '';
+    const si = document.getElementById('searchInput');
+    if (si) si.value = '';
     renderChapter();
   });
   document.getElementById('prevChapBtn').addEventListener('click', () => {
-    const sel = document.getElementById('chapterSelect');
-    if (sel.selectedIndex > 0) { sel.selectedIndex--; sel.dispatchEvent(new Event('change')); }
+    if (currentChapter > 1) { currentChapter--; searchTerm = ''; const si = document.getElementById('searchInput'); if (si) si.value = ''; renderChapter(); }
   });
   document.getElementById('nextChapBtn').addEventListener('click', () => {
-    const sel = document.getElementById('chapterSelect');
-    if (sel.selectedIndex < sel.options.length - 1) { sel.selectedIndex++; sel.dispatchEvent(new Event('change')); }
+    if (currentChapter < currentChapters.length) { currentChapter++; searchTerm = ''; const si = document.getElementById('searchInput'); if (si) si.value = ''; renderChapter(); }
   });
   document.getElementById('markReadBtn').addEventListener('click', toggleMarkRead);
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    searchTerm = e.target.value.trim();
+    renderChapter();
+  });
 
   currentChapter = 1;
-  document.getElementById('chapterSelect').value = '1';
   renderChapter();
 }
 
@@ -187,11 +195,12 @@ function renderChapter() {
   const idx = currentChapter - 1;
   const verses = currentChapters[idx];
   if (!verses) return;
+  currentVerses = verses;
 
   const sel = document.getElementById('chapterSelect');
   const prevBtn = document.getElementById('prevChapBtn');
   const nextBtn = document.getElementById('nextChapBtn');
-  if (sel) sel.value = currentChapter;
+  if (sel) { sel.value = currentChapter; }
   if (prevBtn) prevBtn.disabled = currentChapter <= 1;
   if (nextBtn) nextBtn.disabled = currentChapter >= currentChapters.length;
 
@@ -203,10 +212,23 @@ function renderChapter() {
     markBtn.classList.toggle('done', isRead);
   }
 
+  const filtered = searchTerm
+    ? verses.filter(v => v.toLowerCase().includes(searchTerm.toLowerCase()))
+    : verses;
+
+  const countEl = document.getElementById('searchCount');
+  if (countEl) {
+    countEl.textContent = searchTerm
+      ? filtered.length + ' de ' + verses.length + ' versículos'
+      : '';
+  }
+
   let html = '<div class="chapter-title">' + getBookFullTitle(currentBook) + ' ' + currentChapter + '</div>';
 
-  verses.forEach((text, i) => {
-    const vNum = i + 1;
+  filtered.forEach((text, i) => {
+    const vNum = searchTerm
+      ? verses.indexOf(text) + 1
+      : i + 1;
     const key2 = currentBook.key + ':' + currentChapter + ':' + vNum;
     const isFav = favSet.has(key2);
     html += '<div class="verse">';
