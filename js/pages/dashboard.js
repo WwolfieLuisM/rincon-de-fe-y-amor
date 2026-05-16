@@ -193,7 +193,7 @@ async function loadPage(userId, space) {
   if (verse) {
     html += `
       <div style="padding:16px">
-        <div class="verse-card">
+        <div class="verse-card" onclick="window.location.href='devocional.html'" style="cursor:pointer">
           ${timeLabel ? `<div class="verse-greeting">${timeLabel.label} ${timeLabel.icon}</div>` : ''}
           <div class="verse-quote">"</div>
           <div class="verse-text">${verse.text}</div>
