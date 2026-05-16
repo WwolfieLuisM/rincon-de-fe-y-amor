@@ -9,38 +9,41 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
-  <link rel="stylesheet" href="css/styles.css?v=6">
+  <link rel="stylesheet" href="css/styles.css?v=7">
 </head>
 <body>
+  <div class="auth-bg"></div>
   <div class="auth-page" id="app">
-    <div class="auth-logo">
-      <div class="logo-icon"><i class="ti ti-heart"></i></div>
-      <h1>Crear cuenta</h1>
-      <p>Únete a Rincón de Fe y Amor</p>
-    </div>
-    <div class="auth-form" id="registerForm">
-      <div class="input-group">
-        <label class="input-label">Nombre</label>
-        <input class="input-field" type="text" id="nameInput" placeholder="Tu nombre" autocomplete="name">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="logo-icon"><i class="ti ti-heart"></i></div>
+        <h1>Crear cuenta</h1>
+        <p>Únete a Rincón de Fe y Amor</p>
       </div>
-      <div class="input-group">
-        <label class="input-label">Correo electrónico</label>
-        <input class="input-field" type="email" id="emailInput" placeholder="tu@correo.com" autocomplete="email">
+      <div class="auth-form" id="registerForm">
+        <div class="input-group">
+          <label class="input-label">Nombre</label>
+          <input class="input-field" type="text" id="nameInput" placeholder="Tu nombre" autocomplete="name">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Correo electrónico</label>
+          <input class="input-field" type="email" id="emailInput" placeholder="tu@correo.com" autocomplete="email">
+        </div>
+        <button class="btn-primary w-full" id="registerBtn">Registrarme</button>
+        <div class="auth-link">
+          ¿Ya tienes cuenta? <a href="index.html">Inicia sesión</a>
+        </div>
       </div>
-      <button class="btn-primary w-full" id="registerBtn">Registrarme</button>
-      <div class="auth-link">
-        ¿Ya tienes cuenta? <a href="index.html">Inicia sesión</a>
-      </div>
-    </div>
-    <div class="auth-form" id="confirmationScreen" style="display:none">
-      <div style="text-align:center;padding:2rem 0">
-        <div style="font-size:4rem;margin-bottom:1rem;color:var(--primary)"><i class="ti ti-mail-check"></i></div>
-        <h2>¡Revisa tu correo!</h2>
-        <p style="color:var(--text-secondary);line-height:1.6">
-          Enviamos un enlace mágico a <strong id="confirmEmail"></strong>.<br><br>
-          Haz clic en él para acceder a tu espacio.<br><br>
-          <small style="color:var(--text-muted)">Si no lo ves, revisa la carpeta de spam.</small>
-        </p>
+      <div class="auth-form" id="confirmationScreen" style="display:none">
+        <div style="text-align:center;padding:2rem 0">
+          <div style="font-size:4rem;margin-bottom:1rem;color:var(--primary)"><i class="ti ti-mail-check"></i></div>
+          <h2>¡Revisa tu correo!</h2>
+          <p style="color:var(--text-secondary);line-height:1.6">
+            Enviamos un enlace mágico a <strong id="confirmEmail"></strong>.<br><br>
+            Haz clic en él para acceder a tu espacio.<br><br>
+            <small style="color:var(--text-muted)">Si no lo ves, revisa la carpeta de spam.</small>
+          </p>
+        </div>
       </div>
     </div>
   </div>
