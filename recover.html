@@ -12,24 +12,27 @@
   <link rel="stylesheet" href="css/styles.css?v=12">
 </head>
 <body>
+  <div class="auth-bg"></div>
   <div class="auth-page" id="app">
-    <div class="auth-logo">
-      <div class="logo-icon"><i class="ti ti-lock"></i></div>
-      <h1>Recuperar contraseña</h1>
-      <p>Te enviaremos un enlace mágico para acceder y cambiarla</p>
-    </div>
-    <div class="auth-form" id="authForm">
-      <div class="input-group">
-        <label class="input-label">Correo electrónico</label>
-        <input class="input-field" type="email" id="emailInput" placeholder="tu@correo.com" autocomplete="email">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="logo-icon"><i class="ti ti-lock"></i></div>
+        <h1>Recuperar contraseña</h1>
+        <p>Te enviaremos un enlace mágico para acceder y cambiarla</p>
       </div>
-      <button class="btn-primary w-full" id="recoverBtn">Enviar enlace mágico</button>
-      <p id="recoverySentMsg" style="display:none;text-align:center;color:var(--text-3);font-size:13px;margin-top:8px">
-        <i class="ti ti-mail-check" style="color:var(--accent);font-size:16px;vertical-align:middle;margin-right:4px"></i>
-        Revisa tu correo — al hacer clic irás a tu perfil para cambiar la contraseña
-      </p>
-      <div class="auth-link">
-        <a href="index.html">Volver al inicio de sesión</a>
+      <div class="auth-form" id="authForm">
+        <div class="input-group">
+          <label class="input-label">Correo electrónico</label>
+          <input class="input-field" type="email" id="emailInput" placeholder="tu@correo.com" autocomplete="email">
+        </div>
+        <button class="btn-primary w-full" id="recoverBtn">Enviar enlace mágico</button>
+        <p id="recoverySentMsg" style="display:none;text-align:center;color:var(--text-3);font-size:13px;margin-top:8px">
+          <i class="ti ti-mail-check" style="color:var(--accent);font-size:16px;vertical-align:middle;margin-right:4px"></i>
+          Revisa tu correo — al hacer clic irás a tu perfil para cambiar la contraseña
+        </p>
+        <div class="auth-link">
+          <a href="index.html">Volver al inicio de sesión</a>
+        </div>
       </div>
     </div>
   </div>
