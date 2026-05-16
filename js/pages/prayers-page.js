@@ -349,6 +349,7 @@ function renderCompletedPrayers(prayers) {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
+  document.querySelector('.prayers-bg') || document.body.insertAdjacentHTML('afterbegin', '<div class="prayers-bg"></div>');
   const { data: { session } } = await window.supabase.auth.getSession();
   if (!session) { window.location.href = 'index.html'; return; }
 
