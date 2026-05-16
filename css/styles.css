@@ -79,6 +79,17 @@ input, textarea, select {
   line-height: 1;
 }
 
+.back-btn {
+  background: none;
+  border: none;
+  color: var(--text-2);
+  font-size: 26px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  font-weight: 300;
+}
+
 .header-center {
   font-size: 15px;
   font-weight: 600;
@@ -1860,4 +1871,316 @@ textarea.input-field {
   font-size: 14px;
   color: rgba(255,255,255,0.75);
   line-height: 1.5;
+}
+
+/* ============ STREAK PAGE (RACHA) ============ */
+.streak-hero-card {
+  background: linear-gradient(135deg, #1a0a0f 0%, #111 50%, #0a0a0a 100%);
+  border: 1px solid #e8547a33;
+  border-radius: 20px;
+  padding: 32px 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.streak-hero-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 50% 30%, rgba(232,84,122,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.streak-hero-ring {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 8px;
+}
+
+.streak-hero-ring svg {
+  width: 100%;
+  height: 100%;
+}
+
+.streak-hero-number {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  transition: transform 0.3s ease;
+}
+
+.streak-hero-number.pulse {
+  animation: streakPulse 0.5s ease;
+}
+
+@keyframes streakPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.streak-hero-label {
+  font-size: 16px;
+  color: var(--text-2);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.streak-user-chips {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.streak-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 100px;
+  padding: 6px 14px 6px 6px;
+  transition: all 0.2s;
+}
+
+.streak-chip.marked {
+  border-color: #e8547a44;
+  background: rgba(232,84,122,0.08);
+}
+
+.chip-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.chip-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e0e0e0;
+}
+
+.chip-heart {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.streak-btn-pray {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 20px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 16px;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.streak-btn-pray:active:not(:disabled) {
+  background: var(--accent-dark);
+  transform: scale(0.98);
+}
+
+.streak-btn-pray.done {
+  background: rgba(74,222,128,0.1);
+  color: var(--success);
+  border: 1px solid #4ade8033;
+  cursor: default;
+}
+
+.streak-section-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.streak-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #e0e0e0;
+  margin-bottom: 10px;
+}
+
+.streak-section-sub {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 6px;
+}
+
+.streak-shields {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.shield-icon {
+  font-size: 24px;
+  line-height: 1;
+  transition: transform 0.2s;
+}
+
+.shield-active {
+  filter: drop-shadow(0 0 6px rgba(251,191,36,0.5));
+}
+
+.shield-used {
+  opacity: 0.25;
+  filter: grayscale(1);
+}
+
+.streak-best-number {
+  font-size: 32px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.streak-best-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-2);
+}
+
+.streak-verse-text {
+  font-size: 14px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.streak-verse-ref {
+  font-size: 12px;
+  color: var(--accent);
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+.streak-history-grid {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.history-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.history-day.today .history-label {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.history-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: transform 0.2s;
+}
+
+.history-dot.done {
+  background: rgba(74,222,128,0.15);
+  border: 2px solid #4ade80;
+  color: #4ade80;
+}
+
+.history-dot.done::after {
+  content: '✓';
+  color: #4ade80;
+  font-weight: 700;
+}
+
+.history-dot.partial {
+  background: rgba(251,191,36,0.1);
+  border: 2px solid #fbbf24;
+  color: #fbbf24;
+}
+
+.history-dot.partial::after {
+  content: '~';
+  color: #fbbf24;
+  font-weight: 700;
+}
+
+.history-dot.missed {
+  background: rgba(239,68,68,0.1);
+  border: 2px solid #ef4444;
+  color: #ef4444;
+}
+
+.history-dot.missed::after {
+  content: '✕';
+  color: #ef4444;
+  font-weight: 700;
+}
+
+.history-label {
+  font-size: 10px;
+  color: var(--text-3);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* ============ CONFETTI ============ */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  border-radius: 2px;
+  animation: confettiFall 2.5s ease-in forwards;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
 }

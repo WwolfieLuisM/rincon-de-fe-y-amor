@@ -3,34 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Ánimo — Rincón de Fe y Amor</title>
+  <title>Racha — Rincón de Fe y Amor</title>
   <meta name="theme-color" content="#e8547a">
   <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="stylesheet" href="css/styles.css?v=13">
   <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 </head>
 <body>
-  <div class="encouragement-bg"></div>
   <div class="header">
-    <button id="menuBtn">☰</button>
-    <div class="header-center">Ánimo</div>
+    <button class="back-btn" onclick="history.back()">‹</button>
+    <div class="header-center">Racha 🔥</div>
     <div class="header-right">
       <div class="avatar-small" id="headerAvatar">?</div>
     </div>
   </div>
-  <div id="app" style="padding-bottom:80px"></div>
-  <div class="chat-input-bar">
-    <input id="encouragementInput" placeholder="Escribe un mensaje de ánimo..." autocomplete="off">
-    <button id="sendBtn" aria-label="Enviar"><i class="ti ti-send"></i></button>
-  </div>
+  <div id="app"></div>
   <div class="toast" id="toast"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase.js"></script>
+  <script src="js/supabase.js?v=5"></script>
   <script src="js/auth.js?v=10"></script>
+  <script src="js/streak.js?v=1"></script>
   <script src="components/layout.js?v=9"></script>
-  <script src="js/pages/encouragement-page.js"></script>
+  <script src="js/pages/streak-page.js?v=1"></script>
 </body>
 </html>

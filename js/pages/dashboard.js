@@ -84,6 +84,7 @@ function getActivityIcon(type) {
     goal: { icon: '<i class="ti ti-target"></i>', cls: 'goal' },
     date: { icon: '<i class="ti ti-calendar"></i>', cls: 'date' },
     streak: { icon: '<i class="ti ti-flame"></i>', cls: 'streak' },
+    milestone: { icon: '<i class="ti ti-celebration"></i>', cls: 'streak' },
     space_created: { icon: '<i class="ti ti-hearts"></i>', cls: 'date' },
     space_joined: { icon: '<i class="ti ti-link"></i>', cls: 'date' },
     bible_read: { icon: '<i class="ti ti-book"></i>', cls: 'message' }
@@ -171,17 +172,18 @@ async function loadPage(userId, space) {
   }
 
   const streakCount = streak ? streak.count : 0;
+  const streakBest = streak ? (streak.best_count || 0) : 0;
 
   html += `
     <div style="padding:0 16px">
-      <div class="streak-widget">
+      <div class="streak-widget" onclick="window.location.href='streak.html'" style="cursor:pointer">
         <div style="display:flex;align-items:center;gap:16px">
           <div>
             <div class="streak-number">${streakCount}</div>
-            <div class="streak-label">días de racha</div>
+            <div class="streak-label">días de racha ${streakBest > streakCount ? '· Mejor ' + streakBest : ''}</div>
           </div>
           <div style="flex:1"></div>
-          <div class="streak-hearts">
+          <div class="streak-hearts" onclick="event.stopPropagation();window.location.href='streak.html'">
             <span${!todayMark ? ' class="heart-inactive"' : ''}><i class="ti ti-heart" style="font-size:22px"></i></span>
             ${space.mode === 'couple' ? `<span${!partnerMarked ? ' class="heart-inactive"' : ''}><i class="ti ti-heart" style="font-size:22px"></i></span>` : ''}
             <span class="separator">·</span>
@@ -190,7 +192,7 @@ async function loadPage(userId, space) {
         </div>
         ${space.mode === 'couple' ? `<div style="font-size:12px;color:var(--text-3);margin-top:4px">${userName} ${todayMark ? '<i class="ti ti-check" style="color:var(--success)"></i>' : '<i class="ti ti-clock"></i>'} & ${partnerName} ${partnerMarked ? '<i class="ti ti-check" style="color:var(--success)"></i>' : '<i class="ti ti-clock"></i>'}</div>` : ''}
         <div class="streak-verse">— 1 Corintios 13:4 · El amor es paciente, es bondadoso...</div>
-        <a href="https://www.biblegateway.com/passage/?search=1+Corintios+13&version=RVR1960" target="_blank" class="streak-link">Leer capítulo completo <i class="ti ti-arrow-right" style="font-size:11px"></i></a>
+        <a href="streak.html" class="streak-link" onclick="event.stopPropagation()">Ver racha completa <i class="ti ti-arrow-right" style="font-size:11px"></i></a>
       </div>
     </div>
   `;
@@ -289,6 +291,7 @@ async function loadPage(userId, space) {
       else if (a.module === 'goals') link = 'goals.html';
       else if (a.module === 'dates') link = 'dates.html';
       else if (a.module === 'bible') link = 'palabra.html';
+      else if (a.module === 'streak') link = 'streak.html';
 
       html += `
         <div style="padding:0 16px;margin-bottom:8px">
