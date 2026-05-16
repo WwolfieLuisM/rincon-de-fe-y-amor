@@ -144,17 +144,31 @@ function showPrayerModal(prayer, space, userId) {
 }
 
 async function loadPage(userId, space) {
-  const [prayersRes, todayMarksRes] = await Promise.all([
-    window.supabase.from('prayers').select('*').eq('space_id', space.id).order('created_at', { ascending: false }),
-    window.supabase.from('prayer_marks').select('*').eq('marked_at', new Date().toISOString().split('T')[0])
-      .in('prayer_id', (await window.supabase.from('prayers').select('id').eq('space_id', space.id)).data?.map(p => p.id) || [])
-  ]);
+  const { data: prayers } = await window.supabase
+    .from('prayers')
+    .select('*')
+    .eq('space_id', space.id)
+    .order('created_at', { ascending: false });
 
-  const prayers = prayersRes.data || [];
-  const activePrayers = prayers.filter(p => !p.completed);
-  const completedPrayers = prayers.filter(p => p.completed);
+  const items = prayers || [];
+  const activePrayers = items.filter(p => !p.completed);
+  const completedPrayers = items.filter(p => p.completed);
 
-  const allMarks = todayMarksRes.data || [];
+  const progressMap = {};
+  for (const p of activePrayers) {
+    progressMap[p.id] = await getPrayerProgress(p.id, space, userId);
+  }
+
+  const today = new Date().toISOString().split('T')[0];
+  let todayMarks = [];
+  if (activePrayers.length > 0) {
+    const { data: marks } = await window.supabase
+      .from('prayer_marks')
+      .select('*')
+      .eq('marked_at', today)
+      .in('prayer_id', activePrayers.map(p => p.id));
+    todayMarks = marks || [];
+  }
 
   const headerAvatar = document.getElementById('headerAvatar');
   if (window.currentUser) {
@@ -162,78 +176,93 @@ async function loadPage(userId, space) {
   }
 
   let html = '<div class="page-content">';
-
-  if (activePrayers.length === 0) {
-    html += `
-      <div class="empty-state">
-        <div class="empty-icon">🙏</div>
-        <div class="empty-title">No hay oraciones activas</div>
-        <div class="empty-subtitle">Crea tu primera oración para comenzar</div>
-      </div>
-    `;
-  } else {
-    html += `<div class="section-label" style="padding:0;margin-top:0">Activas (${activePrayers.length})</div>`;
-
-    for (const p of activePrayers) {
-      const progress = await getPrayerProgress(p.id, space, userId);
-      const pct = Math.min(100, Math.round((progress / p.days_goal) * 100));
-      const icon = CATEGORY_ICONS[p.category] || '🙏';
-      const catLabel = CATEGORY_LABELS[p.category] || 'General';
-
-      const todayMark = allMarks.find(m => m.prayer_id === p.id && m.user_id === userId);
-
-      html += `
-        <div class="prayer-card">
-          <div class="prayer-header">
-            <div class="prayer-icon ${p.category}">${icon}</div>
-            <div class="prayer-title">${p.title}</div>
-            <div style="display:flex;gap:8px;flex-shrink:0">
-              <button class="btn-soft prayer-edit-btn" data-id="${p.id}">Editar</button>
-              <button class="btn-soft prayer-del-btn" data-id="${p.id}" style="color:#f87171;border-color:#f8717133">✕</button>
-            </div>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width:${pct}%"></div>
-          </div>
-          <div class="prayer-progress-text">${progress} / ${p.days_goal} días (${pct}%)</div>
-          <div class="prayer-today">
-            <span>Hoy:</span>
-            <span class="${todayMark ? 'prayed' : 'not-prayed'}">${todayMark ? '<i class="ti ti-check"></i> Oraste' : '<i class="ti ti-clock"></i> Pendiente'}</span>
-          </div>
-          <div class="prayer-actions">
-            <button class="btn-soft prayer-mark-btn" data-id="${p.id}" ${todayMark ? 'disabled style="opacity:0.4"' : ''}>
-              ${todayMark ? '<i class="ti ti-check"></i> Oraste hoy' : 'Orar hoy <i class="ti ti-heart"></i>'}
-            </button>
-          </div>
-        </div>
-      `;
-    }
-  }
-
-  if (completedPrayers.length > 0) {
-    html += `<div class="section-label" style="padding:0">Con respuesta (${completedPrayers.length})</div>`;
-    completedPrayers.forEach(p => {
-      const icon = CATEGORY_ICONS[p.category] || '🙏';
-      html += `
-        <div class="prayer-card" style="opacity:0.8">
-          <div class="prayer-header">
-            <div class="prayer-icon ${p.category}" style="opacity:0.6">${icon}</div>
-            <div class="prayer-title" style="text-decoration:line-through;opacity:0.6">${p.title}</div>
-          </div>
-          ${p.answer_note ? `<div style="font-size:13px;color:var(--text-2);margin-top:6px;font-style:italic">"${p.answer_note}"</div>` : ''}
-          <div style="font-size:12px;color:var(--success);margin-top:6px"><i class="ti ti-check"></i> Completada</div>
-        </div>
-      `;
-    });
-  }
+  html += `
+    <div class="tabs">
+      <button class="tab active" data-tab="active">Activas (${activePrayers.length})</button>
+      <button class="tab" data-tab="completed">Completadas (${completedPrayers.length})</button>
+    </div>
+    <div id="prayersList"></div>
+  `;
 
   html += '</div>';
   document.getElementById('app').innerHTML = html;
 
-  document.querySelectorAll('.prayer-mark-btn').forEach(btn => {
+  let activeTab = 'active';
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      activeTab = tab.dataset.tab;
+      if (activeTab === 'active') {
+        renderActivePrayers(activePrayers, progressMap, todayMarks, userId, space);
+      } else {
+        renderCompletedPrayers(completedPrayers);
+      }
+    });
+  });
+
+  renderActivePrayers(activePrayers, progressMap, todayMarks, userId, space);
+
+  document.getElementById('addPrayerBtn').addEventListener('click', () => {
+    showPrayerModal(null, space, userId);
+  });
+}
+
+function renderActivePrayers(prayers, progressMap, todayMarks, userId, space) {
+  const container = document.getElementById('prayersList');
+
+  if (prayers.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🙏</div>
+        <div class="empty-title">No hay oraciones activas</div>
+        <div class="empty-subtitle">Crea una nueva oración para empezar</div>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+  prayers.forEach(p => {
+    const progress = progressMap[p.id] || 0;
+    const pct = Math.min(100, Math.round((progress / p.days_goal) * 100));
+    const icon = CATEGORY_ICONS[p.category] || '🙏';
+    const todayMark = todayMarks.find(m => m.prayer_id === p.id && m.user_id === userId);
+
+    html += `
+      <div class="prayer-card">
+        <div class="prayer-header">
+          <div class="prayer-icon ${p.category}">${icon}</div>
+          <div class="prayer-title">${p.title}</div>
+          <div style="display:flex;gap:8px;flex-shrink:0">
+            <button class="btn-soft prayer-edit-btn" data-id="${p.id}">Editar</button>
+            <button class="btn-soft prayer-del-btn" data-id="${p.id}" style="color:#f87171;border-color:#f8717133">✕</button>
+          </div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${pct}%"></div>
+        </div>
+        <div class="prayer-progress-text">${progress} / ${p.days_goal} días (${pct}%)</div>
+        <div class="prayer-today">
+          <span>Hoy:</span>
+          <span class="${todayMark ? 'prayed' : 'not-prayed'}">${todayMark ? '<i class="ti ti-check"></i> Oraste' : '<i class="ti ti-clock"></i> Pendiente'}</span>
+        </div>
+        <div class="prayer-actions">
+          <button class="btn-soft prayer-mark-btn" data-id="${p.id}" ${todayMark ? 'disabled style="opacity:0.4"' : ''}>
+            ${todayMark ? '<i class="ti ti-check"></i> Oraste hoy' : 'Orar hoy <i class="ti ti-heart"></i>'}
+          </button>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+
+  container.querySelectorAll('.prayer-mark-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
       const prayerId = btn.dataset.id;
-      const prayer = activePrayers.find(p => p.id === prayerId);
+      const prayer = prayers.find(p => p.id === prayerId);
       if (!prayer) return;
 
       btn.disabled = true;
@@ -266,14 +295,14 @@ async function loadPage(userId, space) {
     });
   });
 
-  document.querySelectorAll('.prayer-edit-btn').forEach(btn => {
+  container.querySelectorAll('.prayer-edit-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const prayer = activePrayers.find(p => p.id === btn.dataset.id);
+      const prayer = prayers.find(p => p.id === btn.dataset.id);
       if (prayer) showPrayerModal(prayer, space, userId);
     });
   });
 
-  document.querySelectorAll('.prayer-del-btn').forEach(btn => {
+  container.querySelectorAll('.prayer-del-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
       if (!confirm('¿Eliminar esta oración?')) return;
       const { error } = await window.supabase.from('prayers').delete().eq('id', btn.dataset.id);
@@ -285,10 +314,38 @@ async function loadPage(userId, space) {
       await loadPage(userId, space);
     });
   });
+}
 
-  document.getElementById('addPrayerBtn').addEventListener('click', () => {
-    showPrayerModal(null, space, userId);
+function renderCompletedPrayers(prayers) {
+  const container = document.getElementById('prayersList');
+
+  if (prayers.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">✅</div>
+        <div class="empty-title">No hay oraciones completadas</div>
+        <div class="empty-subtitle">Las oraciones con respuesta aparecerán aquí</div>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+  prayers.forEach(p => {
+    const icon = CATEGORY_ICONS[p.category] || '🙏';
+    html += `
+      <div class="prayer-card" style="opacity:0.8">
+        <div class="prayer-header">
+          <div class="prayer-icon ${p.category}" style="opacity:0.6">${icon}</div>
+          <div class="prayer-title" style="text-decoration:line-through;opacity:0.6">${p.title}</div>
+        </div>
+        ${p.answer_note ? `<div style="font-size:13px;color:var(--text-2);margin-top:6px;font-style:italic">"${p.answer_note}"</div>` : ''}
+        <div style="font-size:12px;color:var(--success);margin-top:6px"><i class="ti ti-check"></i> Completada</div>
+      </div>
+    `;
   });
+
+  container.innerHTML = html;
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -299,7 +356,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     .from('spaces')
     .select('*')
     .or(`created_by.eq.${session.user.id},partner_id.eq.${session.user.id}`)
-    .single();
+    .maybeSingle();
   if (!space) { window.location.href = 'link.html'; return; }
 
   await initLayout();
