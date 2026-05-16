@@ -32,16 +32,25 @@ async function loadPage(userId, space) {
       <div style="padding:16px">
         <div class="devocional-hero">
           <div class="devocional-greeting">${timeInfo.label}, ${userName.split(' ')[0]} ${timeInfo.icon}</div>
-          <div class="devocional-time-badge ${timeInfo.time}">${timeInfo.time === 'morning' ? 'Mañana' : timeInfo.time === 'afternoon' ? 'Tarde' : 'Noche'}</div>
-          ${alreadyRead ? '<div class="devocional-read-badge"><i class="ti ti-check" style="font-size:14px"></i> Leído hoy</div>' : ''}
+          <div>
+            <span class="devocional-time-badge ${timeInfo.time}">${timeInfo.time === 'morning' ? 'Mañana' : timeInfo.time === 'afternoon' ? 'Tarde' : 'Noche'}</span>
+            ${alreadyRead ? '<span class="devocional-read-badge"><i class="ti ti-check" style="font-size:12px"></i> Leído hoy</span>' : ''}
+          </div>
           <div class="devocional-verse">"${personalDev.verses.text}"</div>
           <div class="devocional-reference">— ${personalDev.verses.reference}</div>
-          <div class="devocional-reflection">${personalDev.reflection}</div>
-          <div class="devocional-question">
-            <div class="devocional-q-icon"><i class="ti ti-message-circle"></i></div>
-            <div class="devocional-q-text">${personalDev.question || 'Medita en esta palabra'}</div>
-          </div>
+          <hr class="devocional-divider">
         </div>
+
+        <div class="devocional-reflection-card">
+          <div class="devocional-reflection-title"><i class="ti ti-message-circle" style="font-size:14px"></i> Reflexión</div>
+          <div class="devocional-reflection-text">${personalDev.reflection}</div>
+        </div>
+
+        ${personalDev.question ? `
+        <div class="devocional-question">
+          <div class="devocional-q-icon"><i class="ti ti-message-circle"></i></div>
+          <div class="devocional-q-text">${personalDev.question}</div>
+        </div>` : ''}
       </div>
     `;
   } else {
@@ -56,17 +65,23 @@ async function loadPage(userId, space) {
       <div style="padding:16px">
         <div class="devocional-hero">
           <div class="devocional-greeting">${timeInfo.label}, ${userName.split(' ')[0]} ${timeInfo.icon}</div>
+          <div><span class="devocional-time-badge ${timeInfo.time}">${timeInfo.time === 'morning' ? 'Mañana' : timeInfo.time === 'afternoon' ? 'Tarde' : 'Noche'}</span></div>
           ${fallbackVerse ? `
             <div class="devocional-verse">"${fallbackVerse.text}"</div>
             <div class="devocional-reference">— ${fallbackVerse.reference}</div>
-            <div class="devocional-reflection" style="margin-top:14px;color:var(--text-3);text-align:center;font-size:13px">Toma un momento para reflexionar en esta palabra y agradecer por este día.</div>
+            <hr class="devocional-divider">
+          </div>
+          <div class="devocional-reflection-card">
+            <div class="devocional-reflection-title"><i class="ti ti-message-circle" style="font-size:14px"></i> Reflexión</div>
+            <div class="devocional-reflection-text">Toma un momento para reflexionar en esta palabra y agradecer por este día.</div>
+          </div>
           ` : `
-            <div style="text-align:center;padding:20px 0;color:var(--text-3)">
-              <i class="ti ti-cloud" style="font-size:40px;display:block;margin-bottom:10px"></i>
-          No hay devocional disponible para este momento
-            </div>
+          </div>
+          <div style="text-align:center;padding:20px 0;color:var(--text-3)">
+            <i class="ti ti-cloud" style="font-size:40px;display:block;margin-bottom:10px"></i>
+            No hay devocional disponible para este momento
+          </div>
           `}
-        </div>
       </div>
     `;
   }
@@ -76,10 +91,10 @@ async function loadPage(userId, space) {
       <div style="padding:0 16px;margin-bottom:12px">
         <div class="devocional-shared">
           <div class="devocional-shared-header"><i class="ti ti-heart-handshake"></i> Devocional Compartido</div>
-          <div class="devocional-verse" style="font-size:15px">"${sharedDev.verses.text}"</div>
-          <div class="devocional-reference">— ${sharedDev.verses.reference}</div>
-          ${sharedDev.reflection ? `<div class="devocional-reflection" style="margin-top:10px">${sharedDev.reflection}</div>` : ''}
-          ${sharedDev.question ? `<div class="devocional-question" style="margin-top:12px">
+          <div style="font-size:15px;font-weight:600;color:rgba(255,255,255,0.9);line-height:1.6;font-style:italic">"${sharedDev.verses.text}"</div>
+          <div class="devocional-reference" style="margin-top:6px">— ${sharedDev.verses.reference}</div>
+          ${sharedDev.reflection ? `<div style="font-size:14px;color:#aaa;line-height:1.8;margin-top:12px">${sharedDev.reflection}</div>` : ''}
+          ${sharedDev.question ? `<div class="devocional-question" style="margin-top:14px">
             <div class="devocional-q-icon"><i class="ti ti-message-circle"></i></div>
             <div class="devocional-q-text">${sharedDev.question}</div>
           </div>` : ''}
@@ -103,10 +118,10 @@ async function loadPage(userId, space) {
         <div class="activity-card" style="margin-bottom:8px">
           <div class="activity-icon" style="background:#a855f722;color:#a855f7"><i class="ti ti-heart-handshake"></i></div>
           <div class="activity-info">
-            <div class="activity-text" style="color:#e0e0e0">${timeLabel}</div>
-            <div class="activity-name" style="font-size:12px">${v ? v.reference : ''}</div>
+            <div style="font-size:13px;color:#e0e0e0;font-weight:500">${timeLabel}</div>
+            <div style="font-size:12px;color:var(--text-3)">${v ? v.reference : ''}</div>
           </div>
-          <div class="activity-time">${date}</div>
+          <div style="font-size:12px;color:var(--text-3)">${date}</div>
         </div>
       `;
     });
