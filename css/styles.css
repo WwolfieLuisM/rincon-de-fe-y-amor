@@ -401,6 +401,14 @@ input, textarea, select {
   z-index: 1;
 }
 
+.verse-greeting {
+  font-size: 14px;
+  color: var(--accent);
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 1;
+}
+
 /* ============ SECTION LABEL ============ */
 .section-label {
   font-size: 11px;

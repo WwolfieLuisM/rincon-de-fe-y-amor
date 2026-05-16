@@ -98,6 +98,18 @@ function getTodayStr() {
   return d.toISOString().split('T')[0];
 }
 
+async function loadDevotionalVerse() {
+  try {
+    const devotional = await window.Devotional.getToday(false);
+    if (devotional && devotional.verses) {
+      return devotional;
+    }
+  } catch (e) {
+    console.error('Error loading devotional verse:', e);
+  }
+  return null;
+}
+
 async function loadVerse() {
   const day = getDayOfYear();
 
@@ -107,7 +119,7 @@ async function loadVerse() {
     .eq('mood', 'positive');
   if (dbVerses && dbVerses.length > 0) {
     const idx = day % dbVerses.length;
-    return dbVerses[idx];
+    return { verse: dbVerses[idx], timeLabel: null };
   }
 
   try {
@@ -119,20 +131,38 @@ async function loadVerse() {
     const ch = chapters[day % chapters.length];
     const v = ch[day % ch.length];
     return {
-      reference: book.shortTitle + ' ' + (day % chapters.length + 1) + ':' + (day % ch.length + 1),
-      text: v
+      verse: {
+        reference: book.shortTitle + ' ' + (day % chapters.length + 1) + ':' + (day % ch.length + 1),
+        text: v
+      },
+      timeLabel: null
     };
   } catch (e) {
     const idx = day % VERSES.length;
-    return { reference: VERSES[idx].ref, text: VERSES[idx].text };
+    return {
+      verse: { reference: VERSES[idx].ref, text: VERSES[idx].text },
+      timeLabel: null
+    };
   }
 }
 
 async function loadPage(userId, space) {
   const today = getTodayStr();
 
-  const [verseRes, streakRes, activitiesRes, gratitudesRes, todayMarkRes, datesRes] = await Promise.all([
-    loadVerse(),
+  let timeLabel = null;
+  let devotionalData = await loadDevotionalVerse();
+  let verse = null;
+  if (devotionalData && devotionalData.verses) {
+    verse = { text: devotionalData.verses.text, reference: devotionalData.verses.reference };
+    timeLabel = window.Devotional.getTimeLabel();
+  }
+  if (!verse) {
+    const fallback = await loadVerse();
+    verse = fallback.verse;
+    timeLabel = fallback.timeLabel;
+  }
+
+  const [streakRes, activitiesRes, gratitudesRes, todayMarkRes, datesRes] = await Promise.all([
     window.supabase.from('streak').select('*').eq('space_id', space.id).maybeSingle(),
     window.supabase.from('activity').select('*').eq('space_id', space.id).order('created_at', { ascending: false }).limit(7),
     window.supabase.from('gratitude').select('*').eq('space_id', space.id).order('created_at', { ascending: false }).limit(5),
@@ -140,7 +170,6 @@ async function loadPage(userId, space) {
     window.supabase.from('special_dates').select('*').eq('space_id', space.id)
   ]);
 
-  const verse = verseRes;
   const streak = streakRes.data || null;
   const activities = activitiesRes.data || [];
   const gratitudes = gratitudesRes.data || [];
@@ -165,15 +194,11 @@ async function loadPage(userId, space) {
     html += `
       <div style="padding:16px">
         <div class="verse-card">
+          ${timeLabel ? `<div class="verse-greeting">${timeLabel.label} ${timeLabel.icon}</div>` : ''}
           <div class="verse-quote">"</div>
           <div class="verse-text">${verse.text}</div>
           <div class="verse-ref">— ${verse.reference}</div>
         </div>
-      </div>
-      <div style="padding:0 16px;margin-top:-8px">
-        <a href="devocional.html" style="font-size:12px;color:var(--accent);display:flex;align-items:center;gap:4px;justify-content:flex-end">
-          <i class="ti ti-heart-handshake" style="font-size:14px"></i> Leer devocional de hoy
-        </a>
       </div>
     `;
   }
