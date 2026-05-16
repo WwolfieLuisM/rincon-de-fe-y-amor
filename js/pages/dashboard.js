@@ -84,6 +84,7 @@ function getActivityIcon(type) {
     goal: { icon: '<i class="ti ti-target"></i>', cls: 'goal' },
     date: { icon: '<i class="ti ti-calendar"></i>', cls: 'date' },
     streak: { icon: '<i class="ti ti-flame"></i>', cls: 'streak' },
+    devotional: { icon: '<i class="ti ti-heart-handshake"></i>', cls: 'prayer' },
     milestone: { icon: '<i class="ti ti-celebration"></i>', cls: 'streak' },
     space_created: { icon: '<i class="ti ti-hearts"></i>', cls: 'date' },
     space_joined: { icon: '<i class="ti ti-link"></i>', cls: 'date' },
@@ -168,6 +169,11 @@ async function loadPage(userId, space) {
           <div class="verse-text">${verse.text}</div>
           <div class="verse-ref">— ${verse.reference}</div>
         </div>
+      </div>
+      <div style="padding:0 16px;margin-top:-8px">
+        <a href="devocional.html" style="font-size:12px;color:var(--accent);display:flex;align-items:center;gap:4px;justify-content:flex-end">
+          <i class="ti ti-heart-handshake" style="font-size:14px"></i> Leer devocional de hoy
+        </a>
       </div>
     `;
   }
@@ -292,6 +298,7 @@ async function loadPage(userId, space) {
       else if (a.module === 'goals') link = 'goals.html';
       else if (a.module === 'dates') link = 'dates.html';
       else if (a.module === 'bible') link = 'palabra.html';
+      else if (a.module === 'devotional') link = 'devocional.html';
       else if (a.module === 'streak') link = 'streak.html';
 
       html += `

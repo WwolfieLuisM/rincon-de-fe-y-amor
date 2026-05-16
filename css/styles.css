@@ -2225,3 +2225,151 @@ textarea.input-field {
     opacity: 0;
   }
 }
+
+/* ============ DEVOCIONAL ============ */
+.devocional-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: url('../img/palabra-bg.png') center / cover no-repeat;
+}
+
+.devocional-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.55);
+}
+
+.devocional-hero {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 28px 20px;
+}
+
+.devocional-greeting {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.devocional-time-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 100px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.devocional-time-badge.morning {
+  background: rgba(251,191,36,0.1);
+  color: #fbbf24;
+  border: 1px solid #fbbf2433;
+}
+
+.devocional-time-badge.afternoon {
+  background: rgba(251,146,60,0.1);
+  color: #fb923c;
+  border: 1px solid #fb923c33;
+}
+
+.devocional-time-badge.night {
+  background: rgba(99,102,241,0.1);
+  color: #818cf8;
+  border: 1px solid #818cf833;
+}
+
+.devocional-read-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--success);
+  background: rgba(74,222,128,0.08);
+  border: 1px solid #4ade8033;
+  padding: 4px 10px;
+  border-radius: 100px;
+  margin-left: 8px;
+}
+
+.devocional-verse {
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  line-height: 1.6;
+  font-style: italic;
+  margin: 16px 0 8px;
+}
+
+.devocional-reference {
+  font-size: 14px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.devocional-reflection {
+  font-size: 14px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.7;
+  margin-top: 14px;
+}
+
+.devocional-question {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(232,84,122,0.06);
+  border: 1px solid #e8547a33;
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 16px;
+}
+
+.devocional-q-icon {
+  font-size: 18px;
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.devocional-q-text {
+  font-size: 14px;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.devocional-shared {
+  background: linear-gradient(135deg, rgba(168,85,247,0.08) 0%, rgba(232,84,122,0.05) 100%);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid #a855f733;
+  border-radius: 20px;
+  padding: 24px 20px;
+}
+
+.devocional-shared-header {
+  font-size: 14px;
+  font-weight: 700;
+  color: #c084fc;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.devocional-shared-footer {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  margin-top: 16px;
+  font-style: italic;
+}

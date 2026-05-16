@@ -61,6 +61,7 @@ window.initLayout = async function () {
     { icon: '<i class="ti ti-heart"></i>', label: 'Oraciones', href: 'prayers.html' },
     { icon: '<i class="ti ti-star"></i>', label: 'Gratitud', href: 'gratitude.html' },
     { icon: '<i class="ti ti-book"></i>', label: 'La Palabra', href: 'palabra.html' },
+    { icon: '<i class="ti ti-heart-handshake"></i>', label: 'Devocional', href: 'devocional.html' },
     { icon: '<i class="ti ti-message-2"></i>', label: 'Ánimo', href: 'encouragement.html' },
     { icon: '<i class="ti ti-target"></i>', label: 'Metas', href: 'goals.html' },
     { icon: '<i class="ti ti-calendar"></i>', label: 'Fechas', href: 'dates.html' },

@@ -124,6 +124,14 @@ window.streakService = {
   },
 
   async getSharedVerse() {
+    if (window.Devotional) {
+      try {
+        const shared = await window.Devotional.getToday(true);
+        if (shared && shared.verses) {
+          return { reference: shared.verses.reference, text: shared.verses.text };
+        }
+      } catch (e) {}
+    }
     const { data: dbVerses } = await window.supabase
       .from('verses')
       .select('*')
