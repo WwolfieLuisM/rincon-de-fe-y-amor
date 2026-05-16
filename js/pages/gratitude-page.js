@@ -21,7 +21,7 @@ async function loadPage(userId, space) {
   const container = document.getElementById('app');
   const partnerName = window.currentPartner ? window.currentPartner.name || 'Pareja' : 'Pareja';
 
-  let html = '<div class="chat-container">';
+  let html = '<div class="chat-container" id="chatContainer">';
 
   if (items.length === 0) {
     html += `
@@ -71,14 +71,66 @@ async function loadPage(userId, space) {
     await window.auth.logActivity(space.id, userId, 'gratitude', text, 'gratitude');
     input.value = '';
     sendBtn.disabled = false;
-    await loadPage(userId, space);
+    appendGratitude({ user_id: userId, text, created_at: new Date().toISOString() }, userId, partnerName);
   }
 
   sendBtn.addEventListener('click', sendGratitude);
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') sendGratitude();
   });
+
+  setupRealtime(space.id, userId, partnerName);
 }
+
+function appendGratitude(g, userId, partnerName) {
+  const container = document.getElementById('chatContainer');
+  if (!container) return;
+
+  const emptyState = container.querySelector('.empty-state');
+  if (emptyState) container.innerHTML = '';
+
+  const isMine = g.user_id === userId;
+  const name = isMine ? 'Tú' : partnerName;
+  const time = new Date(g.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble ' + (isMine ? 'mine' : 'other');
+  bubble.innerHTML = `${g.text}<div class="chat-meta">${name} · ${time}</div>`;
+  container.appendChild(bubble);
+  container.parentElement.scrollTop = container.parentElement.scrollHeight;
+}
+
+let realtimeChannel = null;
+
+function setupRealtime(spaceId, userId, partnerName) {
+  if (realtimeChannel) return;
+
+  realtimeChannel = window.supabase
+    .channel('gratitude-changes')
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'gratitude',
+        filter: `space_id=eq.${spaceId}`
+      },
+      (payload) => {
+        const g = payload.new;
+        if (g.user_id !== userId) {
+          appendGratitude(g, userId, partnerName);
+        }
+      }
+    )
+    .subscribe();
+}
+
+window.addEventListener('beforeunload', () => {
+  if (realtimeChannel) {
+    window.supabase.removeChannel(realtimeChannel);
+    realtimeChannel = null;
+  }
+});
 
 window.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await window.supabase.auth.getSession();
