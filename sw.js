@@ -1,8 +1,10 @@
-const CACHE = 'rincon-fe-v3';
+const CACHE = 'rincon-fe-v4';
 const STATIC = [
   '/rincon-de-fe-y-amor/',
   '/rincon-de-fe-y-amor/index.html',
   '/rincon-de-fe-y-amor/dashboard.html',
+  '/rincon-de-fe-y-amor/devocional.html',
+  '/rincon-de-fe-y-amor/streak.html',
   '/rincon-de-fe-y-amor/encouragement.html',
   '/rincon-de-fe-y-amor/gratitude.html',
   '/rincon-de-fe-y-amor/link.html',
@@ -53,14 +55,24 @@ self.addEventListener('fetch', e => {
     e.respondWith(fetch(e.request));
     return;
   }
-  const cleanUrl = stripQuery(e.request.url);
+  // HTML: network-first, strip query for cache fallback
   if (url.pathname.endsWith('.html')) {
+    const cleanUrl = stripQuery(e.request.url);
     e.respondWith(
       fetch(e.request).catch(() => caches.match(cleanUrl))
     );
     return;
   }
+  // Assets (JS, CSS, images): cache-first with FULL URL (?v=N included)
+  // This way layout.js?v=11 and layout.js?v=10 are separate cache entries
   e.respondWith(
-    caches.match(cleanUrl).then(r => r || fetch(e.request))
+    caches.match(e.request).then(cached => {
+      if (cached) return cached;
+      return fetch(e.request).then(res => {
+        const clone = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+        return res;
+      });
+    })
   );
 });
