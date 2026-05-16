@@ -17,6 +17,13 @@ function generateCode() {
 async function handleAuthenticated(session) {
   const userId = session.user.id;
 
+  const { data: { user } } = await window.supabase.auth.getUser();
+  if (!user) {
+    await window.supabase.auth.signOut();
+    window.location.href = 'index.html';
+    return;
+  }
+
   const pendingName = localStorage.getItem('pendingName') || session.user?.user_metadata?.name;
   if (pendingName) {
     const { data: existingProfile } = await window.supabase
@@ -62,6 +69,11 @@ async function handleAuthenticated(session) {
     }
 
     if (error) {
+      if (error.code === 'PGRST301' || error.code === '401' || error.message?.includes('JWT')) {
+        await window.supabase.auth.signOut();
+        window.location.href = 'index.html';
+        return;
+      }
       showToast('Error: ' + error.message, 'error');
       return;
     }
@@ -97,6 +109,11 @@ async function handleAuthenticated(session) {
     }
 
     if (error) {
+      if (error.code === 'PGRST301' || error.code === '401' || error.message?.includes('JWT')) {
+        await window.supabase.auth.signOut();
+        window.location.href = 'index.html';
+        return;
+      }
       showToast('Error: ' + error.message, 'error');
       return;
     }
@@ -119,6 +136,11 @@ async function handleAuthenticated(session) {
       .maybeSingle();
 
     if (error) {
+      if (error.code === 'PGRST301' || error.code === '401' || error.message?.includes('JWT')) {
+        await window.supabase.auth.signOut();
+        window.location.href = 'index.html';
+        return;
+      }
       showToast('Error: ' + error.message, 'error');
       return;
     }
@@ -141,6 +163,11 @@ async function handleAuthenticated(session) {
       .eq('id', space.id);
 
     if (updateError) {
+      if (updateError.code === 'PGRST301' || updateError.code === '401' || updateError.message?.includes('JWT')) {
+        await window.supabase.auth.signOut();
+        window.location.href = 'index.html';
+        return;
+      }
       showToast('Error: ' + updateError.message, 'error');
       return;
     }
