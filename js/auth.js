@@ -33,6 +33,35 @@ window.auth = {
     return { data, error };
   },
 
+  async loginWithPassword(email, password) {
+    const { data, error } = await window.supabase.auth.signInWithPassword({ email, password });
+    return { data, error };
+  },
+
+  async registerWithPassword(email, password, name) {
+    const { data, error } = await window.supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { name },
+        emailRedirectTo: 'https://wwolfieluism.github.io/rincon-de-fe-y-amor/link.html'
+      }
+    });
+    return { data, error };
+  },
+
+  async changePassword(currentPassword, newPassword, userEmail) {
+    if (currentPassword) {
+      const { error: signInError } = await window.supabase.auth.signInWithPassword({
+        email: userEmail,
+        password: currentPassword
+      });
+      if (signInError) return { error: signInError };
+    }
+    const { data, error } = await window.supabase.auth.updateUser({ password: newPassword });
+    return { data, error };
+  },
+
   async logout() {
     await window.supabase.auth.signOut();
     window.location.href = 'index.html';

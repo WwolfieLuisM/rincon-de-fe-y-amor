@@ -20,6 +20,7 @@ async function loadPage(userId, space) {
 
   const session = await window.auth.getSession();
   const email = session?.user?.email || '';
+  window.currentUserEmail = email;
 
   const userName = window.currentUser?.name || 'Usuario';
   const initial = userName.charAt(0).toUpperCase();
@@ -96,12 +97,12 @@ async function loadPage(userId, space) {
       <div style="padding:0 0 8px;font-size:13px;color:var(--text-2)">${bibleFavCount} favoritos</div>
       <a href="palabra.html" class="btn-primary w-full" style="display:block;text-align:center;padding:10px;text-decoration:none;margin-bottom:12px"><i class="ti ti-book"></i> Leer la Biblia</a>
 
-      <!-- div class="section-label" style="padding:0;margin-top:24px">Cuenta</div -->
-      <!-- div class="more-item" id="changePasswordBtn" style="margin-bottom:0">
-        <div class="more-icon" style="background:#2563eb22;color:#60a5fa">🔑</div>
+      <div class="section-label" style="padding:0;margin-top:24px">Cuenta</div>
+      <div class="more-item" id="changePasswordBtn" style="margin-bottom:0">
+        <div class="more-icon" style="background:#2563eb22;color:#60a5fa"><i class="ti ti-key"></i></div>
         <div class="more-text">Cambiar contraseña</div>
         <div class="more-arrow">›</div>
-      </div -->
+      </div>
     </div>
   `;
 
@@ -137,7 +138,7 @@ async function loadPage(userId, space) {
     loadPage(userId, space);
   });
 
-  // document.getElementById('changePasswordBtn').addEventListener('click', openChangePasswordModal);
+  document.getElementById('changePasswordBtn').addEventListener('click', openChangePasswordModal);
 
   const joinBtn = document.getElementById('joinPartnerBtn');
   const joinInput = document.getElementById('joinCodeInput');
@@ -251,29 +252,38 @@ async function showPageSlim(userId, email) {
       <div class="profile-avatar" style="margin:0 auto 12px">?</div>
       <div style="color:var(--text-2);margin-bottom:24px;font-size:13px">${email}</div>
       <p style="color:var(--text-3);font-size:13px;margin-bottom:24px">Aún no tienes un espacio. Crea tu espacio para comenzar.</p>
-      <!-- div class="more-item" id="changePwSlim" style="margin-bottom:0">
+      <div class="more-item" id="changePwSlim" style="margin-bottom:0">
         <div class="more-icon" style="background:#2563eb22;color:#60a5fa"><i class="ti ti-key"></i></div>
         <div class="more-text">Cambiar contraseña</div>
         <div class="more-arrow">›</div>
-      </div -->
+      </div>
       <button class="btn-primary w-full" id="goCreateSpace" style="margin-top:24px">Crear mi espacio</button>
     </div>
   `;
-  // document.getElementById('changePwSlim').addEventListener('click', () => openChangePasswordModal());
+  document.getElementById('changePwSlim').addEventListener('click', () => openChangePasswordModal());
   document.getElementById('goCreateSpace').addEventListener('click', () => { window.location.href = 'link.html'; });
 }
 
 function openChangePasswordModal() {
+  const session = window.currentUserEmail || '';
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay open';
   overlay.innerHTML = `
     <div class="modal-sheet">
       <div class="modal-title">Cambiar contraseña</div>
       <div class="input-group">
-        <label class="input-label">Nueva contraseña (mín. 6 caracteres)</label>
-        <input class="input-field" type="password" id="newPasswordInput" placeholder="••••••••">
+        <label class="input-label">Contraseña actual <span style="color:rgba(255,255,255,0.3);font-size:11px">(déjalo vacío si no tienes)</span></label>
+        <input class="input-field" type="password" id="currentPasswordInput" placeholder="••••••••" autocomplete="current-password">
       </div>
-      <button class="btn-primary w-full" id="savePasswordBtn">Actualizar contraseña</button>
+      <div class="input-group">
+        <label class="input-label">Nueva contraseña (mín. 6 caracteres)</label>
+        <input class="input-field" type="password" id="newPasswordInput" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Confirmar nueva contraseña</label>
+        <input class="input-field" type="password" id="confirmPasswordInput" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <button class="btn-primary w-full" id="savePasswordBtn">Guardar contraseña</button>
       <button class="btn-primary w-full" style="background:var(--surface-2);color:var(--text-2);margin-top:8px" id="cancelPasswordBtn">Cancelar</button>
     </div>
   `;
@@ -283,9 +293,15 @@ function openChangePasswordModal() {
   overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
   document.getElementById('cancelPasswordBtn').addEventListener('click', () => overlay.remove());
   document.getElementById('savePasswordBtn').addEventListener('click', async () => {
-    const pwd = document.getElementById('newPasswordInput').value;
-    if (!pwd || pwd.length < 6) { showToast('Mínimo 6 caracteres', 'error'); return; }
-    const { error } = await window.supabase.auth.updateUser({ password: pwd });
+    const currentPw = document.getElementById('currentPasswordInput').value;
+    const newPw = document.getElementById('newPasswordInput').value;
+    const confirmPw = document.getElementById('confirmPasswordInput').value;
+    if (!newPw || newPw.length < 6) { showToast('La nueva contraseña debe tener al menos 6 caracteres', 'error'); return; }
+    if (newPw !== confirmPw) { showToast('Las contraseñas no coinciden', 'error'); return; }
+    const session2 = await window.auth.getSession();
+    const email = session2?.user?.email;
+    if (!email) { showToast('No se pudo obtener tu correo', 'error'); return; }
+    const { error } = await window.auth.changePassword(currentPw, newPw, email);
     if (error) { showToast('Error: ' + error.message, 'error'); return; }
     showToast('Contraseña actualizada ✓', 'success');
     overlay.remove();

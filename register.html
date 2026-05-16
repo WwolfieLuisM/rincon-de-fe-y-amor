@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
-  <link rel="stylesheet" href="css/styles.css?v=8">
+  <link rel="stylesheet" href="css/styles.css?v=12">
 </head>
 <body>
   <div class="auth-bg"></div>
@@ -21,6 +21,10 @@
         <p>Únete a Rincón de Fe y Amor</p>
       </div>
       <div class="auth-form" id="registerForm">
+        <div class="testament-tabs" style="margin-bottom:16px">
+          <button class="active" id="registerTabMagic">Enlace mágico</button>
+          <button id="registerTabPw">Contraseña</button>
+        </div>
         <div class="input-group">
           <label class="input-label">Nombre</label>
           <input class="input-field" type="text" id="nameInput" placeholder="Tu nombre" autocomplete="name">
@@ -28,6 +32,14 @@
         <div class="input-group">
           <label class="input-label">Correo electrónico</label>
           <input class="input-field" type="email" id="emailInput" placeholder="tu@correo.com" autocomplete="email">
+        </div>
+        <div class="input-group" id="pwGroupRegister" style="display:none">
+          <label class="input-label">Contraseña (mín. 6 caracteres)</label>
+          <input class="input-field" type="password" id="passwordInput" placeholder="••••••••" autocomplete="new-password">
+        </div>
+        <div class="input-group" id="confirmPwGroup" style="display:none">
+          <label class="input-label">Confirmar contraseña</label>
+          <input class="input-field" type="password" id="confirmPasswordInput" placeholder="••••••••" autocomplete="new-password">
         </div>
         <button class="btn-primary w-full" id="registerBtn">Registrarme</button>
         <div class="auth-link">
@@ -50,7 +62,7 @@
   <div class="toast" id="toast"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js?v=6"></script>
-  <script src="js/auth.js?v=8"></script>
-  <script src="js/pages/register.js?v=6"></script>
+  <script src="js/auth.js?v=9"></script>
+  <script src="js/pages/register.js?v=7"></script>
 </body>
 </html>
