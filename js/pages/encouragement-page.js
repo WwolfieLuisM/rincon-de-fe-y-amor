@@ -5,6 +5,34 @@ function showToast(msg, type) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+let encouragementChannel = null;
+
+function appendMessage(msg, userId, partnerName) {
+  const container = document.getElementById('app');
+  if (!container) return;
+
+  let chatContainer = container.querySelector('.chat-container');
+  if (!chatContainer) {
+    chatContainer = document.createElement('div');
+    chatContainer.className = 'chat-container';
+    container.innerHTML = '';
+    container.appendChild(chatContainer);
+  }
+
+  const emptyState = chatContainer.querySelector('.empty-state');
+  if (emptyState) emptyState.remove();
+
+  const isMine = msg.sender_id === userId;
+  const name = isMine ? 'Tú' : partnerName;
+  const time = new Date(msg.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble ' + (isMine ? 'mine encouragement' : 'other');
+  bubble.innerHTML = `${msg.text}<div class="chat-meta">${name} · ${time}</div>`;
+  chatContainer.appendChild(bubble);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
 async function loadPage(userId, space) {
   const headerAvatar = document.getElementById('headerAvatar');
   if (window.currentUser) {
@@ -72,7 +100,6 @@ async function loadPage(userId, space) {
     input.value = '';
     sendBtn.disabled = false;
     showToast('Mensaje enviado ✅', 'success');
-    await loadPage(userId, space);
   }
 
   sendBtn.addEventListener('click', sendMessage);
@@ -94,4 +121,23 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   await initLayout();
   await loadPage(session.user.id, space);
+
+  const partnerName = window.currentPartner ? window.currentPartner.name || 'Pareja' : 'Pareja';
+  encouragementChannel = window.supabase
+    .channel('encouragement-' + space.id)
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'encouragement',
+      filter: 'space_id=eq.' + space.id,
+    }, (payload) => {
+      appendMessage(payload.new, session.user.id, partnerName);
+    })
+    .subscribe();
+});
+
+window.addEventListener('beforeunload', () => {
+  if (encouragementChannel) {
+    window.supabase.removeChannel(encouragementChannel);
+  }
 });

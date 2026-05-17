@@ -203,6 +203,21 @@ async function loadPage(userId, space) {
     `;
   }
 
+  if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+    html += `
+      <div style="padding:0 16px;margin-bottom:8px">
+        <div class="alert-refined" id="notifPrompt" style="cursor:pointer">
+          <div class="alert-icon" style="background:#e8547a22;color:#e8547a"><i class="ti ti-bell"></i></div>
+          <div class="alert-body">
+            <div class="alert-title">🔔 Activar notificaciones</div>
+            <div class="alert-sub">Recibe alertas cuando tu pareja haga algo</div>
+          </div>
+          <button class="btn-soft" id="enableNotifBtn">ACTIVAR</button>
+        </div>
+      </div>
+    `;
+  }
+
   const streakCount = streak ? streak.count : 0;
   const streakBest = streak ? (streak.best_count || 0) : 0;
 
@@ -287,7 +302,9 @@ async function loadPage(userId, space) {
   });
 
   if (alertCount > 0) {
-    document.getElementById('notifDot').style.display = 'block';
+    const badge = document.getElementById('notifBadge');
+    badge.style.display = 'block';
+    badge.textContent = '';
   }
 
   if (gratitudes.length > 0) {
@@ -311,6 +328,7 @@ async function loadPage(userId, space) {
 
   if (activities.length > 0) {
     html += `<div class="section-label">Actividad reciente</div>`;
+    html += `<div id="recentActivity">`;
     activities.forEach(a => {
       const icon = getActivityIcon(a.type);
       const isMine = a.user_id === userId;
@@ -339,6 +357,7 @@ async function loadPage(userId, space) {
         </div>
       `;
     });
+    html += `</div>`;
   }
 
   if (activities.length === 0 && gratitudes.length === 0) {
@@ -416,6 +435,18 @@ async function loadPage(userId, space) {
       if (prayBtn) prayBtn.click();
     });
   }
+
+  const enableNotifBtn = document.getElementById('enableNotifBtn');
+  if (enableNotifBtn) {
+    enableNotifBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      enableNotifBtn.disabled = true;
+      enableNotifBtn.textContent = '...';
+      await Notifications.requestPermission(userId);
+      const prompt = document.getElementById('notifPrompt');
+      if (prompt) prompt.remove();
+    });
+  }
 }
 
 async function checkPartnerMarked(space, userId, today) {
@@ -448,6 +479,31 @@ window.addEventListener('DOMContentLoaded', async () => {
   await initLayout();
   await loadPage(session.user.id, space);
   initInstallBanner();
+  await Notifications.init(session.user.id);
+  await updateNotifBadge(space, session.user.id);
+  document.getElementById('notifBell').addEventListener('click', async () => {
+    if (Notification.permission === 'default') {
+      await Notifications.requestPermission(session.user.id);
+    }
+    localStorage.setItem('lastNotifVisit_' + space.id, new Date().toISOString());
+    window.location.href = 'notifications.html';
+  });
+
+  const partnerName = window.currentPartner ? window.currentPartner.name || 'Pareja' : 'Pareja';
+  const activityChannel = window.supabase
+    .channel('activity-' + space.id)
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'activity',
+      filter: 'space_id=eq.' + space.id,
+    }, async (payload) => {
+      await updateNotifBadge(space, session.user.id);
+      if (payload.new.user_id !== session.user.id) {
+        appendActivity(payload.new, session.user.id, partnerName);
+      }
+    })
+    .subscribe();
 });
 
 // PWA Install Banner
@@ -476,6 +532,79 @@ function initInstallBanner() {
     localStorage.setItem('pwa_dismissed', 'true');
   });
 }
+
+function appendActivity(activity, userId, partnerName) {
+  const app = document.getElementById('app');
+  if (!app) return;
+
+  const icon = getActivityIcon(activity.type);
+  const isMine = activity.user_id === userId;
+  const name = isMine ? 'Tú' : partnerName;
+  const text = activity.text || 'Actividad';
+
+  let link = 'dashboard.html';
+  if (activity.module === 'prayers') link = 'prayers.html';
+  else if (activity.module === 'gratitude') link = 'gratitude.html';
+  else if (activity.module === 'encouragement') link = 'encouragement.html';
+  else if (activity.module === 'goals') link = 'goals.html';
+  else if (activity.module === 'dates') link = 'dates.html';
+  else if (activity.module === 'bible') link = 'palabra.html';
+  else if (activity.module === 'devotional') link = 'devocional.html';
+  else if (activity.module === 'streak') link = 'streak.html';
+
+  const cardHtml = `
+    <div style="padding:0 16px;margin-bottom:8px">
+      <div class="activity-card" onclick="window.location.href='${link}'">
+        <div class="activity-icon ${icon.cls}">${icon.icon}</div>
+        <div class="activity-info">
+          <div class="activity-name">${name}</div>
+          <div class="activity-text">${text}</div>
+        </div>
+        <div class="activity-time">${timeAgo(activity.created_at)}</div>
+      </div>
+    </div>
+  `;
+
+  let sectionLabel = app.querySelector('.section-label');
+  let section = app.querySelector('#recentActivity');
+  if (!section) {
+    if (!sectionLabel) {
+      const label = document.createElement('div');
+      label.className = 'section-label';
+      label.textContent = 'Actividad reciente';
+      app.appendChild(label);
+    }
+    section = document.createElement('div');
+    section.id = 'recentActivity';
+    app.appendChild(section);
+  }
+
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = cardHtml;
+  section.insertBefore(wrapper.firstElementChild, section.firstChild);
+}
+
+async function updateNotifBadge(space, userId) {
+  try {
+    const lastVisit = localStorage.getItem('lastNotifVisit_' + space.id);
+    if (!lastVisit) {
+      localStorage.setItem('lastNotifVisit_' + space.id, new Date().toISOString());
+      return;
+    }
+    const count = await Notifications.getUnreadCount(space.id, userId, lastVisit);
+    const badge = document.getElementById('notifBadge');
+    if (count > 0) {
+      badge.style.display = 'block';
+      badge.textContent = count > 9 ? '9+' : count;
+    }
+  } catch (e) {
+    console.error('Error updating badge:', e);
+  }
+}
+
+window.addEventListener('beforeunload', () => {
+  window.supabase.removeAllChannels();
+});
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();

@@ -17,7 +17,7 @@
     <button id="menuBtn">☰</button>
     <div class="header-center" id="headerDate"></div>
     <div class="header-right">
-      <div class="notification-bell" id="notifBell"><i class="ti ti-bell" style="font-size:20px"></i><span class="notification-dot" id="notifDot" style="display:none"></span></div>
+      <div class="notification-bell" id="notifBell"><i class="ti ti-bell" style="font-size:20px"></i><span class="notification-dot" id="notifBadge" style="display:none"></span></div>
       <div class="avatar-small" id="headerAvatar">?</div>
     </div>
   </div>
@@ -36,12 +36,15 @@
       <button id="dismissInstall" class="install-dismiss">✕</button>
     </div>
   </div>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js?v=5"></script>
   <script src="js/auth.js?v=11"></script>
   <script src="js/devotional.js?v=1"></script>
   <script src="js/streak.js?v=2"></script>
-  <script src="components/layout.js?v=11"></script>
-  <script src="js/pages/dashboard.js?v=11"></script>
+  <script src="js/notifications.js?v=2"></script>
+  <script src="components/layout.js?v=12"></script>
+  <script src="js/pages/dashboard.js?v=14"></script>
 </body>
 </html>

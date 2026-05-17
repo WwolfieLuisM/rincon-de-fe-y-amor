@@ -66,6 +66,7 @@ window.initLayout = async function () {
     { icon: '<i class="ti ti-target"></i>', label: 'Metas', href: 'goals.html' },
     { icon: '<i class="ti ti-calendar"></i>', label: 'Fechas', href: 'dates.html' },
     { icon: '<i class="ti ti-flame"></i>', label: 'Racha', href: 'streak.html' },
+    { icon: '<i class="ti ti-bell"></i>', label: 'Notificaciones', href: 'notifications.html' },
     { icon: '<i class="ti ti-user"></i>', label: 'Perfil', href: 'profile.html' },
     { icon: '<i class="ti ti-settings"></i>', label: 'Más', href: 'more.html' }
   ];
