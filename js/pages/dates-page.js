@@ -98,7 +98,7 @@ function showDateModal(dateItem, space, userId) {
     }
 
     overlay.remove();
-    loadPage(userId, space);
+    await loadPage(userId, space);
   });
 }
 
@@ -166,7 +166,7 @@ async function loadPage(userId, space) {
         return;
       }
       showToast('Fecha eliminada', 'success');
-      loadPage(userId, space);
+      await loadPage(userId, space);
     });
   });
 

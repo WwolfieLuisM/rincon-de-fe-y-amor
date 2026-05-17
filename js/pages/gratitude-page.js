@@ -71,7 +71,8 @@ async function loadPage(userId, space) {
     await window.auth.logActivity(space.id, userId, 'gratitude', text, 'gratitude');
     input.value = '';
     sendBtn.disabled = false;
-    appendGratitude({ user_id: userId, text, created_at: new Date().toISOString() }, userId, partnerName);
+    showToast('Gratitud guardada ✅', 'success');
+    await loadPage(userId, space);
   }
 
   sendBtn.addEventListener('click', sendGratitude);

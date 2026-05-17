@@ -71,6 +71,7 @@ async function loadPage(userId, space) {
     await window.auth.logActivity(space.id, userId, 'encouragement', text, 'encouragement');
     input.value = '';
     sendBtn.disabled = false;
+    showToast('Mensaje enviado ✅', 'success');
     await loadPage(userId, space);
   }
 

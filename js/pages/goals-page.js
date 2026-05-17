@@ -11,7 +11,7 @@ function formatDate(dateStr) {
   return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-function showGoalModal(goal, space) {
+function showGoalModal(goal, space, userId) {
   const overlay = document.createElement('div');
   overlay.className = 'modal-overlay open';
   overlay.innerHTML = `
@@ -73,12 +73,12 @@ function showGoalModal(goal, space) {
         showToast('Error: ' + error.message, 'error');
         return;
       }
-      await window.auth.logActivity(space.id, window.currentUser?.id, 'goal', 'Nueva meta: ' + title, 'goals');
+      await window.auth.logActivity(space.id, userId, 'goal', 'Nueva meta: ' + title, 'goals');
       showToast('Meta creada ✓', 'success');
     }
 
     overlay.remove();
-    loadPage(window.currentUser?.id, space);
+    await loadPage(userId, space);
   });
 }
 
@@ -126,7 +126,7 @@ async function loadPage(userId, space) {
   renderGoals(activeGoals, userId, space);
 
   document.getElementById('addGoalBtn').addEventListener('click', () => {
-    showGoalModal(null, space);
+    showGoalModal(null, space, userId);
   });
 }
 
@@ -201,7 +201,7 @@ function renderGoals(goals, userId, space) {
         showToast('Progreso actualizado ✓', 'success');
       }
 
-      loadPage(userId, space);
+      await loadPage(userId, space);
     });
   });
 
@@ -218,7 +218,7 @@ function renderGoals(goals, userId, space) {
         await window.auth.logActivity(space.id, userId, 'goal', 'Meta completada: ' + goal.title, 'goals');
       }
       showToast('🎉 ¡Meta completada!', 'success');
-      loadPage(userId, space);
+      await loadPage(userId, space);
     });
   });
 
@@ -231,7 +231,7 @@ function renderGoals(goals, userId, space) {
         return;
       }
       showToast('Meta eliminada', 'success');
-      loadPage(userId, space);
+      await loadPage(userId, space);
     });
   });
 }

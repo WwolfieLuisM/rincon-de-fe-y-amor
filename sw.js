@@ -1,4 +1,4 @@
-const CACHE = 'rincon-fe-v5';
+const CACHE = 'rincon-fe-v6';
 const STATIC = [
   '/rincon-de-fe-y-amor/',
   '/rincon-de-fe-y-amor/index.html',
@@ -54,6 +54,10 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
+  if (url.hostname.includes('supabase.co')) {
+    e.respondWith(fetch(e.request));
+    return;
+  }
   if (url.pathname.startsWith('/rincon-de-fe-y-amor/data/')) {
     e.respondWith(fetch(e.request));
     return;
