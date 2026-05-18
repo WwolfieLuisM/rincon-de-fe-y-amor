@@ -29,7 +29,7 @@ self.addEventListener('notificationclick', (event) => {
   event.waitUntil(clients.openWindow(url));
 });
 
-const CACHE = 'rincon-fe-v6';
+const CACHE = 'rincon-fe-v7';
 const STATIC = [
   '/rincon-de-fe-y-amor/',
   '/rincon-de-fe-y-amor/index.html',
