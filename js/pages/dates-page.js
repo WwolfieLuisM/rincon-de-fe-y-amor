@@ -171,14 +171,26 @@ async function loadPage(userId, space) {
       const dotBtn = e.target.closest('.three-dot-btn');
       if (dotBtn) {
         e.stopPropagation();
-        document.querySelectorAll('.three-dot-menu.open').forEach(m => { if (m.closest('.three-dot-wrap') !== dotBtn.parentElement) m.classList.remove('open'); });
-        dotBtn.parentElement.querySelector('.three-dot-menu').classList.toggle('open');
+        const menu = dotBtn.parentElement.querySelector('.three-dot-menu');
+        const wasOpen = menu.classList.contains('open');
+        document.querySelectorAll('.three-dot-menu.open').forEach(m => {
+          if (m.closest('.three-dot-wrap') !== dotBtn.parentElement) {
+            m.classList.remove('open');
+            const c = m.closest('.date-card');
+            if (c) c.style.zIndex = '';
+          }
+        });
+        menu.classList.toggle('open');
+        const card = dotBtn.closest('.date-card');
+        if (card) card.style.zIndex = wasOpen ? '' : '2';
         return;
       }
 
       const item = e.target.closest('.three-dot-item');
       if (!item) return;
       item.closest('.three-dot-menu').classList.remove('open');
+      const card = item.closest('.date-card');
+      if (card) card.style.zIndex = '';
       const id = item.dataset.id;
       const dateItem = items.find(d => d.id === id);
       if (item.dataset.action === 'edit' && dateItem) {
@@ -215,5 +227,9 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 document.addEventListener('click', () => {
-  document.querySelectorAll('.three-dot-menu.open').forEach(m => m.classList.remove('open'));
+  document.querySelectorAll('.three-dot-menu.open').forEach(m => {
+    m.classList.remove('open');
+    const card = m.closest('.date-card');
+    if (card) card.style.zIndex = '';
+  });
 });
