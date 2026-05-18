@@ -119,10 +119,10 @@ async function loadPage(userId, space) {
       <button class="btn-primary w-full" style="margin-top:16px;background:var(--surface-2);color:var(--text-2)" id="closeContactBtn">Cerrar</button>
     `);
 
-    const wa1 = '53636245';
-    const wa2 = '67';
+    const waCode = '53';
+    const waNum = '63624567';
     document.getElementById('whatsappBtn').addEventListener('click', () => {
-      window.open('https://wa.me/' + wa1 + wa2 + '?text=¡Hola!', '_blank');
+      window.open('https://wa.me/' + waCode + waNum + '?text=¡Hola!', '_blank');
     });
 
     document.getElementById('closeContactBtn').addEventListener('click', () => overlay.remove());
