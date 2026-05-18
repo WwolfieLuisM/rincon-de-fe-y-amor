@@ -5,6 +5,21 @@ function showToast(msg, type) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+function openSheet(htmlContent) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay open';
+  overlay.innerHTML = `
+    <div class="modal-sheet">
+      ${htmlContent}
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  const sheet = overlay.querySelector('.modal-sheet');
+  setTimeout(() => sheet.style.transform = 'translateX(-50%) translateY(0)', 10);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+  return overlay;
+}
+
 async function loadPage(userId, space) {
   const headerAvatar = document.getElementById('headerAvatar');
   if (window.currentUser) {
@@ -35,7 +50,7 @@ async function loadPage(userId, space) {
       </div>
 
       <div style="text-align:center;margin-top:32px;color:var(--text-3);font-size:12px">
-        Rincón de Fe y Amor v1.0.0
+        Rincón de Fe y Amor v1.0.1
       </div>
     </div>
   `;
@@ -43,29 +58,37 @@ async function loadPage(userId, space) {
   document.getElementById('app').innerHTML = html;
 
   document.getElementById('aboutBtn').addEventListener('click', () => {
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay open';
-    overlay.innerHTML = `
-      <div class="modal-sheet">
-        <div class="modal-title">Acerca de</div>
-        <p style="color:var(--text-2);font-size:14px;line-height:1.6;text-align:center">
-          Rincón de Fe y Amor es un espacio espiritual para parejas y personas solas que desean crecer en su vida de oración y fortalecer su relación con Dios y con su ser amado.
-        </p>
-        <p style="color:var(--text-2);font-size:14px;line-height:1.6;text-align:center;margin-top:12px">
-          🙏 Ora juntos · ✨ Compartan gratitud · 💬 Anímense · 🎯 Cumplan metas
-        </p>
-        <button class="btn-primary w-full" style="margin-top:16px;background:var(--surface-2);color:var(--text-2)" id="closeAboutBtn">Cerrar</button>
-      </div>
-    `;
-    document.body.appendChild(overlay);
-    const sheet = overlay.querySelector('.modal-sheet');
-    setTimeout(() => sheet.style.transform = 'translateX(-50%) translateY(0)', 10);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
-    document.getElementById('closeAboutBtn').addEventListener('click', () => overlay.remove());
+    openSheet(`
+      <div class="modal-title">🌸 Acerca de</div>
+      <p style="color:var(--text-2);font-size:14px;line-height:1.7;text-align:center">
+        Rincón de Fe y Amor nace del deseo de crear un espacio sagrado donde las parejas puedan cultivar su vida espiritual juntos. En un mundo que corre sin descanso, esta app te invita a pausar, conectar con Dios y fortalecer el vínculo con tu ser amado a través de la oración, la gratitud y el compañerismo.
+      </p>
+      <p style="color:var(--text-1);font-size:14px;line-height:1.7;text-align:center;margin-top:14px;font-weight:500">
+        🙏 Oren en unidad · ⭐ Compartan testimonios · 💬 Anímense mutuamente · 🎯 Cumplan metas juntos
+      </p>
+      <p style="color:var(--text-2);font-size:13px;line-height:1.6;text-align:center;margin-top:12px;font-style:italic">
+        "Donde dos o tres se reúnen en mi nombre, allí estoy yo en medio de ellos." — Mateo 18:20
+      </p>
+      <button class="btn-primary w-full" style="margin-top:16px;background:var(--surface-2);color:var(--text-2)" id="closeAboutBtn">Cerrar</button>
+    `);
+    document.getElementById('closeAboutBtn').addEventListener('click', () => document.body.lastElementChild.remove());
   });
 
   document.getElementById('donateBtn').addEventListener('click', () => {
-    showToast('Próximamente disponible', 'success');
+    openSheet(`
+      <div class="modal-title">🎁 Donativos</div>
+      <p style="color:var(--text-2);font-size:14px;line-height:1.6;text-align:center">
+        Si esta app ha sido de bendición para tu relación, considera apoyarnos con un donativo voluntario. Tu contribución nos ayuda a mantener este proyecto vivo y seguir mejorando la experiencia para más parejas.
+      </p>
+      <div style="margin-top:14px;text-align:center">
+        <img src="https://drive.google.com/uc?export=view&id=1oPKyHr1TNke95dB32ggHuX5tVW2wP3Fq" alt="Tarjetas para donar" style="max-width:100%;border-radius:var(--radius-sm);border:1px solid var(--border)">
+      </div>
+      <p style="color:var(--text-3);font-size:12px;text-align:center;margin-top:8px">
+        Desde el corazón, gracias por tu apoyo 🙏
+      </p>
+      <button class="btn-primary w-full" style="margin-top:16px;background:var(--surface-2);color:var(--text-2)" id="closeDonateBtn">Cerrar</button>
+    `);
+    document.getElementById('closeDonateBtn').addEventListener('click', () => document.body.lastElementChild.remove());
   });
 
   document.getElementById('shareBtn').addEventListener('click', () => {
@@ -81,24 +104,27 @@ async function loadPage(userId, space) {
   });
 
   document.getElementById('contactBtn').addEventListener('click', () => {
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay open';
-    overlay.innerHTML = `
-      <div class="modal-sheet">
-        <div class="modal-title">Contacto</div>
-        <p style="color:var(--text-2);font-size:14px;line-height:1.6;text-align:center">
-          ¿Tienes sugerencias o comentarios? Escríbenos para mejorar tu experiencia.
-        </p>
-        <p style="color:var(--accent);font-size:14px;text-align:center;margin-top:12px;word-break:break-all">
-          soporte@rincondefeyamor.app
-        </p>
-        <button class="btn-primary w-full" style="margin-top:16px;background:var(--surface-2);color:var(--text-2)" id="closeContactBtn">Cerrar</button>
+    const overlay = openSheet(`
+      <div class="modal-title">💌 Contacto</div>
+      <p style="color:var(--text-2);font-size:14px;line-height:1.6;text-align:center;margin-bottom:16px">
+        Escríbenos, estaremos encantados de leerte
+      </p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <a href="mailto:luisking89@gmail.com" class="contact-link"><i class="ti ti-mail" style="color:#ea4335"></i> luisking89@gmail.com</a>
+        <a href="mailto:miguewolf06@gmail.com" class="contact-link"><i class="ti ti-mail" style="color:#ea4335"></i> miguewolf06@gmail.com</a>
+        <a href="https://www.linkedin.com/in/luis-herrera-71739236a" target="_blank" class="contact-link"><i class="ti ti-brand-linkedin" style="color:#0a66c2"></i> LinkedIn</a>
+        <a href="https://www.facebook.com/share/1EhKE5VJ5y/" target="_blank" class="contact-link"><i class="ti ti-brand-facebook" style="color:#1877f2"></i> Facebook</a>
+        <button class="contact-link" id="whatsappBtn" style="text-align:left;cursor:pointer"><i class="ti ti-brand-whatsapp" style="color:#25d366"></i> WhatsApp</button>
       </div>
-    `;
-    document.body.appendChild(overlay);
-    const sheet = overlay.querySelector('.modal-sheet');
-    setTimeout(() => sheet.style.transform = 'translateX(-50%) translateY(0)', 10);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+      <button class="btn-primary w-full" style="margin-top:16px;background:var(--surface-2);color:var(--text-2)" id="closeContactBtn">Cerrar</button>
+    `);
+
+    const wa1 = '535362456';
+    const wa2 = '7';
+    document.getElementById('whatsappBtn').addEventListener('click', () => {
+      window.open('https://wa.me/' + wa1 + wa2 + '?text=¡Hola!', '_blank');
+    });
+
     document.getElementById('closeContactBtn').addEventListener('click', () => overlay.remove());
   });
 }
