@@ -29,11 +29,27 @@ async function getPrayerProgress(prayerId, space, userId) {
 
   if (!marks || marks.length === 0) return 0;
 
-  const userDates = new Set();
+  const partnerId = space?.partner_id || null;
+
+  if (!partnerId) {
+    const userDates = new Set();
+    marks.forEach(m => {
+      if (m.user_id === userId) userDates.add(m.marked_at);
+    });
+    return userDates.size;
+  }
+
+  const byDate = {};
   marks.forEach(m => {
-    if (m.user_id === userId) userDates.add(m.marked_at);
+    if (!byDate[m.marked_at]) byDate[m.marked_at] = new Set();
+    byDate[m.marked_at].add(m.user_id);
   });
-  return userDates.size;
+
+  let mutual = 0;
+  for (const users of Object.values(byDate)) {
+    if (users.has(userId) && users.has(partnerId)) mutual++;
+  }
+  return mutual;
 }
 
 function showPrayerModal(prayer, space, userId) {
