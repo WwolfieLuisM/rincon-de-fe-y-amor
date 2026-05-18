@@ -1,0 +1,21 @@
+{
+  "name": "rincon-de-fe-y-amor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "firebase-messaging-sw.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WwolfieLuisM/rincon-de-fe-y-amor.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/WwolfieLuisM/rincon-de-fe-y-amor/issues"
+  },
+  "homepage": "https://github.com/WwolfieLuisM/rincon-de-fe-y-amor#readme"
+}
