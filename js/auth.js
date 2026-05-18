@@ -103,13 +103,28 @@ window.auth = {
   },
 
   async ensureSession(timeoutMs) {
-    if (_cachedSession) return _cachedSession;
-
     const { data: { session } } = await window.supabase.auth.getSession();
     if (session) {
       _cachedSession = session;
       try { localStorage.setItem('rd_s', JSON.stringify(session)); } catch (e) {}
       return session;
+    }
+
+    if (_cachedSession) {
+      try {
+        const { data } = await window.supabase.auth.setSession({
+          access_token: _cachedSession.access_token,
+          refresh_token: _cachedSession.refresh_token
+        });
+        if (data?.session) {
+          _cachedSession = data.session;
+          try { localStorage.setItem('rd_s', JSON.stringify(data.session)); } catch (e) {}
+          return data.session;
+        }
+      } catch (e) {}
+      _cachedSession = null;
+      try { localStorage.removeItem('rd_s'); } catch (e) {}
+      return null;
     }
 
     const ms = timeoutMs || 15000;
