@@ -26,7 +26,7 @@ const Notifications = {
       });
 
       if (Notification.permission === 'granted') {
-        const swReg = await navigator.serviceWorker.getRegistration();
+        const swReg = await navigator.serviceWorker.ready;
         const token = await messaging.getToken({
           vapidKey: 'BGeRmKLKpX5wDfkyYLKUXPvM-1mLe8Iit8XJIXaqR1kLiz2a4GHMjnQxjC4kl0Eeclqb9KnJRiRLEN9dy3v6qig',
           serviceWorkerRegistration: swReg
@@ -49,7 +49,7 @@ const Notifications = {
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') return null;
 
-      const swReg = await navigator.serviceWorker.getRegistration();
+      const swReg = await navigator.serviceWorker.ready;
       const token = await messaging.getToken({
         vapidKey: 'BGeRmKLKpX5wDfkyYLKUXPvM-1mLe8Iit8XJIXaqR1kLiz2a4GHMjnQxjC4kl0Eeclqb9KnJRiRLEN9dy3v6qig',
         serviceWorkerRegistration: swReg
@@ -85,7 +85,6 @@ const Notifications = {
       .from('activity')
       .select('*')
       .eq('space_id', spaceId)
-      .eq('module', 'notification')
       .order('created_at', { ascending: false })
       .limit(limit);
     return data || [];
