@@ -162,12 +162,13 @@ async function loadPage(userId, space) {
     timeLabel = fallback.timeLabel;
   }
 
-  const [streakRes, activitiesRes, gratitudesRes, todayMarkRes, datesRes] = await Promise.all([
+  const [streakRes, activitiesRes, gratitudesRes, todayMarkRes, datesRes, streakVerseRes] = await Promise.all([
     window.supabase.from('streak').select('*').eq('space_id', space.id).maybeSingle(),
     window.supabase.from('activity').select('*').eq('space_id', space.id).order('created_at', { ascending: false }).limit(7),
     window.supabase.from('gratitude').select('*').eq('space_id', space.id).order('created_at', { ascending: false }).limit(5),
     window.supabase.from('streak_marks').select('*').eq('space_id', space.id).eq('user_id', userId).eq('marked_at', today).maybeSingle(),
-    window.supabase.from('special_dates').select('*').eq('space_id', space.id)
+    window.supabase.from('special_dates').select('*').eq('space_id', space.id),
+    window.streakService.getSharedVerse()
   ]);
 
   const streak = streakRes.data || null;
@@ -175,6 +176,7 @@ async function loadPage(userId, space) {
   const gratitudes = gratitudesRes.data || [];
   const todayMark = todayMarkRes.data;
   const dates = datesRes.data || [];
+  const streakVerse = streakVerseRes || null;
 
   const partnerMarked = space.mode === 'couple' ? await checkPartnerMarked(space, userId, today) : false;
 
@@ -238,7 +240,7 @@ async function loadPage(userId, space) {
           </div>
         </div>
         ${space.mode === 'couple' ? `<div style="font-size:12px;color:var(--text-3);margin-top:4px">${userName} ${todayMark ? '<i class="ti ti-check" style="color:var(--success)"></i>' : '<i class="ti ti-clock"></i>'} & ${partnerName} ${partnerMarked ? '<i class="ti ti-check" style="color:var(--success)"></i>' : '<i class="ti ti-clock"></i>'}</div>` : ''}
-        <div class="streak-verse">— 1 Corintios 13:4 · El amor es paciente, es bondadoso...</div>
+        <div class="streak-verse">${streakVerse ? '— ' + streakVerse.reference + ' · ' + streakVerse.text : '— 1 Corintios 13:4 · El amor es paciente, es bondadoso...'}</div>
         <a href="streak.html" class="streak-link" onclick="event.stopPropagation()">Ver racha completa <i class="ti ti-arrow-right" style="font-size:11px"></i></a>
       </div>
     </div>
