@@ -38,7 +38,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     registerBtn.textContent = 'Crear cuenta';
 
     if (error) {
-      showToast('Error: ' + (error.message || 'No se pudo crear la cuenta'), 'error');
+      showToast(window.auth.translateError(error.message || 'No se pudo crear la cuenta'), 'error');
       return;
     }
 
@@ -51,4 +51,13 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   emailInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') registerBtn.click(); });
   confirmPwInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') registerBtn.click(); });
+
+  document.querySelectorAll('.password-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = btn.parentElement.querySelector('.input-field');
+      const isPw = input.type === 'password';
+      input.type = isPw ? 'text' : 'password';
+      btn.querySelector('i').className = isPw ? 'ti ti-eye-off' : 'ti ti-eye';
+    });
+  });
 });

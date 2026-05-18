@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
-  <link rel="stylesheet" href="css/styles.css?v=19">
+  <link rel="stylesheet" href="css/styles.css?v=20">
   <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
   <link rel="icon" type="image/x-icon" href="img/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="img/favicon.png">
@@ -34,11 +34,17 @@
         </div>
         <div class="input-group">
           <label class="input-label">Contraseña (mín. 6 caracteres)</label>
-          <input class="input-field" type="password" id="passwordInput" placeholder="••••••••" autocomplete="new-password">
+          <div class="password-wrap">
+            <input class="input-field" type="password" id="passwordInput" placeholder="••••••••" autocomplete="new-password">
+            <button class="password-toggle" type="button" tabindex="-1"><i class="ti ti-eye"></i></button>
+          </div>
         </div>
         <div class="input-group">
           <label class="input-label">Confirmar contraseña</label>
-          <input class="input-field" type="password" id="confirmPasswordInput" placeholder="••••••••" autocomplete="new-password">
+          <div class="password-wrap">
+            <input class="input-field" type="password" id="confirmPasswordInput" placeholder="••••••••" autocomplete="new-password">
+            <button class="password-toggle" type="button" tabindex="-1"><i class="ti ti-eye"></i></button>
+          </div>
         </div>
         <button class="btn-primary w-full" id="registerBtn">Crear cuenta</button>
         <div class="auth-link">
@@ -61,7 +67,7 @@
   <div class="toast" id="toast"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js?v=6"></script>
-  <script src="js/auth.js?v=16"></script>
-  <script src="js/pages/register.js?v=8"></script>
+  <script src="js/auth.js?v=17"></script>
+  <script src="js/pages/register.js?v=9"></script>
 </body>
 </html>

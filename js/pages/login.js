@@ -25,7 +25,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     loginBtn.textContent = 'Iniciando sesión...';
     const { error } = await window.auth.loginWithPassword(email, password);
     if (error) {
-      showToast('❌ ' + error.message, 'error');
+      showToast(window.auth.translateError(error.message), 'error');
       loginBtn.disabled = false;
       loginBtn.textContent = 'Iniciar sesión';
       return;
@@ -35,4 +35,13 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   emailInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') loginBtn.click(); });
   passwordInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') loginBtn.click(); });
+
+  document.querySelectorAll('.password-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = btn.parentElement.querySelector('.input-field');
+      const isPw = input.type === 'password';
+      input.type = isPw ? 'text' : 'password';
+      btn.querySelector('i').className = isPw ? 'ti ti-eye-off' : 'ti ti-eye';
+    });
+  });
 });

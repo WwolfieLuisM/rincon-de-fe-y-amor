@@ -273,15 +273,24 @@ function openChangePasswordModal() {
       <div class="modal-title">Cambiar contraseña</div>
       <div class="input-group">
         <label class="input-label">Contraseña actual <span style="color:rgba(255,255,255,0.3);font-size:11px">(déjalo vacío si no tienes)</span></label>
-        <input class="input-field" type="password" id="currentPasswordInput" placeholder="••••••••" autocomplete="current-password">
+        <div class="password-wrap">
+          <input class="input-field" type="password" id="currentPasswordInput" placeholder="••••••••" autocomplete="current-password">
+          <button class="password-toggle" type="button" tabindex="-1"><i class="ti ti-eye"></i></button>
+        </div>
       </div>
       <div class="input-group">
         <label class="input-label">Nueva contraseña (mín. 6 caracteres)</label>
-        <input class="input-field" type="password" id="newPasswordInput" placeholder="••••••••" autocomplete="new-password">
+        <div class="password-wrap">
+          <input class="input-field" type="password" id="newPasswordInput" placeholder="••••••••" autocomplete="new-password">
+          <button class="password-toggle" type="button" tabindex="-1"><i class="ti ti-eye"></i></button>
+        </div>
       </div>
       <div class="input-group">
         <label class="input-label">Confirmar nueva contraseña</label>
-        <input class="input-field" type="password" id="confirmPasswordInput" placeholder="••••••••" autocomplete="new-password">
+        <div class="password-wrap">
+          <input class="input-field" type="password" id="confirmPasswordInput" placeholder="••••••••" autocomplete="new-password">
+          <button class="password-toggle" type="button" tabindex="-1"><i class="ti ti-eye"></i></button>
+        </div>
       </div>
       <button class="btn-primary w-full" id="savePasswordBtn">Guardar contraseña</button>
       <button class="btn-primary w-full" style="background:var(--surface-2);color:var(--text-2);margin-top:8px" id="cancelPasswordBtn">Cancelar</button>
@@ -302,8 +311,17 @@ function openChangePasswordModal() {
     const email = session2?.user?.email;
     if (!email) { showToast('No se pudo obtener tu correo', 'error'); return; }
     const { error } = await window.auth.changePassword(currentPw, newPw, email);
-    if (error) { showToast('Error: ' + error.message, 'error'); return; }
+    if (error) { showToast(window.auth.translateError(error.message), 'error'); return; }
     showToast('Contraseña actualizada ✓', 'success');
     overlay.remove();
+  });
+
+  overlay.querySelectorAll('.password-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = btn.parentElement.querySelector('.input-field');
+      const isPw = input.type === 'password';
+      input.type = isPw ? 'text' : 'password';
+      btn.querySelector('i').className = isPw ? 'ti ti-eye-off' : 'ti ti-eye';
+    });
   });
 }

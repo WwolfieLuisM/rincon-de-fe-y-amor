@@ -167,6 +167,29 @@ window.auth = {
     return { data, error };
   },
 
+  translateError(msg) {
+    if (!msg) return msg;
+    const map = {
+      'Invalid login credentials': 'Credenciales inválidas',
+      'Email not confirmed': 'Correo no confirmado',
+      'User already registered': 'El usuario ya está registrado',
+      'Password should be at least 6 characters': 'La contraseña debe tener al menos 6 caracteres',
+      'Email rate limit exceeded': 'Demasiados intentos, espera un momento',
+      'Invalid email': 'Correo electrónico inválido',
+      'New password should be different from the old password': 'La nueva contraseña debe ser diferente a la actual',
+      'The email is already registered': 'El correo ya está registrado',
+      'Missing email or password': 'Falta el correo o la contraseña',
+      'request rate limit reached': 'Demasiados intentos, espera un momento',
+      'Token has expired or is invalid': 'El enlace ha expirado o es inválido',
+      'Signup requires a valid password': 'La contraseña debe tener al menos 6 caracteres',
+    };
+    const lower = msg.toLowerCase();
+    for (const [en, es] of Object.entries(map)) {
+      if (lower.includes(en.toLowerCase())) return es;
+    }
+    return msg;
+  },
+
   async logActivity(spaceId, userId, type, text, module) {
     try {
       await window.supabase
