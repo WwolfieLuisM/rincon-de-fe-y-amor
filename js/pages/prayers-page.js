@@ -129,6 +129,51 @@ function showPrayerModal(prayer, space, userId) {
   });
 }
 
+function showAnswerModal(prayer, userId, space) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay open';
+  overlay.innerHTML = `
+    <div class="modal-sheet">
+      <div class="modal-title">Marcar como respondida</div>
+      <p style="font-size:13px;color:var(--text-2);margin-bottom:12px"><i class="ti ti-heart" style="color:var(--success)"></i> ¿Cómo fue respondida esta oración?</p>
+      <div class="input-group">
+        <textarea class="input-field" id="answerNoteInput" rows="3" style="resize:none" placeholder="Describe cómo Dios respondió... (opcional)"></textarea>
+      </div>
+      <button class="btn-primary w-full" id="confirmAnswerBtn">Marcar como respondida</button>
+      <button class="btn-primary w-full" style="background:var(--surface-2);color:var(--text-2);margin-top:8px" id="cancelModalBtn">Cancelar</button>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  const sheet = overlay.querySelector('.modal-sheet');
+  setTimeout(() => sheet.style.transform = 'translateX(-50%) translateY(0)', 10);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+  document.getElementById('cancelModalBtn').addEventListener('click', () => overlay.remove());
+
+  document.getElementById('confirmAnswerBtn').addEventListener('click', async () => {
+    const note = document.getElementById('answerNoteInput').value.trim();
+    const updates = { completed: true };
+    if (note) updates.answer_note = note;
+
+    const { error } = await window.supabase
+      .from('prayers')
+      .update(updates)
+      .eq('id', prayer.id);
+
+    if (error) {
+      showToast('Error: ' + error.message, 'error');
+      return;
+    }
+
+    await window.auth.logActivity(space.id, userId, 'prayer', 'Oración respondida: ' + prayer.title, 'prayers');
+    showToast('🎉 Oración marcada como respondida', 'success');
+    overlay.remove();
+    await loadPage(userId, space);
+  });
+
+  setTimeout(() => document.getElementById('answerNoteInput').focus(), 200);
+}
+
 async function loadPage(userId, space) {
   const { data: prayers } = await window.supabase
     .from('prayers')
@@ -182,21 +227,21 @@ async function loadPage(userId, space) {
       tab.classList.add('active');
       activeTab = tab.dataset.tab;
       if (activeTab === 'active') {
-        renderActivePrayers(activePrayers, progressMap, todayMarks, userId, space);
+        renderActivePrayers(activePrayers, progressMap, todayMarks, userId, space, today);
       } else {
         renderCompletedPrayers(completedPrayers);
       }
     });
   });
 
-  renderActivePrayers(activePrayers, progressMap, todayMarks, userId, space);
+  renderActivePrayers(activePrayers, progressMap, todayMarks, userId, space, today);
 
   document.getElementById('addPrayerBtn').addEventListener('click', () => {
     showPrayerModal(null, space, userId);
   });
 }
 
-function renderActivePrayers(prayers, progressMap, todayMarks, userId, space) {
+function renderActivePrayers(prayers, progressMap, todayMarks, userId, space, today) {
   const container = document.getElementById('prayersList');
 
   if (prayers.length === 0) {
@@ -226,6 +271,7 @@ function renderActivePrayers(prayers, progressMap, todayMarks, userId, space) {
             <button class="three-dot-btn" data-id="${p.id}">⋮</button>
             <div class="three-dot-menu">
               <button class="three-dot-item" data-action="edit" data-id="${p.id}"><i class="ti ti-edit"></i> Editar</button>
+              <button class="three-dot-item" data-action="answer" data-id="${p.id}"><i class="ti ti-check"></i> Respondida</button>
               <button class="three-dot-item danger" data-action="delete" data-id="${p.id}"><i class="ti ti-trash"></i> Eliminar</button>
             </div>
           </div>
@@ -301,6 +347,8 @@ function renderActivePrayers(prayers, progressMap, todayMarks, userId, space) {
     const prayer = prayers.find(p => p.id === id);
     if (item.dataset.action === 'edit' && prayer) {
       showPrayerModal(prayer, space, userId);
+    } else if (item.dataset.action === 'answer' && prayer) {
+      showAnswerModal(prayer, userId, space);
     } else if (item.dataset.action === 'delete') {
       if (!confirm('¿Eliminar esta oración?')) return;
       window.supabase.from('prayers').delete().eq('id', id).then(({ error }) => {
