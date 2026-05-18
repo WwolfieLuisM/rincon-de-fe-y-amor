@@ -8,6 +8,32 @@ function showToast(msg, type) {
 let encouragementChannel = null;
 let loadController = null;
 
+function formatChatDate(dateStr) {
+  const d = new Date(dateStr);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const target = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+  if (target.getTime() === today.getTime()) return 'Hoy';
+  if (target.getTime() === yesterday.getTime()) return 'Ayer';
+  return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function isNewDay(prevDate, currentDate) {
+  if (!prevDate) return true;
+  const a = new Date(prevDate);
+  const b = new Date(currentDate);
+  return a.getFullYear() !== b.getFullYear()
+    || a.getMonth() !== b.getMonth()
+    || a.getDate() !== b.getDate();
+}
+
+function formatTime(dateStr) {
+  return new Date(dateStr).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+}
+
 function appendMessage(msg, userId, partnerName) {
   const container = document.getElementById('app');
   if (!container) return;
@@ -25,12 +51,33 @@ function appendMessage(msg, userId, partnerName) {
 
   const isMine = msg.sender_id === userId;
   const name = isMine ? 'Tú' : partnerName;
-  const time = new Date(msg.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const time = formatTime(msg.created_at);
 
-  const bubble = document.createElement('div');
-  bubble.className = 'chat-bubble ' + (isMine ? 'mine encouragement' : 'other');
-  bubble.innerHTML = `${msg.text}<div class="chat-meta">${name} · ${time}</div>`;
-  chatContainer.appendChild(bubble);
+  const lastMsg = chatContainer.lastElementChild;
+  if (isNewDay(lastMsg?.dataset?.date, msg.created_at)) {
+    const sep = document.createElement('div');
+    sep.className = 'chat-date-sep';
+    sep.innerHTML = `<span>${formatChatDate(msg.created_at)}</span>`;
+    chatContainer.appendChild(sep);
+  }
+
+  const row = document.createElement('div');
+  row.className = 'chat-message-row ' + (isMine ? 'mine' : 'other');
+  row.dataset.date = msg.created_at;
+
+  let avatarHtml = '';
+  if (!isMine) {
+    avatarHtml = `<div class="chat-avatar">${name.charAt(0).toUpperCase()}</div>`;
+  }
+
+  row.innerHTML = `
+    ${avatarHtml}
+    <div class="chat-bubble ${isMine ? 'mine' : 'other'}">
+      ${msg.text}
+      <div class="chat-meta">${time}</div>
+    </div>
+  `;
+  chatContainer.appendChild(row);
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
@@ -51,27 +98,42 @@ async function loadPage(userId, space) {
   const partnerName = window.currentPartner ? window.currentPartner.name || 'Pareja' : 'Pareja';
 
   let html = '<div class="chat-container">';
+  let lastDate = null;
+
+  items.forEach(m => {
+    const isMine = m.sender_id === userId;
+    const name = isMine ? 'Tú' : partnerName;
+    const time = formatTime(m.created_at);
+
+    if (isNewDay(lastDate, m.created_at)) {
+      html += `<div class="chat-date-sep"><span>${formatChatDate(m.created_at)}</span></div>`;
+    }
+    lastDate = m.created_at;
+
+    let avatarHtml = '';
+    if (!isMine) {
+      avatarHtml = `<div class="chat-avatar">${name.charAt(0).toUpperCase()}</div>`;
+    }
+
+    html += `
+      <div class="chat-message-row ${isMine ? 'mine' : 'other'}">
+        ${avatarHtml}
+        <div class="chat-bubble ${isMine ? 'mine' : 'other'}">
+          ${m.text}
+          <div class="chat-meta">${time}</div>
+        </div>
+      </div>
+    `;
+  });
 
   if (items.length === 0) {
     html += `
       <div class="empty-state">
         <div class="empty-icon"><i class="ti ti-message-2" style="font-size:48px;opacity:0.15"></i></div>
-        <div class="empty-title">Comparte ánimo</div>
-        <div class="empty-subtitle">Envía palabras de aliento a tu pareja</div>
+        <div class="empty-title">Conversación vacía</div>
+        <div class="empty-subtitle">Envía el primer mensaje</div>
       </div>
     `;
-  } else {
-    items.forEach(m => {
-      const isMine = m.sender_id === userId;
-      const name = isMine ? 'Tú' : partnerName;
-      const time = new Date(m.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-      html += `
-        <div class="chat-bubble ${isMine ? 'mine encouragement' : 'other'}">
-          ${m.text}
-          <div class="chat-meta">${name} · ${time}</div>
-        </div>
-      `;
-    });
   }
 
   html += '</div>';
@@ -105,7 +167,6 @@ async function loadPage(userId, space) {
     appendMessage({ text, sender_id: userId, created_at: new Date().toISOString() }, userId, partnerName);
     input.value = '';
     sendBtn.disabled = false;
-    showToast('Mensaje enviado ✅', 'success');
   }
 
   sendBtn.addEventListener('click', sendMessage, { signal });
