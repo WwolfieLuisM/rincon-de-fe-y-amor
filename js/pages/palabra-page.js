@@ -11,6 +11,8 @@ let readMap = {};
 let favSet = new Set();
 let userId = null;
 let spaceId = null;
+let _isRendering = false;
+let _searchRaf = null;
 
 function showToast(msg, type) {
   const t = document.getElementById('toast');
@@ -237,7 +239,7 @@ async function onBookSelect(key, goTo) {
 
   document.getElementById('app').innerHTML = html;
 
-  document.getElementById('backBtn').addEventListener('click', goBackToWelcome);
+  document.getElementById('backBtn')?.addEventListener('click', goBackToWelcome);
   document.getElementById('chapterSelect').addEventListener('change', (e) => {
     currentChapter = parseInt(e.target.value);
     searchTerm = '';
@@ -255,7 +257,11 @@ async function onBookSelect(key, goTo) {
   document.getElementById('markReadBtn').addEventListener('click', toggleMarkRead);
   document.getElementById('searchInput').addEventListener('input', (e) => {
     searchTerm = e.target.value.trim();
-    renderChapter();
+    if (_searchRaf) cancelAnimationFrame(_searchRaf);
+    _searchRaf = requestAnimationFrame(() => {
+      _searchRaf = null;
+      renderChapter();
+    });
   });
   document.getElementById('selectToggleBtn').addEventListener('click', toggleSelectMode);
   document.getElementById('copySelectedBtn').addEventListener('click', copySelected);
@@ -266,71 +272,93 @@ async function onBookSelect(key, goTo) {
 }
 
 function renderChapter() {
-  if (!currentBook || !currentChapters.length || !currentChapter) return;
-  const idx = currentChapter - 1;
-  const verses = currentChapters[idx];
-  if (!verses) return;
-  currentVerses = verses;
+  if (_isRendering) return;
+  _isRendering = true;
+  try {
+    if (!currentBook || !currentChapters.length || !currentChapter) return;
+    const idx = currentChapter - 1;
+    const verses = currentChapters[idx];
+    if (!verses) return;
+    currentVerses = verses;
 
-  const sel = document.getElementById('chapterSelect');
-  const prevBtn = document.getElementById('prevChapBtn');
-  const nextBtn = document.getElementById('nextChapBtn');
-  if (sel) { sel.value = currentChapter; }
-  if (prevBtn) prevBtn.disabled = currentChapter <= 1;
-  if (nextBtn) nextBtn.disabled = currentChapter >= currentChapters.length;
+    const sel = document.getElementById('chapterSelect');
+    const prevBtn = document.getElementById('prevChapBtn');
+    const nextBtn = document.getElementById('nextChapBtn');
+    if (sel) sel.value = currentChapter;
+    if (prevBtn) prevBtn.disabled = currentChapter <= 1;
+    if (nextBtn) nextBtn.disabled = currentChapter >= currentChapters.length;
 
-  const key = currentBook.key + ':' + currentChapter;
-  const isRead = !!readMap[key];
-  const markBtn = document.getElementById('markReadBtn');
-  if (markBtn) {
-    markBtn.textContent = isRead ? '✓ Capítulo leído' : 'Marcar como leído';
-    markBtn.classList.toggle('done', isRead);
-  }
-
-  const filtered = searchTerm
-    ? verses.filter(v => v.toLowerCase().includes(searchTerm.toLowerCase()))
-    : verses;
-
-  const countEl = document.getElementById('searchCount');
-  if (countEl) {
-    countEl.textContent = searchTerm
-      ? filtered.length + ' de ' + verses.length + ' versículos'
-      : '';
-  }
-
-  const stBtn = document.getElementById('selectToggleBtn');
-  if (stBtn) stBtn.classList.toggle('active', selectMode);
-
-  let html = '';
-  filtered.forEach((text, i) => {
-    const vNum = searchTerm ? verses.indexOf(text) + 1 : i + 1;
-    const key2 = currentBook.key + ':' + currentChapter + ':' + vNum;
-    const isFav = favSet.has(key2);
-    const isSelected = selectedVerses.has(key2);
-    html += '<div class="verse' + (isSelected ? ' selected' : '') + '" data-vkey="' + key2 + '">';
-    if (selectMode) {
-      html += '<div class="verse-cb">' + (isSelected ? '<i class="ti ti-checkbox"></i>' : '<i class="ti ti-square"></i>') + '</div>';
+    const key = currentBook.key + ':' + currentChapter;
+    const isRead = !!readMap[key];
+    const markBtn = document.getElementById('markReadBtn');
+    if (markBtn) {
+      markBtn.textContent = isRead ? '\u2713 Cap\u00edtulo le\u00eddo' : 'Marcar como le\u00eddo';
+      markBtn.classList.toggle('done', isRead);
     }
-    html += '<div class="verse-num">' + vNum + '</div>';
-    html += '<div class="verse-text">' + text + '</div>';
-    if (!selectMode) {
-      html += '<button class="verse-fav' + (isFav ? ' favorited' : '') + '" data-key="' + key2 + '" data-verse="' + vNum + '" data-text="' + escapeAttr(text) + '"><i class="ti ti-heart"></i></button>';
-    }
-    html += '</div>';
-  });
 
-  const container = document.getElementById('versesContainer');
-  if (container) {
-    container.innerHTML = html;
-    if (selectMode) {
-      container.querySelectorAll('.verse').forEach(el => {
-        el.addEventListener('click', toggleVerseSelection);
+    const filtered = searchTerm
+      ? verses.filter(v => v.toLowerCase().includes(searchTerm.toLowerCase()))
+      : verses;
+
+    const countEl = document.getElementById('searchCount');
+    if (countEl) {
+      countEl.textContent = searchTerm
+        ? filtered.length + ' de ' + verses.length + ' vers\u00edculos'
+        : '';
+    }
+
+    const stBtn = document.getElementById('selectToggleBtn');
+    if (stBtn) stBtn.classList.toggle('active', selectMode);
+
+    const container = document.getElementById('versesContainer');
+    if (container) {
+      const fragment = document.createDocumentFragment();
+      filtered.forEach((text, i) => {
+        const vNum = searchTerm ? verses.indexOf(text) + 1 : i + 1;
+        const key2 = currentBook.key + ':' + currentChapter + ':' + vNum;
+        const isFav = favSet.has(key2);
+        const isSelected = selectedVerses.has(key2);
+
+        const div = document.createElement('div');
+        div.className = 'verse' + (isSelected ? ' selected' : '');
+        div.dataset.vkey = key2;
+
+        if (selectMode) {
+          const cb = document.createElement('div');
+          cb.className = 'verse-cb';
+          cb.innerHTML = isSelected ? '<i class="ti ti-checkbox"></i>' : '<i class="ti ti-square"></i>';
+          div.appendChild(cb);
+        }
+
+        const num = document.createElement('div');
+        num.className = 'verse-num';
+        num.textContent = vNum;
+        div.appendChild(num);
+
+        const txt = document.createElement('div');
+        txt.className = 'verse-text';
+        txt.textContent = text;
+        div.appendChild(txt);
+
+        if (!selectMode) {
+          const fav = document.createElement('button');
+          fav.className = 'verse-fav' + (isFav ? ' favorited' : '');
+          fav.dataset.key = key2;
+          fav.dataset.verse = vNum;
+          fav.dataset.text = text;
+          fav.innerHTML = '<i class="ti ti-heart"></i>';
+          fav.addEventListener('click', toggleFav);
+          div.appendChild(fav);
+        }
+
+        fragment.appendChild(div);
       });
-    } else {
-      container.querySelectorAll('.verse-fav').forEach(btn => {
-        btn.addEventListener('click', toggleFav);
-      });
+
+      container.innerHTML = '';
+      container.appendChild(fragment);
     }
+  } finally {
+    _isRendering = false;
   }
 }
 
@@ -494,10 +522,6 @@ async function doGlobalSearch(term) {
       onBookSelect(el.dataset.bk, { chapter: parseInt(el.dataset.ch), verse: parseInt(el.dataset.vs) });
     });
   });
-}
-
-function escapeAttr(s) {
-  return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 async function toggleMarkRead() {

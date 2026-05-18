@@ -1680,6 +1680,15 @@ textarea.input-field {
   gap: 8px;
   padding: 6px 0;
   border-bottom: 1px solid rgba(255,255,255,0.04);
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+@media (hover: hover) {
+  .reader-card .verse {
+    user-select: text;
+  }
 }
 
 .reader-card .verse:last-child {

@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
-  <link rel="stylesheet" href="css/styles.css?v=20">
+  <link rel="stylesheet" href="css/styles.css?v=21">
   <style>
     .palabra-bg {
       position: fixed; top: 0; left: 0;
@@ -124,9 +124,17 @@
       gap: 8px;
       align-items: flex-start;
       transition: background 0.2s;
+      touch-action: manipulation;
+      -webkit-touch-callout: none;
+      user-select: none;
     }
     .reader-card .verse:hover {
       background: rgba(255,255,255,0.05);
+    }
+    @media (hover: hover) {
+      .reader-card .verse {
+        user-select: text;
+      }
     }
     .reader-card .verse-num {
       font-size: 11px;
@@ -268,6 +276,6 @@
   <script src="js/supabase.js?v=7"></script>
   <script src="js/auth.js?v=18"></script>
   <script src="components/layout.js?v=14"></script>
-  <script src="js/pages/palabra-page.js?v=4"></script>
+  <script src="js/pages/palabra-page.js?v=5"></script>
 </body>
 </html>
