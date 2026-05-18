@@ -5,6 +5,44 @@ function showToast(msg, type) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+let datesChannel = null;
+let _datesUserId = null;
+let _datesSpace = null;
+
+function setupDatesRealtime(spaceId, userId) {
+  if (datesChannel) window.supabase.removeChannel(datesChannel);
+
+  datesChannel = window.supabase
+    .channel('dates-' + spaceId)
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'special_dates',
+      filter: 'space_id=eq.' + spaceId,
+    }, (payload) => {
+      if (payload.new.user_id === userId) return;
+      loadPage(_datesUserId, _datesSpace);
+    })
+    .on('postgres_changes', {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'special_dates',
+      filter: 'space_id=eq.' + spaceId,
+    }, (payload) => {
+      if (payload.new.user_id === userId) return;
+      loadPage(_datesUserId, _datesSpace);
+    })
+    .on('postgres_changes', {
+      event: 'DELETE',
+      schema: 'public',
+      table: 'special_dates',
+      filter: 'space_id=eq.' + spaceId,
+    }, (payload) => {
+      loadPage(_datesUserId, _datesSpace);
+    })
+    .subscribe();
+}
+
 function daysUntilNext(dateStr) {
   const today = new Date();
   const d = new Date(dateStr);
@@ -20,7 +58,7 @@ function formatDateDisplay(dateStr) {
 
 const TYPE_LABELS = {
   anniversary: 'Aniversario',
-  birthday: 'Cumpleaños',
+  birthday: 'Cumplea\u00f1os',
   special: 'Especial',
   general: 'General'
 };
@@ -32,7 +70,7 @@ function showDateModal(dateItem, space, userId) {
     <div class="modal-sheet">
       <div class="modal-title">${dateItem ? 'Editar fecha' : 'Nueva fecha'}</div>
       <div class="input-group">
-        <label class="input-label">Título</label>
+        <label class="input-label">T\u00edtulo</label>
         <input class="input-field" id="dateTitleInput" value="${dateItem ? dateItem.title : ''}" placeholder="Ej. Aniversario">
       </div>
       <div class="input-group">
@@ -43,7 +81,7 @@ function showDateModal(dateItem, space, userId) {
         <label class="input-label">Tipo</label>
         <select class="input-field" id="dateTypeInput">
           <option value="anniversary" ${dateItem && dateItem.type === 'anniversary' ? 'selected' : ''}>Aniversario</option>
-          <option value="birthday" ${dateItem && dateItem.type === 'birthday' ? 'selected' : ''}>Cumpleaños</option>
+          <option value="birthday" ${dateItem && dateItem.type === 'birthday' ? 'selected' : ''}>Cumplea\u00f1os</option>
           <option value="special" ${dateItem && dateItem.type === 'special' ? 'selected' : ''}>Especial</option>
           <option value="general" ${dateItem && dateItem.type === 'general' ? 'selected' : ''}>General</option>
         </select>
@@ -83,7 +121,7 @@ function showDateModal(dateItem, space, userId) {
         showToast('Error: ' + error.message, 'error');
         return;
       }
-      showToast('Fecha actualizada ✓', 'success');
+      showToast('Fecha actualizada \u2713', 'success');
     } else {
       const { error } = await window.supabase
         .from('special_dates')
@@ -94,7 +132,7 @@ function showDateModal(dateItem, space, userId) {
         return;
       }
       await window.auth.logActivity(space.id, userId, 'date', 'Nueva fecha: ' + title, 'dates');
-      showToast('Fecha creada ✓', 'success');
+      showToast('Fecha creada \u2713', 'success');
     }
 
     overlay.remove();
@@ -107,6 +145,9 @@ async function loadPage(userId, space) {
   if (window.currentUser) {
     headerAvatar.textContent = (window.currentUser.name || '?').charAt(0).toUpperCase();
   }
+
+  _datesUserId = userId;
+  _datesSpace = space;
 
   const { data: dates } = await window.supabase
     .from('special_dates')
@@ -124,7 +165,7 @@ async function loadPage(userId, space) {
       <div class="empty-state">
         <div class="empty-icon"><i class="ti ti-calendar" style="font-size:48px;opacity:0.15"></i></div>
         <div class="empty-title">No hay fechas especiales</div>
-        <div class="empty-subtitle">Agrega aniversarios, cumpleaños y más</div>
+        <div class="empty-subtitle">Agrega aniversarios, cumplea\u00f1os y m\u00e1s</div>
       </div>
     `;
   } else {
@@ -133,9 +174,9 @@ async function loadPage(userId, space) {
       const days = daysUntilNext(d.date);
       let badge = '';
       if (days === 0) {
-        badge = '<span class="badge badge-today"><i class="ti ti-celebration"></i> ¡Hoy!</span>';
+        badge = '<span class="badge badge-today"><i class="ti ti-celebration"></i> \u00a1Hoy!</span>';
       } else {
-        badge = `<span class="badge badge-soon">En ${days} días</span>`;
+        badge = '<span class="badge badge-soon">En ' + days + ' d\u00edas</span>';
       }
 
       const typeLabel = TYPE_LABELS[d.type] || 'General';
@@ -144,12 +185,12 @@ async function loadPage(userId, space) {
         <div class="date-card">
           <div class="date-info">
             <div class="date-title">${d.title}</div>
-            <div class="date-type">${typeLabel} · ${formatDateDisplay(d.date)}</div>
+            <div class="date-type">${typeLabel} \u00b7 ${formatDateDisplay(d.date)}</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
             ${badge}
             <div class="three-dot-wrap">
-              <button class="three-dot-btn" data-id="${d.id}">⋮</button>
+              <button class="three-dot-btn" data-id="${d.id}">\u22ee</button>
               <div class="three-dot-menu">
                 <button class="three-dot-item" data-action="edit" data-id="${d.id}"><i class="ti ti-edit"></i> Editar</button>
                 <button class="three-dot-item danger" data-action="delete" data-id="${d.id}"><i class="ti ti-trash"></i> Eliminar</button>
@@ -196,7 +237,7 @@ async function loadPage(userId, space) {
       if (item.dataset.action === 'edit' && dateItem) {
         showDateModal(dateItem, space, userId);
       } else if (item.dataset.action === 'delete') {
-        if (!confirm('¿Eliminar esta fecha?')) return;
+        if (!confirm('\u00bfEliminar esta fecha?')) return;
         window.supabase.from('special_dates').delete().eq('id', id).then(({ error }) => {
           if (error) { showToast('Error: ' + error.message, 'error'); return; }
           showToast('Fecha eliminada', 'success');
@@ -209,7 +250,13 @@ async function loadPage(userId, space) {
   document.getElementById('addDateBtn').addEventListener('click', () => {
     showDateModal(null, space, userId);
   });
+
+  setupDatesRealtime(space.id, userId);
 }
+
+window.addEventListener('beforeunload', () => {
+  if (datesChannel) window.supabase.removeChannel(datesChannel);
+});
 
 window.addEventListener('DOMContentLoaded', async () => {
   const session = await window.auth.ensureSession();
