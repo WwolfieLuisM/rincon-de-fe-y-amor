@@ -129,7 +129,7 @@ function fetchFromSupabase(url: string, key: string, path: string) {
 const MODULE_LABELS: Record<string, string> = {
   prayer: 'Oración',
   prayers: 'Oración',
-  gratitude: 'Gratitud',
+  gratitude: 'Testimonio',
   chat: 'Chat',
   encouragement: 'Chat',
   goals: 'Metas',
@@ -144,6 +144,7 @@ const MODULE_LABELS: Record<string, string> = {
 const TYPE_ICONS: Record<string, string> = {
   prayer: '🙏',
   gratitude: '⭐',
+  testimony: '⭐',
   chat: '💬',
   encouragement: '💬',
   goal: '🎯',
