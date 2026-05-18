@@ -548,7 +548,7 @@ async function updateProgress() {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const { data: { session } } = await window.supabase.auth.getSession();
+  const session = await window.auth.ensureSession();
   if (!session) { window.location.href = 'index.html'; return; }
   userId = session.user.id;
 

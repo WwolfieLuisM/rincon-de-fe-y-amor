@@ -88,7 +88,7 @@ function appendGratitude(g, userId, partnerName) {
   if (!container) return;
 
   const emptyState = container.querySelector('.empty-state');
-  if (emptyState) container.innerHTML = '';
+  if (emptyState) emptyState.remove();
 
   const isMine = g.user_id === userId;
   const name = isMine ? 'Tú' : partnerName;
@@ -134,7 +134,7 @@ window.addEventListener('beforeunload', () => {
 });
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const { data: { session } } = await window.supabase.auth.getSession();
+  const session = await window.auth.ensureSession();
   if (!session) { window.location.href = 'index.html'; return; }
 
   const { data: space } = await window.supabase

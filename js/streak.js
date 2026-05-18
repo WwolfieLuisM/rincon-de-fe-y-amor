@@ -1,3 +1,8 @@
+function getLocalDateStr(d) {
+  const dt = d || new Date();
+  return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+}
+
 window.streakService = {
   async getStreak(spaceId) {
     const { data } = await window.supabase
@@ -9,7 +14,7 @@ window.streakService = {
   },
 
   async getTodayMarks(spaceId, today) {
-    const todayStr = today || new Date().toISOString().split('T')[0];
+    const todayStr = today || getLocalDateStr();
     const { data } = await window.supabase
       .from('streak_marks')
       .select('user_id')
@@ -19,7 +24,7 @@ window.streakService = {
   },
 
   async markToday(spaceId, userId, today) {
-    const todayStr = today || new Date().toISOString().split('T')[0];
+    const todayStr = today || getLocalDateStr();
     const { error } = await window.supabase
       .from('streak_marks')
       .insert({ space_id: spaceId, user_id: userId, marked_at: todayStr });
@@ -28,10 +33,10 @@ window.streakService = {
   },
 
   async checkAndUpdate(spaceId, mode, userId, today) {
-    const todayStr = today || new Date().toISOString().split('T')[0];
+    const todayStr = today || getLocalDateStr();
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const yStr = yesterday.toISOString().split('T')[0];
+    const yStr = getLocalDateStr(yesterday);
 
     const todayUsers = await this.getTodayMarks(spaceId, todayStr);
     const bothMarked = mode === 'solo' || (todayUsers.length >= 2);
@@ -94,7 +99,7 @@ window.streakService = {
     for (let i = n - 1; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      dates.push(d.toISOString().split('T')[0]);
+      dates.push(getLocalDateStr(d));
     }
     const { data } = await window.supabase
       .from('streak_marks')
@@ -110,7 +115,7 @@ window.streakService = {
 
   async getPartnerMarked(space, userId, today) {
     if (space.mode === 'solo') return true;
-    const todayStr = today || new Date().toISOString().split('T')[0];
+    const todayStr = today || getLocalDateStr();
     const otherId = space.created_by === userId ? space.partner_id : space.created_by;
     if (!otherId) return false;
     const { data } = await window.supabase

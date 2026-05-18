@@ -33,7 +33,8 @@ function fireConfetti() {
 }
 
 async function loadPage(userId, space) {
-  const today = new Date().toISOString().split('T')[0];
+  const d = new Date();
+  const today = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   const userName = window.currentUser ? window.currentUser.name || 'Tú' : 'Tú';
   const partnerName = window.currentPartner ? window.currentPartner.name : 'Pareja';
 
@@ -200,7 +201,7 @@ async function loadPage(userId, space) {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const { data: { session } } = await window.supabase.auth.getSession();
+  const session = await window.auth.ensureSession();
   if (!session) { window.location.href = 'index.html'; return; }
 
   const { data: space } = await window.supabase

@@ -1,5 +1,5 @@
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').then(reg => {
+  navigator.serviceWorker.register('firebase-messaging-sw.js').then(reg => {
     reg.update();
   }).catch(() => {});
 }
@@ -81,6 +81,22 @@ window.auth = {
   async getSession() {
     const { data: { session } } = await window.supabase.auth.getSession();
     return session;
+  },
+
+  async ensureSession(timeoutMs) {
+    const { data: { session } } = await window.supabase.auth.getSession();
+    if (session) return session;
+    const ms = timeoutMs || 5000;
+    return new Promise(resolve => {
+      const timer = setTimeout(() => resolve(null), ms);
+      const { data: { subscription } } = window.supabase.auth.onAuthStateChange((event, s) => {
+        if (event === 'SIGNED_IN' && s) {
+          clearTimeout(timer);
+          subscription.unsubscribe();
+          resolve(s);
+        }
+      });
+    });
   },
 
   async getProfile(userId) {

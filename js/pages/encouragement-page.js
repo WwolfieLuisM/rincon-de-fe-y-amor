@@ -6,6 +6,7 @@ function showToast(msg, type) {
 }
 
 let encouragementChannel = null;
+let loadController = null;
 
 function appendMessage(msg, userId, partnerName) {
   const container = document.getElementById('app');
@@ -80,6 +81,10 @@ async function loadPage(userId, space) {
   const input = document.getElementById('encouragementInput');
   const sendBtn = document.getElementById('sendBtn');
 
+  if (loadController) loadController.abort();
+  loadController = new AbortController();
+  const signal = loadController.signal;
+
   async function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
@@ -97,19 +102,20 @@ async function loadPage(userId, space) {
     }
 
     await window.auth.logActivity(space.id, userId, 'encouragement', text, 'encouragement');
+    appendMessage({ text, sender_id: userId, created_at: new Date().toISOString() }, userId, partnerName);
     input.value = '';
     sendBtn.disabled = false;
     showToast('Mensaje enviado ✅', 'success');
   }
 
-  sendBtn.addEventListener('click', sendMessage);
+  sendBtn.addEventListener('click', sendMessage, { signal });
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') sendMessage();
-  });
+  }, { signal });
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const { data: { session } } = await window.supabase.auth.getSession();
+  const session = await window.auth.ensureSession();
   if (!session) { window.location.href = 'index.html'; return; }
 
   const { data: space } = await window.supabase
@@ -131,7 +137,9 @@ window.addEventListener('DOMContentLoaded', async () => {
       table: 'encouragement',
       filter: 'space_id=eq.' + space.id,
     }, (payload) => {
-      appendMessage(payload.new, session.user.id, partnerName);
+      if (payload.new.sender_id !== session.user.id) {
+        appendMessage(payload.new, session.user.id, partnerName);
+      }
     })
     .subscribe();
 });

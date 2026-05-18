@@ -95,7 +95,7 @@ function getActivityIcon(type) {
 
 function getTodayStr() {
   const d = new Date();
-  return d.toISOString().split('T')[0];
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 
 async function loadDevotionalVerse() {
@@ -406,7 +406,7 @@ async function loadPage(userId, space) {
       if (bothMarked) {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
-        const yStr = yesterday.toISOString().split('T')[0];
+        const yStr = yesterday.getFullYear() + '-' + String(yesterday.getMonth() + 1).padStart(2, '0') + '-' + String(yesterday.getDate()).padStart(2, '0');
 
         let updateData = {};
         if (streak && streak.last_marked === yStr) {
@@ -464,7 +464,7 @@ async function checkPartnerMarked(space, userId, today) {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-  const { data: { session } } = await window.supabase.auth.getSession();
+  const session = await window.auth.ensureSession();
   if (!session) { window.location.href = 'index.html'; return; }
 
   const { data: space } = await window.supabase

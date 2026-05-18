@@ -29,25 +29,11 @@ async function getPrayerProgress(prayerId, space, userId) {
 
   if (!marks || marks.length === 0) return 0;
 
-  const byDate = {};
+  const userDates = new Set();
   marks.forEach(m => {
-    if (!byDate[m.marked_at]) byDate[m.marked_at] = new Set();
-    byDate[m.marked_at].add(m.user_id);
+    if (m.user_id === userId) userDates.add(m.marked_at);
   });
-
-  if (space.mode === 'couple') {
-    let count = 0;
-    for (const date in byDate) {
-      if (byDate[date].size >= 2) count++;
-    }
-    return count;
-  } else {
-    const userDates = new Set();
-    marks.forEach(m => {
-      if (m.user_id === userId) userDates.add(m.marked_at);
-    });
-    return userDates.size;
-  }
+  return userDates.size;
 }
 
 function showPrayerModal(prayer, space, userId) {
@@ -159,7 +145,8 @@ async function loadPage(userId, space) {
     progressMap[p.id] = await getPrayerProgress(p.id, space, userId);
   }
 
-  const today = new Date().toISOString().split('T')[0];
+  const d = new Date();
+  const today = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   let todayMarks = [];
   if (activePrayers.length > 0) {
     const { data: marks } = await window.supabase
@@ -171,7 +158,7 @@ async function loadPage(userId, space) {
   }
 
   const headerAvatar = document.getElementById('headerAvatar');
-  if (window.currentUser) {
+  if (headerAvatar && window.currentUser) {
     headerAvatar.textContent = (window.currentUser.name || '?').charAt(0).toUpperCase();
   }
 
@@ -269,7 +256,7 @@ function renderActivePrayers(prayers, progressMap, todayMarks, userId, space) {
 
       const { error } = await window.supabase
         .from('prayer_marks')
-        .insert({ prayer_id: prayerId, user_id: userId, marked_at: new Date().toISOString().split('T')[0] });
+        .insert({ prayer_id: prayerId, user_id: userId, marked_at: today });
 
       if (error) {
         if (error.code === '23505') {
@@ -350,7 +337,7 @@ function renderCompletedPrayers(prayers) {
 
 window.addEventListener('DOMContentLoaded', async () => {
   document.querySelector('.prayers-bg') || document.body.insertAdjacentHTML('afterbegin', '<div class="prayers-bg"></div>');
-  const { data: { session } } = await window.supabase.auth.getSession();
+  const session = await window.auth.ensureSession();
   if (!session) { window.location.href = 'index.html'; return; }
 
   const { data: space } = await window.supabase
