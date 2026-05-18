@@ -20,6 +20,7 @@ function getNotifIcon(type) {
     prayer: '<i class="ti ti-heart" style="color:#e8547a"></i>',
     gratitude: '<i class="ti ti-star" style="color:#fbbf24"></i>',
     encouragement: '<i class="ti ti-message-2" style="color:#60a5fa"></i>',
+    chat: '<i class="ti ti-message-2" style="color:#60a5fa"></i>',
     goal: '<i class="ti ti-target" style="color:#34d399"></i>',
     date: '<i class="ti ti-calendar" style="color:#f472b6"></i>',
     streak: '<i class="ti ti-flame" style="color:#fb923c"></i>',

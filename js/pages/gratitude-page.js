@@ -91,9 +91,12 @@ function createCardHtml(g, userId, partnerName) {
   }
 
   const editDelHtml = isMine ? `
-    <div style="display:flex;gap:8px;flex-shrink:0">
-      <button class="btn-soft testimony-edit-btn" data-id="${g.id}">Editar</button>
-      <button class="btn-soft testimony-del-btn" data-id="${g.id}" style="color:#f87171;border-color:#f8717133">✕</button>
+    <div class="three-dot-wrap">
+      <button class="three-dot-btn" data-id="${g.id}">⋮</button>
+      <div class="three-dot-menu">
+        <button class="three-dot-item" data-action="edit" data-id="${g.id}"><i class="ti ti-edit"></i> Editar</button>
+        <button class="three-dot-item danger" data-action="delete" data-id="${g.id}"><i class="ti ti-trash"></i> Eliminar</button>
+      </div>
     </div>
   ` : '';
 
@@ -171,19 +174,29 @@ async function loadPage(userId, space) {
   container.innerHTML = html;
 
   container.addEventListener('click', async (e) => {
-    const btn = e.target.closest('.testimony-edit-btn');
-    if (btn) {
-      const g = items.find(i => i.id === btn.dataset.id);
-      if (g) showTestimonyModal(g, space.id, userId);
+    const dotBtn = e.target.closest('.three-dot-btn');
+    if (dotBtn) {
+      e.stopPropagation();
+      document.querySelectorAll('.three-dot-menu.open').forEach(m => { if (m.closest('.three-dot-wrap') !== dotBtn.parentElement) m.classList.remove('open'); });
+      const menu = dotBtn.parentElement.querySelector('.three-dot-menu');
+      menu.classList.toggle('open');
       return;
     }
 
-    const delBtn = e.target.closest('.testimony-del-btn');
-    if (delBtn) {
-      if (!confirm('¿Eliminar este testimonio?')) return;
-      await window.supabase.from('gratitude').delete().eq('id', delBtn.dataset.id);
-      showToast('Testimonio eliminado', 'success');
-      await loadPage(userId, space);
+    const item = e.target.closest('.three-dot-item');
+    if (item) {
+      item.closest('.three-dot-menu').classList.remove('open');
+      const id = item.dataset.id;
+      const action = item.dataset.action;
+      const g = items.find(i => i.id === id);
+      if (action === 'edit' && g) {
+        showTestimonyModal(g, space.id, userId);
+      } else if (action === 'delete') {
+        if (!confirm('¿Eliminar este testimonio?')) return;
+        await window.supabase.from('gratitude').delete().eq('id', id);
+        showToast('Testimonio eliminado', 'success');
+        await loadPage(userId, space);
+      }
       return;
     }
   });
@@ -321,4 +334,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('addTestimonyBtn').addEventListener('click', () => {
     showTestimonyModal(null, space.id, session.user.id);
   });
+});
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.three-dot-menu.open').forEach(m => m.classList.remove('open'));
 });

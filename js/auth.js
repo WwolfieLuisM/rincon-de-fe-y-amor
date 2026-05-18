@@ -7,17 +7,17 @@ if ('serviceWorker' in navigator) {
 let _cachedSession = null;
 
 try {
-  const stored = sessionStorage.getItem('rd_s');
+  const stored = localStorage.getItem('rd_s');
   if (stored) _cachedSession = JSON.parse(stored);
 } catch (e) {}
 
 window.supabase.auth.onAuthStateChange((event, session) => {
   if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
     _cachedSession = session;
-    try { sessionStorage.setItem('rd_s', JSON.stringify(session)); } catch (e) {}
+    try { localStorage.setItem('rd_s', JSON.stringify(session)); } catch (e) {}
   } else if (event === 'SIGNED_OUT') {
     _cachedSession = null;
-    try { sessionStorage.removeItem('rd_s'); } catch (e) {}
+    try { localStorage.removeItem('rd_s'); } catch (e) {}
   }
 });
 
@@ -87,7 +87,7 @@ window.auth = {
 
   async logout() {
     _cachedSession = null;
-    try { sessionStorage.removeItem('rd_s'); } catch (e) {}
+    try { localStorage.removeItem('rd_s'); } catch (e) {}
     await window.supabase.auth.signOut();
     window.location.href = 'index.html';
   },
@@ -108,7 +108,7 @@ window.auth = {
     const { data: { session } } = await window.supabase.auth.getSession();
     if (session) {
       _cachedSession = session;
-      try { sessionStorage.setItem('rd_s', JSON.stringify(session)); } catch (e) {}
+      try { localStorage.setItem('rd_s', JSON.stringify(session)); } catch (e) {}
       return session;
     }
 
@@ -120,12 +120,12 @@ window.auth = {
             if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
               subscription.unsubscribe();
               _cachedSession = s;
-              try { sessionStorage.setItem('rd_s', JSON.stringify(s)); } catch (e) {}
+              try { localStorage.setItem('rd_s', JSON.stringify(s)); } catch (e) {}
               resolve(s);
             } else if (event === 'SIGNED_OUT') {
               subscription.unsubscribe();
               _cachedSession = null;
-              try { sessionStorage.removeItem('rd_s'); } catch (e) {}
+              try { localStorage.removeItem('rd_s'); } catch (e) {}
               resolve(null);
             }
           }

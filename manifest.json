@@ -2,7 +2,7 @@
   "name": "Rincón de Fe y Amor",
   "short_name": "Fe y Amor",
   "description": "Un espacio espiritual para parejas. Ora, agradece y crece juntos.",
-  "start_url": "/rincon-de-fe-y-amor/index.html",
+  "start_url": "/rincon-de-fe-y-amor/dashboard.html",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#e8547a",

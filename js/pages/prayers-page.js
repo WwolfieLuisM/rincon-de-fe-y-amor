@@ -222,10 +222,14 @@ function renderActivePrayers(prayers, progressMap, todayMarks, userId, space) {
         <div class="prayer-header">
           <div class="prayer-icon ${p.category}">${icon}</div>
           <div class="prayer-title">${p.title}</div>
-          <div style="display:flex;gap:8px;flex-shrink:0">
-            <button class="btn-soft prayer-edit-btn" data-id="${p.id}">Editar</button>
-            <button class="btn-soft prayer-del-btn" data-id="${p.id}" style="color:#f87171;border-color:#f8717133">✕</button>
-          </div>
+          ${isMine ? `
+          <div class="three-dot-wrap">
+            <button class="three-dot-btn" data-id="${p.id}">⋮</button>
+            <div class="three-dot-menu">
+              <button class="three-dot-item" data-action="edit" data-id="${p.id}"><i class="ti ti-edit"></i> Editar</button>
+              <button class="three-dot-item danger" data-action="delete" data-id="${p.id}"><i class="ti ti-trash"></i> Eliminar</button>
+            </div>
+          </div>` : ''}
         </div>
         <div class="progress-bar">
           <div class="progress-fill" style="width:${pct}%"></div>
@@ -282,25 +286,32 @@ function renderActivePrayers(prayers, progressMap, todayMarks, userId, space) {
     });
   });
 
-  container.querySelectorAll('.prayer-edit-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const prayer = prayers.find(p => p.id === btn.dataset.id);
-      if (prayer) showPrayerModal(prayer, space, userId);
-    });
+  container.addEventListener('click', (e) => {
+    const dotBtn = e.target.closest('.three-dot-btn');
+    if (dotBtn) {
+      e.stopPropagation();
+      document.querySelectorAll('.three-dot-menu.open').forEach(m => { if (m.closest('.three-dot-wrap') !== dotBtn.parentElement) m.classList.remove('open'); });
+      dotBtn.parentElement.querySelector('.three-dot-menu').classList.toggle('open');
+      return;
+    }
+
+    const item = e.target.closest('.three-dot-item');
+    if (!item) return;
+    item.closest('.three-dot-menu').classList.remove('open');
+    const id = item.dataset.id;
+    const prayer = prayers.find(p => p.id === id);
+    if (item.dataset.action === 'edit' && prayer) {
+      showPrayerModal(prayer, space, userId);
+    } else if (item.dataset.action === 'delete') {
+      if (!confirm('¿Eliminar esta oración?')) return;
+      window.supabase.from('prayers').delete().eq('id', id).then(({ error }) => {
+        if (error) { showToast('Error: ' + error.message, 'error'); return; }
+        showToast('Oración eliminada', 'success');
+        loadPage(userId, space);
+      });
+    }
   });
 
-  container.querySelectorAll('.prayer-del-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      if (!confirm('¿Eliminar esta oración?')) return;
-      const { error } = await window.supabase.from('prayers').delete().eq('id', btn.dataset.id);
-      if (error) {
-        showToast('Error: ' + error.message, 'error');
-        return;
-      }
-      showToast('Oración eliminada', 'success');
-      await loadPage(userId, space);
-    });
-  });
 }
 
 function renderCompletedPrayers(prayers) {
@@ -349,4 +360,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   await initLayout();
   await loadPage(session.user.id, space);
+});
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.three-dot-menu.open').forEach(m => m.classList.remove('open'));
 });

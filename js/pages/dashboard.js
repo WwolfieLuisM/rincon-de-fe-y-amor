@@ -81,6 +81,7 @@ function getActivityIcon(type) {
     gratitude: { icon: '<i class="ti ti-star"></i>', cls: 'gratitude' },
     encouragement: { icon: '<i class="ti ti-message-2"></i>', cls: 'message' },
     message: { icon: '<i class="ti ti-message-2"></i>', cls: 'message' },
+    chat: { icon: '<i class="ti ti-message-2"></i>', cls: 'message' },
     goal: { icon: '<i class="ti ti-target"></i>', cls: 'goal' },
     date: { icon: '<i class="ti ti-calendar"></i>', cls: 'date' },
     streak: { icon: '<i class="ti ti-flame"></i>', cls: 'streak' },
@@ -340,6 +341,7 @@ async function loadPage(userId, space) {
       if (a.module === 'prayers') link = 'prayers.html';
       else if (a.module === 'gratitude') link = 'gratitude.html';
       else if (a.module === 'encouragement') link = 'encouragement.html';
+      else if (a.module === 'chat') link = 'encouragement.html';
       else if (a.module === 'goals') link = 'goals.html';
       else if (a.module === 'dates') link = 'dates.html';
       else if (a.module === 'bible') link = 'palabra.html';
@@ -548,6 +550,7 @@ function appendActivity(activity, userId, partnerName) {
   if (activity.module === 'prayers') link = 'prayers.html';
   else if (activity.module === 'gratitude') link = 'gratitude.html';
   else if (activity.module === 'encouragement') link = 'encouragement.html';
+  else if (activity.module === 'chat') link = 'encouragement.html';
   else if (activity.module === 'goals') link = 'goals.html';
   else if (activity.module === 'dates') link = 'dates.html';
   else if (activity.module === 'bible') link = 'palabra.html';
