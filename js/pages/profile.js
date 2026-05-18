@@ -72,7 +72,7 @@ async function loadPage(userId, space) {
         </div>
         <div class="stat-card">
           <div class="stat-number">${gratitudeCount}</div>
-          <div class="stat-label"><i class="ti ti-star"></i> Gratitudes</div>
+          <div class="stat-label"><i class="ti ti-star"></i> Testimonios</div>
         </div>
         <div class="stat-card">
           <div class="stat-number">${space.mode === 'couple' ? daysTogether : '-'}</div>

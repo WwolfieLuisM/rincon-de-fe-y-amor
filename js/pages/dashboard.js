@@ -310,7 +310,7 @@ async function loadPage(userId, space) {
   }
 
   if (gratitudes.length > 0) {
-    html += `<div class="section-label">Últimas gratitudes</div>`;
+    html += `<div class="section-label">Últimos testimonios</div>`;
     gratitudes.forEach(g => {
       const isMine = g.user_id === userId;
       html += `
@@ -367,7 +367,7 @@ async function loadPage(userId, space) {
       <div class="empty-state">
         <div class="empty-icon"><i class="ti ti-seedling" style="font-size:48px;opacity:0.15"></i></div>
         <div class="empty-title">Comienza tu viaje espiritual</div>
-        <div class="empty-subtitle">Empieza registrando tus oraciones y gratitudes</div>
+        <div class="empty-subtitle">Empieza registrando tus oraciones y testimonios</div>
       </div>
     `;
   }
