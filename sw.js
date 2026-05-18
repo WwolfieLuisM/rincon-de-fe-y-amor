@@ -81,6 +81,14 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
+  if (e.request.method !== 'GET') {
+    e.respondWith(fetch(e.request));
+    return;
+  }
+  if (url.hostname.includes('googleapis.com')) {
+    e.respondWith(fetch(e.request));
+    return;
+  }
   if (url.hostname.includes('supabase.co')) {
     e.respondWith(fetch(e.request));
     return;
