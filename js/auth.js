@@ -4,6 +4,16 @@ if ('serviceWorker' in navigator) {
   }).catch(() => {});
 }
 
+let _cachedSession = null;
+
+window.supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+    _cachedSession = session;
+  } else if (event === 'SIGNED_OUT') {
+    _cachedSession = null;
+  }
+});
+
 window.auth = {
   async registerViaMagicLink(email, name) {
     const { data, error } = await window.supabase.auth.signInWithOtp({
@@ -69,13 +79,14 @@ window.auth = {
   },
 
   async logout() {
+    _cachedSession = null;
     await window.supabase.auth.signOut();
     window.location.href = 'index.html';
   },
 
   async getUser() {
-    const { data: { user } } = await window.supabase.auth.getUser();
-    return user;
+    const session = await this.ensureSession();
+    return session?.user || null;
   },
 
   async getSession() {
@@ -84,19 +95,33 @@ window.auth = {
   },
 
   async ensureSession(timeoutMs) {
+    if (_cachedSession) return _cachedSession;
+
     const { data: { session } } = await window.supabase.auth.getSession();
-    if (session) return session;
-    const ms = timeoutMs || 5000;
-    return new Promise(resolve => {
-      const timer = setTimeout(() => resolve(null), ms);
-      const { data: { subscription } } = window.supabase.auth.onAuthStateChange((event, s) => {
-        if (event === 'SIGNED_IN' && s) {
-          clearTimeout(timer);
-          subscription.unsubscribe();
-          resolve(s);
-        }
-      });
-    });
+    if (session) {
+      _cachedSession = session;
+      return session;
+    }
+
+    const ms = timeoutMs || 15000;
+    return Promise.race([
+      new Promise(resolve => {
+        const { data: { subscription } } = window.supabase.auth.onAuthStateChange(
+          (event, s) => {
+            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+              subscription.unsubscribe();
+              _cachedSession = s;
+              resolve(s);
+            } else if (event === 'SIGNED_OUT') {
+              subscription.unsubscribe();
+              _cachedSession = null;
+              resolve(null);
+            }
+          }
+        );
+      }),
+      new Promise(resolve => setTimeout(() => resolve(null), ms))
+    ]);
   },
 
   async getProfile(userId) {
