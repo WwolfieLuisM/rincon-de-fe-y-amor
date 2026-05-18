@@ -4,19 +4,8 @@ if ('serviceWorker' in navigator) {
   }).catch(() => {});
 }
 
-let _cachedSession = null;
-
-try {
-  const stored = localStorage.getItem('rd_s');
-  if (stored) _cachedSession = JSON.parse(stored);
-} catch (e) {}
-
-window.supabase.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-    _cachedSession = session;
-    try { localStorage.setItem('rd_s', JSON.stringify(session)); } catch (e) {}
-  } else if (event === 'SIGNED_OUT') {
-    _cachedSession = null;
+window.supabase.auth.onAuthStateChange((event) => {
+  if (event === 'SIGNED_OUT') {
     try { localStorage.removeItem('rd_s'); } catch (e) {}
   }
 });
@@ -86,7 +75,6 @@ window.auth = {
   },
 
   async logout() {
-    _cachedSession = null;
     try { localStorage.removeItem('rd_s'); } catch (e) {}
     await window.supabase.auth.signOut();
     window.location.href = 'index.html';
@@ -102,51 +90,30 @@ window.auth = {
     return session;
   },
 
-  async ensureSession(timeoutMs) {
-    const { data: { session } } = await window.supabase.auth.getSession();
-    if (session) {
-      _cachedSession = session;
-      try { localStorage.setItem('rd_s', JSON.stringify(session)); } catch (e) {}
-      return session;
-    }
+  ensureSession: async function() {
+    try {
+      const { data: { session } } = await window.supabase.auth.getSession();
+      if (session?.user) return session;
+    } catch(e) {}
 
-    const ms = timeoutMs || 15000;
-
-    const recovered = await new Promise(resolve => {
-      const { data: { subscription } } = window.supabase.auth.onAuthStateChange(
-        (event, s) => {
-          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-            subscription.unsubscribe();
-            resolve(s);
-          } else if (event === 'SIGNED_OUT') {
-            subscription.unsubscribe();
-            resolve(null);
-          }
+    try {
+      const key = 'sb-qktdrlhdzfefjwhxqjws-auth-token';
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const stored = JSON.parse(raw);
+        const token = stored?.access_token || stored?.body?.access_token;
+        const refresh = stored?.refresh_token || stored?.body?.refresh_token;
+        if (token && refresh) {
+          const { data, error } = await window.supabase.auth.setSession({
+            access_token: token,
+            refresh_token: refresh
+          });
+          if (!error && data?.session) return data.session;
         }
-      );
-
-      if (_cachedSession?.access_token) {
-        window.supabase.auth.setSession({
-          access_token: _cachedSession.access_token,
-          refresh_token: _cachedSession.refresh_token
-        }).catch(() => {});
       }
+    } catch(e) {}
 
-      setTimeout(() => {
-        subscription.unsubscribe();
-        resolve(null);
-      }, ms);
-    });
-
-    if (recovered) {
-      _cachedSession = recovered;
-      try { localStorage.setItem('rd_s', JSON.stringify(recovered)); } catch (e) {}
-    } else {
-      _cachedSession = null;
-      try { localStorage.removeItem('rd_s'); } catch (e) {}
-    }
-
-    return recovered;
+    return null;
   },
 
   async getProfile(userId) {
