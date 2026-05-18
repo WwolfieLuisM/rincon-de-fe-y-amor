@@ -25,7 +25,8 @@ async function loadPage(userId, space) {
 
     if (!alreadyRead) {
       await window.Devotional.markAsRead(userId, personalDev.id);
-      await window.auth.logActivity(space.id, userId, 'devotional', 'Leyó el devocional de ' + timeInfo.time, 'devotional');
+      const t = timeInfo.time === 'morning' ? 'la Mañana' : timeInfo.time === 'afternoon' ? 'la Tarde' : 'la Noche';
+      await window.auth.logActivity(space.id, userId, 'devotional', 'Leyó el devocional de ' + t, 'devotional');
     }
 
     html += `
