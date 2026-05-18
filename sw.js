@@ -29,7 +29,7 @@ self.addEventListener('notificationclick', (event) => {
   event.waitUntil(clients.openWindow(url));
 });
 
-const CACHE = 'rincon-fe-v7';
+const CACHE = 'rincon-fe-v8';
 const STATIC = [
   '/rincon-de-fe-y-amor/',
   '/rincon-de-fe-y-amor/index.html',
@@ -55,7 +55,16 @@ const STATIC = [
   '/rincon-de-fe-y-amor/img/icon-192.png',
   '/rincon-de-fe-y-amor/img/icon-512.png',
   '/rincon-de-fe-y-amor/img/icon.svg',
-  '/rincon-de-fe-y-amor/img/apple-touch-icon.png'
+  '/rincon-de-fe-y-amor/img/apple-touch-icon.png',
+  '/rincon-de-fe-y-amor/img/login-bg.webp',
+  '/rincon-de-fe-y-amor/img/dashboard-bg.webp',
+  '/rincon-de-fe-y-amor/img/prayers-bg.webp',
+  '/rincon-de-fe-y-amor/img/encouragement-bg.webp',
+  '/rincon-de-fe-y-amor/img/goals-bg.webp',
+  '/rincon-de-fe-y-amor/img/streak-bg.webp',
+  '/rincon-de-fe-y-amor/img/devocional-bg.webp',
+  '/rincon-de-fe-y-amor/img/palabra-bg.webp',
+  '/rincon-de-fe-y-amor/img/donativos.webp'
 ];
 
 function stripQuery(url) {

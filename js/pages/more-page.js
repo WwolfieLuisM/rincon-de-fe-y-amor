@@ -81,7 +81,7 @@ async function loadPage(userId, space) {
         Si esta app ha sido de bendición para tu relación, considera apoyarnos con un donativo voluntario. Tu contribución nos ayuda a mantener este proyecto vivo y seguir mejorando la experiencia para más parejas.
       </p>
       <div style="margin-top:14px;text-align:center">
-        <img src="img/donativos.png" alt="Tarjetas para donar" style="max-width:100%;border-radius:var(--radius-sm);border:1px solid var(--border)">
+        <img src="img/donativos.webp" alt="Tarjetas para donar" style="max-width:100%;border-radius:var(--radius-sm);border:1px solid var(--border)">
       </div>
       <p style="color:var(--text-3);font-size:12px;text-align:center;margin-top:8px">
         Desde el corazón, gracias por tu apoyo 🙏

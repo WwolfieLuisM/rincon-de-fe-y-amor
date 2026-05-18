@@ -854,14 +854,14 @@ textarea.input-field {
   position: fixed;
   inset: 0;
   z-index: 0;
-  background: url('../img/login-bg.png') center / cover no-repeat;
+  background: url('../img/login-bg.webp') center / cover no-repeat;
 }
 
 .app-bg {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: url('../img/dashboard-bg.png') center / cover no-repeat;
+  background: url('../img/dashboard-bg.webp') center / cover no-repeat;
 }
 
 .app-bg::after {
@@ -875,7 +875,7 @@ textarea.input-field {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: url('../img/prayers-bg.png') center / cover no-repeat;
+  background: url('../img/prayers-bg.webp') center / cover no-repeat;
 }
 
 .prayers-bg::after {
@@ -889,7 +889,7 @@ textarea.input-field {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: url('../img/encouragement-bg.png') center / cover no-repeat;
+  background: url('../img/encouragement-bg.webp') center / cover no-repeat;
 }
 
 .encouragement-bg::after {
@@ -903,7 +903,7 @@ textarea.input-field {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: url('../img/goals-bg.png') center / cover no-repeat;
+  background: url('../img/goals-bg.webp') center / cover no-repeat;
 }
 
 .goals-bg::after {
@@ -917,7 +917,7 @@ textarea.input-field {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: url('../img/streak-bg.png') center / cover no-repeat;
+  background: url('../img/streak-bg.webp') center / cover no-repeat;
 }
 
 .streak-bg::after {
@@ -2316,7 +2316,7 @@ textarea.input-field {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: url('../img/devocional-bg.png') center / cover no-repeat;
+  background: url('../img/devocional-bg.webp') center / cover no-repeat;
 }
 
 .devocional-bg::after {

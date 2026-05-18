@@ -24,23 +24,28 @@ function getInitialsFromName(name) {
   return getInitials(name);
 }
 
-window.initLayout = async function () {
+window.initLayout = async function (session, space) {
   (document.querySelector('.app-bg') || document.body.insertAdjacentHTML('afterbegin', '<div class="app-bg"></div>'));
 
-  const session = await window.auth.getSession();
+  if (!session) {
+    session = await window.auth.getSession();
+  }
   if (!session) return;
 
   const userId = session.user.id;
   const profile = await window.auth.getProfile(userId);
   window.currentUser = profile || { id: userId, name: session.user.email?.split('@')[0] || 'User' };
 
-  const { data: space } = await window.supabase
-    .from('spaces')
-    .select('*')
-    .or(`created_by.eq.${userId},partner_id.eq.${userId}`)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  if (!space) {
+    const { data: s } = await window.supabase
+      .from('spaces')
+      .select('*')
+      .or(`created_by.eq.${userId},partner_id.eq.${userId}`)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    space = s;
+  }
   if (!space) return;
   window.currentSpace = space;
 
