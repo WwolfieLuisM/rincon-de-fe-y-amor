@@ -110,44 +110,43 @@ window.auth = {
       return session;
     }
 
-    if (_cachedSession) {
-      try {
-        const { data } = await window.supabase.auth.setSession({
+    const ms = timeoutMs || 15000;
+
+    const recovered = await new Promise(resolve => {
+      const { data: { subscription } } = window.supabase.auth.onAuthStateChange(
+        (event, s) => {
+          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+            subscription.unsubscribe();
+            resolve(s);
+          } else if (event === 'SIGNED_OUT') {
+            subscription.unsubscribe();
+            resolve(null);
+          }
+        }
+      );
+
+      if (_cachedSession?.access_token) {
+        window.supabase.auth.setSession({
           access_token: _cachedSession.access_token,
           refresh_token: _cachedSession.refresh_token
-        });
-        if (data?.session) {
-          _cachedSession = data.session;
-          try { localStorage.setItem('rd_s', JSON.stringify(data.session)); } catch (e) {}
-          return data.session;
-        }
-      } catch (e) {}
+        }).catch(() => {});
+      }
+
+      setTimeout(() => {
+        subscription.unsubscribe();
+        resolve(null);
+      }, ms);
+    });
+
+    if (recovered) {
+      _cachedSession = recovered;
+      try { localStorage.setItem('rd_s', JSON.stringify(recovered)); } catch (e) {}
+    } else {
       _cachedSession = null;
       try { localStorage.removeItem('rd_s'); } catch (e) {}
-      return null;
     }
 
-    const ms = timeoutMs || 15000;
-    return Promise.race([
-      new Promise(resolve => {
-        const { data: { subscription } } = window.supabase.auth.onAuthStateChange(
-          (event, s) => {
-            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-              subscription.unsubscribe();
-              _cachedSession = s;
-              try { localStorage.setItem('rd_s', JSON.stringify(s)); } catch (e) {}
-              resolve(s);
-            } else if (event === 'SIGNED_OUT') {
-              subscription.unsubscribe();
-              _cachedSession = null;
-              try { localStorage.removeItem('rd_s'); } catch (e) {}
-              resolve(null);
-            }
-          }
-        );
-      }),
-      new Promise(resolve => setTimeout(() => resolve(null), ms))
-    ]);
+    return recovered;
   },
 
   async getProfile(userId) {
