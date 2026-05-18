@@ -163,7 +163,7 @@ async function loadPage(userId, space) {
       return;
     }
 
-    await window.auth.logActivity(space.id, userId, 'encouragement', text, 'encouragement');
+    await window.auth.logActivity(space.id, userId, 'chat', text, 'chat');
     appendMessage({ text, sender_id: userId, created_at: new Date().toISOString() }, userId, partnerName);
     input.value = '';
     sendBtn.disabled = false;

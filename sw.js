@@ -105,8 +105,20 @@ self.addEventListener('fetch', e => {
     );
     return;
   }
-  // Assets (JS, CSS, images): cache-first with FULL URL (?v=N included)
-  // This way layout.js?v=11 and layout.js?v=10 are separate cache entries
+  // JS & CSS: network-first with FULL URL (?v=N included)
+  if (url.pathname.endsWith('.js') || url.pathname.endsWith('.css')) {
+    e.respondWith(
+      fetch(e.request)
+        .then(res => {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+          return res;
+        })
+        .catch(() => caches.match(e.request))
+    );
+    return;
+  }
+  // Images & other assets: cache-first with FULL URL (?v=N included)
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;

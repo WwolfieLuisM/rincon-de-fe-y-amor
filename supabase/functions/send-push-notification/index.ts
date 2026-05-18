@@ -31,11 +31,11 @@ interface ActivityRecord {
 }
 
 function pemToBinary(pem: string): Uint8Array {
-  const b64 = pem
+  const normalized = pem.replace(/\\n/g, '\n');
+  const b64 = normalized
     .replace(/-----BEGIN PRIVATE KEY-----/g, '')
     .replace(/-----END PRIVATE KEY-----/g, '')
-    .replace(/\r?\n/g, '')
-    .replace(/\r/g, '')
+    .replace(/\s+/g, '')
     .trim();
   const binary = atob(b64);
   const bytes = new Uint8Array(binary.length);
@@ -46,8 +46,20 @@ function pemToBinary(pem: string): Uint8Array {
 }
 
 async function createJwt(clientEmail: string, privateKeyPem: string): Promise<string> {
-  const header = { alg: 'RS256', typ: 'JWT' };
+  const enc = new TextEncoder();
+
+  const toB64Url = (data: string | Uint8Array): string => {
+    const bytes = typeof data === 'string' ? enc.encode(data) : data;
+    let binary = '';
+    bytes.forEach(b => binary += String.fromCharCode(b));
+    return btoa(binary)
+      .replace(/=/g, '')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_');
+  };
+
   const now = Math.floor(Date.now() / 1000);
+  const header = { alg: 'RS256', typ: 'JWT' };
   const claims = {
     iss: clientEmail,
     scope: 'https://www.googleapis.com/auth/firebase.messaging',
@@ -56,15 +68,8 @@ async function createJwt(clientEmail: string, privateKeyPem: string): Promise<st
     iat: now,
   };
 
-  const enc = new TextEncoder();
-  const toB64 = (obj: unknown) =>
-    btoa(JSON.stringify(obj))
-      .replace(/=/g, '')
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_');
-
-  const headerB64 = toB64(header);
-  const claimsB64 = toB64(claims);
+  const headerB64 = toB64Url(JSON.stringify(header));
+  const claimsB64 = toB64Url(JSON.stringify(claims));
   const signatureInput = `${headerB64}.${claimsB64}`;
 
   const keyBytes = pemToBinary(privateKeyPem);
@@ -82,8 +87,7 @@ async function createJwt(clientEmail: string, privateKeyPem: string): Promise<st
     enc.encode(signatureInput),
   );
 
-  const sigB64 = toB64(new Uint8Array(sig));
-  return `${signatureInput}.${sigB64}`;
+  return `${signatureInput}.${toB64Url(new Uint8Array(sig))}`;
 }
 
 async function getAccessToken(sa: ServiceAccount): Promise<string | null> {
@@ -98,10 +102,16 @@ async function getAccessToken(sa: ServiceAccount): Promise<string | null> {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: params,
     });
-    const data = await res.json();
+    const responseText = await res.text();
+    if (!res.ok) {
+      console.error('OAuth response error:', res.status, responseText);
+      return null;
+    }
+    const data = JSON.parse(responseText);
     return data.access_token || null;
   } catch (e) {
-    console.error('getAccessToken error:', e);
+    console.error('getAccessToken error:', (e as Error).message);
+    console.error('private_key preview:', sa.private_key.substring(0, 80));
     return null;
   }
 }
@@ -120,7 +130,8 @@ const MODULE_LABELS: Record<string, string> = {
   prayer: 'Oración',
   prayers: 'Oración',
   gratitude: 'Gratitud',
-  encouragement: 'Ánimo',
+  chat: 'Chat',
+  encouragement: 'Chat',
   goals: 'Metas',
   dates: 'Fechas',
   streak: 'Racha',
@@ -133,6 +144,7 @@ const MODULE_LABELS: Record<string, string> = {
 const TYPE_ICONS: Record<string, string> = {
   prayer: '🙏',
   gratitude: '⭐',
+  chat: '💬',
   encouragement: '💬',
   goal: '🎯',
   date: '📅',

@@ -9,8 +9,62 @@ const EMOJIS = ['❤️', '🙏', '👏', '🔥'];
 const TYPE_LABELS = { testimony: 'Testimonio', prayer: 'Oración', goal: 'Meta' };
 const TYPE_ICONS = { testimony: '⭐', prayer: '🙏', goal: '🎯' };
 
-let selectedType = 'testimony';
 let realtimeChannel = null;
+
+function showTestimonyModal(item, spaceId, userId) {
+  const isEdit = !!item;
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay open';
+  overlay.innerHTML = `
+    <div class="modal-sheet">
+      <div class="modal-title">${isEdit ? 'Editar testimonio' : 'Nuevo testimonio'}</div>
+      <div class="input-group">
+        <label class="input-label">Tipo</label>
+        <select class="input-field" id="testimonyTypeInput">
+          <option value="testimony" ${isEdit && item.category === 'testimony' ? 'selected' : ''}>⭐ Testimonio</option>
+          <option value="prayer" ${isEdit && item.category === 'prayer' ? 'selected' : ''}>🙏 Oración</option>
+          <option value="goal" ${isEdit && item.category === 'goal' ? 'selected' : ''}>🎯 Meta</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Texto</label>
+        <textarea class="input-field" id="testimonyTextInput" rows="4" style="resize:none" placeholder="Comparte tu testimonio...">${isEdit ? item.text : ''}</textarea>
+      </div>
+      <button class="btn-primary w-full" id="saveTestimonyBtn">${isEdit ? 'Guardar cambios' : 'Compartir'}</button>
+      <button class="btn-primary w-full" style="background:var(--surface-2);color:var(--text-2);margin-top:8px" id="cancelModalBtn">Cancelar</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const sheet = overlay.querySelector('.modal-sheet');
+  setTimeout(() => sheet.style.transform = 'translateX(-50%) translateY(0)', 10);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+  document.getElementById('cancelModalBtn').addEventListener('click', () => overlay.remove());
+
+  document.getElementById('saveTestimonyBtn').addEventListener('click', async () => {
+    const textInput = document.getElementById('testimonyTextInput');
+    const typeInput = document.getElementById('testimonyTypeInput');
+    const text = textInput.value.trim();
+    const category = typeInput.value;
+    if (!text) { showToast('Escribe algo', 'error'); return; }
+
+    if (isEdit) {
+      const { error } = await window.supabase.from('gratitude').update({ text, category }).eq('id', item.id);
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      showToast('Testimonio actualizado ✓', 'success');
+    } else {
+      const { error } = await window.supabase.from('gratitude').insert({ space_id: spaceId, user_id: userId, text, category });
+      if (error) { showToast('Error: ' + error.message, 'error'); return; }
+      await window.auth.logActivity(spaceId, userId, 'testimony', text, 'gratitude');
+      showToast('Testimonio compartido ✓', 'success');
+    }
+
+    overlay.remove();
+    await loadPage(userId, { id: spaceId });
+  });
+
+  if (!isEdit) setTimeout(() => document.getElementById('testimonyTextInput').focus(), 200);
+}
 
 function createCardHtml(g, userId, partnerName) {
   const isMine = g.user_id === userId;
@@ -21,48 +75,65 @@ function createCardHtml(g, userId, partnerName) {
   const label = TYPE_LABELS[category] || 'Testimonio';
   const reactions = g.reactions || {};
 
-  let reactionsHtml = EMOJIS.map(emoji => {
+  const activeEmojis = EMOJIS.filter(emoji => {
     const users = reactions[emoji] || [];
-    const count = users.length;
-    const active = users.includes(userId);
-    return `
-      <button class="reaction-btn ${active ? 'active' : ''}" data-id="${g.id}" data-emoji="${emoji}">
-        ${emoji} <span class="reaction-count">${count || ''}</span>
-      </button>
-    `;
-  }).join('');
+    return users.length > 0;
+  });
+
+  let summaryHtml = '';
+  if (activeEmojis.length > 0) {
+    summaryHtml = '<div class="reaction-summary">' +
+      activeEmojis.map(emoji => {
+        const count = (reactions[emoji] || []).length;
+        return `<span class="reaction-summary-item">${emoji} ${count}</span>`;
+      }).join('') +
+      '</div>';
+  }
+
+  const editDelHtml = isMine ? `
+    <div style="display:flex;gap:8px;flex-shrink:0">
+      <button class="btn-soft testimony-edit-btn" data-id="${g.id}">Editar</button>
+      <button class="btn-soft testimony-del-btn" data-id="${g.id}" style="color:#f87171;border-color:#f8717133">✕</button>
+    </div>
+  ` : '';
 
   return `
-    <div class="testimony-card" data-id="${g.id}">
-      <div class="testimony-header">
-        <div class="testimony-avatar">${name.charAt(0).toUpperCase()}</div>
-        <span class="testimony-author">${name}</span>
-        <span class="testimony-date">${date}</span>
+    <div class="prayer-card testimony-card" data-id="${g.id}" data-userid="${g.user_id}">
+      <div class="prayer-header">
+        <div class="prayer-icon ${category}">${icon}</div>
+        <div class="prayer-title">${name}</div>
+        ${editDelHtml}
       </div>
+      <div style="font-size:12px;color:var(--text-2);margin-bottom:8px">${date} · <span class="testimony-badge ${category}">${icon} ${label}</span></div>
       <div class="testimony-text">${g.text}</div>
-      <div class="testimony-badge ${category}">${icon} ${label}</div>
-      <div class="testimony-reactions" data-id="${g.id}">
-        ${reactionsHtml}
-      </div>
+      ${summaryHtml}
     </div>
   `;
 }
 
 function updateCardReactions(g, userId) {
   const reactions = g.reactions || {};
-  const container = document.querySelector(`.testimony-reactions[data-id="${g.id}"]`);
-  if (!container) return;
+  const card = document.querySelector(`.testimony-card[data-id="${g.id}"]`);
+  if (!card) return;
 
-  container.innerHTML = EMOJIS.map(emoji => {
+  const activeEmojis = EMOJIS.filter(emoji => {
     const users = reactions[emoji] || [];
-    const count = users.length;
-    const active = users.includes(userId);
-    return `
-      <button class="reaction-btn ${active ? 'active' : ''}" data-id="${g.id}" data-emoji="${emoji}">
-        ${emoji} <span class="reaction-count">${count || ''}</span>
-      </button>
-    `;
-  }).join('');
+    return users.length > 0;
+  });
+
+  let summaryHtml = '';
+  if (activeEmojis.length > 0) {
+    summaryHtml = '<div class="reaction-summary">' +
+      activeEmojis.map(emoji => {
+        const count = (reactions[emoji] || []).length;
+        return `<span class="reaction-summary-item">${emoji} ${count}</span>`;
+      }).join('') +
+      '</div>';
+  }
+
+  let existing = card.querySelector('.reaction-summary');
+  if (existing) existing.remove();
+  if (summaryHtml) card.insertAdjacentHTML('beforeend', summaryHtml);
 }
 
 async function loadPage(userId, space) {
@@ -80,12 +151,12 @@ async function loadPage(userId, space) {
   const container = document.getElementById('app');
   const partnerName = window.currentPartner ? window.currentPartner.name || 'Pareja' : 'Pareja';
 
-  let html = '<div class="testimony-feed" id="testimonyFeed">';
+  let html = '<div class="page-content" id="testimonyFeed">';
 
   if (!items || items.length === 0) {
     html += `
       <div class="empty-state">
-        <div class="empty-icon"><i class="ti ti-star" style="font-size:48px;opacity:0.15"></i></div>
+        <div class="empty-icon">⭐</div>
         <div class="empty-title">Comparte tu testimonio</div>
         <div class="empty-subtitle">Escribe algo que Dios ha hecho en tu vida</div>
       </div>
@@ -100,80 +171,88 @@ async function loadPage(userId, space) {
   container.innerHTML = html;
 
   container.addEventListener('click', async (e) => {
-    const btn = e.target.closest('.reaction-btn');
-    if (!btn) return;
-
-    const id = btn.dataset.id;
-    const emoji = btn.dataset.emoji;
-
-    try {
-      await window.supabase.rpc('toggle_reaction', {
-        p_gratitude_id: id,
-        p_user_id: userId,
-        p_emoji: emoji
-      });
-    } catch (err) {
-      console.error('Reaction error:', err);
-    }
-  });
-
-  setupInput(userId, space);
-  setupRealtime(space.id, userId, partnerName);
-}
-
-function setupInput(userId, space) {
-  const input = document.getElementById('gratitudeInput');
-  const sendBtn = document.getElementById('sendBtn');
-
-  const typeSelector = document.createElement('div');
-  typeSelector.className = 'type-selector';
-  typeSelector.innerHTML = `
-    <div class="type-option testimony active" data-type="testimony">⭐ Testimonio</div>
-    <div class="type-option prayer" data-type="prayer">🙏 Oración</div>
-    <div class="type-option goal" data-type="goal">🎯 Meta</div>
-  `;
-
-  const inputBar = document.querySelector('.chat-input-bar');
-  inputBar.parentNode.insertBefore(typeSelector, inputBar);
-
-  typeSelector.addEventListener('click', (e) => {
-    const opt = e.target.closest('.type-option');
-    if (!opt) return;
-    typeSelector.querySelectorAll('.type-option').forEach(o => o.classList.remove('active'));
-    opt.classList.add('active');
-    selectedType = opt.dataset.type;
-    input.placeholder = selectedType === 'testimony' ? 'Comparte tu testimonio...'
-      : selectedType === 'prayer' ? 'Comparte tu oración...'
-      : 'Comparte tu meta...';
-  });
-
-  async function sendTestimony() {
-    const text = input.value.trim();
-    if (!text) return;
-
-    sendBtn.disabled = true;
-
-    const { error } = await window.supabase
-      .from('gratitude')
-      .insert({ space_id: space.id, user_id: userId, text, category: selectedType });
-
-    if (error) {
-      showToast('Error: ' + error.message, 'error');
-      sendBtn.disabled = false;
+    const btn = e.target.closest('.testimony-edit-btn');
+    if (btn) {
+      const g = items.find(i => i.id === btn.dataset.id);
+      if (g) showTestimonyModal(g, space.id, userId);
       return;
     }
 
-    await window.auth.logActivity(space.id, userId, 'testimony', text, 'gratitude');
-    input.value = '';
-    sendBtn.disabled = false;
-    showToast('Testimonio compartido ✅', 'success');
-    await loadPage(userId, space);
-  }
-
-  sendBtn.addEventListener('click', sendTestimony);
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') sendTestimony();
+    const delBtn = e.target.closest('.testimony-del-btn');
+    if (delBtn) {
+      if (!confirm('¿Eliminar este testimonio?')) return;
+      await window.supabase.from('gratitude').delete().eq('id', delBtn.dataset.id);
+      showToast('Testimonio eliminado', 'success');
+      await loadPage(userId, space);
+      return;
+    }
   });
+
+  let longPressTimer = null;
+  let longPressCard = null;
+
+  container.addEventListener('touchstart', (e) => {
+    const card = e.target.closest('.testimony-card');
+    if (!card) return;
+    longPressCard = card;
+    longPressTimer = setTimeout(() => {
+      showReactionPopup(card, userId);
+    }, 500);
+  }, { passive: true });
+
+  container.addEventListener('touchend', () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+    longPressCard = null;
+  });
+
+  container.addEventListener('touchmove', () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+  });
+
+  setupRealtime(space.id, userId, partnerName);
+}
+
+function showReactionPopup(card, userId) {
+  const id = card.dataset.id;
+  const rect = card.getBoundingClientRect();
+
+  const popup = document.createElement('div');
+  popup.className = 'reaction-popup';
+  popup.innerHTML = EMOJIS.map(emoji =>
+    `<button class="reaction-popup-btn" data-id="${id}" data-emoji="${emoji}">${emoji}</button>`
+  ).join('');
+
+  const top = rect.top - 60;
+  popup.style.top = Math.max(10, top) + 'px';
+  popup.style.left = '50%';
+  popup.style.transform = 'translateX(-50%)';
+  document.body.appendChild(popup);
+
+  const removePopup = () => { if (popup.parentNode) popup.remove(); };
+
+  popup.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.reaction-popup-btn');
+    if (!btn) return;
+    const gId = btn.dataset.id;
+    const emoji = btn.dataset.emoji;
+    try {
+      await window.supabase.rpc('toggle_reaction', { p_gratitude_id: gId, p_user_id: userId, p_emoji: emoji });
+    } catch (err) {
+      console.error('Reaction error:', err);
+    }
+    removePopup();
+  });
+
+  setTimeout(() => {
+    document.addEventListener('click', removePopup, { once: true });
+    document.addEventListener('touchstart', removePopup, { once: true });
+  }, 50);
 }
 
 function setupRealtime(spaceId, userId, partnerName) {
@@ -204,8 +283,16 @@ function setupRealtime(spaceId, userId, partnerName) {
       table: 'gratitude',
       filter: `space_id=eq.${spaceId}`
     }, (payload) => {
-      const g = payload.new;
-      updateCardReactions(g, userId);
+      updateCardReactions(payload.new, userId);
+    })
+    .on('postgres_changes', {
+      event: 'DELETE',
+      schema: 'public',
+      table: 'gratitude',
+      filter: `space_id=eq.${spaceId}`
+    }, (payload) => {
+      const card = document.querySelector(`.testimony-card[data-id="${payload.old.id}"]`);
+      if (card) card.remove();
     })
     .subscribe();
 }
@@ -230,4 +317,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   await initLayout();
   await loadPage(session.user.id, space);
+
+  document.getElementById('addTestimonyBtn').addEventListener('click', () => {
+    showTestimonyModal(null, space.id, session.user.id);
+  });
 });
