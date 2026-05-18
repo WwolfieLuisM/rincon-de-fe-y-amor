@@ -154,7 +154,14 @@ function renderGoals(goals, userId, space) {
             <div class="goal-title">${g.title}</div>
             ${g.target_date ? `<div class="goal-date"><i class="ti ti-calendar"></i> ${formatDate(g.target_date)}</div>` : ''}
           </div>
-          ${!g.completed ? `<button class="btn-soft goal-del-btn" data-id="${g.id}" style="color:#f87171;border-color:#f8717133">✕</button>` : ''}
+          ${!g.completed ? `
+          <div class="three-dot-wrap">
+            <button class="three-dot-btn" data-id="${g.id}">⋮</button>
+            <div class="three-dot-menu">
+              <button class="three-dot-item" data-action="edit" data-id="${g.id}"><i class="ti ti-edit"></i> Editar</button>
+              <button class="three-dot-item danger" data-action="delete" data-id="${g.id}"><i class="ti ti-trash"></i> Eliminar</button>
+            </div>
+          </div>` : ''}
         </div>
         <div style="margin-top:10px">
           <div class="progress-bar">
@@ -222,17 +229,30 @@ function renderGoals(goals, userId, space) {
     });
   });
 
-  document.querySelectorAll('.goal-del-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
+  container.addEventListener('click', (e) => {
+    const dotBtn = e.target.closest('.three-dot-btn');
+    if (dotBtn) {
+      e.stopPropagation();
+      document.querySelectorAll('.three-dot-menu.open').forEach(m => { if (m.closest('.three-dot-wrap') !== dotBtn.parentElement) m.classList.remove('open'); });
+      dotBtn.parentElement.querySelector('.three-dot-menu').classList.toggle('open');
+      return;
+    }
+
+    const item = e.target.closest('.three-dot-item');
+    if (!item) return;
+    item.closest('.three-dot-menu').classList.remove('open');
+    const id = item.dataset.id;
+    const goal = goals.find(g => g.id === id);
+    if (item.dataset.action === 'edit' && goal) {
+      showGoalModal(goal, space, userId);
+    } else if (item.dataset.action === 'delete') {
       if (!confirm('¿Eliminar esta meta?')) return;
-      const { error } = await window.supabase.from('goals').delete().eq('id', btn.dataset.id);
-      if (error) {
-        showToast('Error: ' + error.message, 'error');
-        return;
-      }
-      showToast('Meta eliminada', 'success');
-      await loadPage(userId, space);
-    });
+      window.supabase.from('goals').delete().eq('id', id).then(({ error }) => {
+        if (error) { showToast('Error: ' + error.message, 'error'); return; }
+        showToast('Meta eliminada', 'success');
+        loadPage(userId, space);
+      });
+    }
   });
 }
 
@@ -249,4 +269,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   await initLayout();
   await loadPage(session.user.id, space);
+});
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.three-dot-menu.open').forEach(m => m.classList.remove('open'));
 });

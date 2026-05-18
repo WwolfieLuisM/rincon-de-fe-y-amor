@@ -128,6 +128,7 @@ async function loadPage(userId, space) {
       </div>
     `;
   } else {
+    html += '<div id="datesList">';
     items.forEach(d => {
       const days = daysUntilNext(d.date);
       let badge = '';
@@ -147,28 +148,51 @@ async function loadPage(userId, space) {
           </div>
           <div style="display:flex;align-items:center;gap:8px">
             ${badge}
-            <button class="btn-soft date-del-btn" data-id="${d.id}" style="color:#f87171;border-color:#f8717133">✕</button>
+            <div class="three-dot-wrap">
+              <button class="three-dot-btn" data-id="${d.id}">⋮</button>
+              <div class="three-dot-menu">
+                <button class="three-dot-item" data-action="edit" data-id="${d.id}"><i class="ti ti-edit"></i> Editar</button>
+                <button class="three-dot-item danger" data-action="delete" data-id="${d.id}"><i class="ti ti-trash"></i> Eliminar</button>
+              </div>
+            </div>
           </div>
         </div>
       `;
     });
+    html += '</div>';
   }
 
   html += '</div>';
   document.getElementById('app').innerHTML = html;
 
-  document.querySelectorAll('.date-del-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      if (!confirm('¿Eliminar esta fecha?')) return;
-      const { error } = await window.supabase.from('special_dates').delete().eq('id', btn.dataset.id);
-      if (error) {
-        showToast('Error: ' + error.message, 'error');
+  const container = document.getElementById('datesList');
+  if (container) {
+    container.addEventListener('click', (e) => {
+      const dotBtn = e.target.closest('.three-dot-btn');
+      if (dotBtn) {
+        e.stopPropagation();
+        document.querySelectorAll('.three-dot-menu.open').forEach(m => { if (m.closest('.three-dot-wrap') !== dotBtn.parentElement) m.classList.remove('open'); });
+        dotBtn.parentElement.querySelector('.three-dot-menu').classList.toggle('open');
         return;
       }
-      showToast('Fecha eliminada', 'success');
-      await loadPage(userId, space);
+
+      const item = e.target.closest('.three-dot-item');
+      if (!item) return;
+      item.closest('.three-dot-menu').classList.remove('open');
+      const id = item.dataset.id;
+      const dateItem = items.find(d => d.id === id);
+      if (item.dataset.action === 'edit' && dateItem) {
+        showDateModal(dateItem, space, userId);
+      } else if (item.dataset.action === 'delete') {
+        if (!confirm('¿Eliminar esta fecha?')) return;
+        window.supabase.from('special_dates').delete().eq('id', id).then(({ error }) => {
+          if (error) { showToast('Error: ' + error.message, 'error'); return; }
+          showToast('Fecha eliminada', 'success');
+          loadPage(userId, space);
+        });
+      }
     });
-  });
+  }
 
   document.getElementById('addDateBtn').addEventListener('click', () => {
     showDateModal(null, space, userId);
@@ -188,4 +212,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   await initLayout();
   await loadPage(session.user.id, space);
+});
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.three-dot-menu.open').forEach(m => m.classList.remove('open'));
 });

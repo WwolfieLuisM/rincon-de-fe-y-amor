@@ -222,14 +222,13 @@ function renderActivePrayers(prayers, progressMap, todayMarks, userId, space) {
         <div class="prayer-header">
           <div class="prayer-icon ${p.category}">${icon}</div>
           <div class="prayer-title">${p.title}</div>
-          ${isMine ? `
           <div class="three-dot-wrap">
             <button class="three-dot-btn" data-id="${p.id}">⋮</button>
             <div class="three-dot-menu">
               <button class="three-dot-item" data-action="edit" data-id="${p.id}"><i class="ti ti-edit"></i> Editar</button>
               <button class="three-dot-item danger" data-action="delete" data-id="${p.id}"><i class="ti ti-trash"></i> Eliminar</button>
             </div>
-          </div>` : ''}
+          </div>
         </div>
         <div class="progress-bar">
           <div class="progress-fill" style="width:${pct}%"></div>
