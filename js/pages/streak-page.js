@@ -1,1 +1,218 @@
-function showToast(msg, type) {  const t = document.getElementById('toast');  t.innerHTML = msg;  t.className = 'toast ' + type + ' show';  setTimeout(() => t.classList.remove('show'), 2500);}const MILESTONE_MESSAGES = {  7: '-ÌUna semana orando juntos! =ÉÓÉ',  30: '-ÌUn mes de fidelidad! =ÉƒÎ',  100: '-ÌCien d+°as de racha! =É≈Â',  365: '-ÌUn a+¶o entero! =ÉƒË',  1000: '-ÌMIL D+ÏAS! Incre+°ble =É÷Ó'};function fireConfetti() {  const colors = ['#e8547a', '#a855f7', '#fbbf24', '#fff', '#f472b6'];  const container = document.createElement('div');  container.className = 'confetti-container';  document.body.appendChild(container);  for (let i = 0; i < 60; i++) {    const piece = document.createElement('div');    piece.className = 'confetti-piece';    const color = colors[Math.floor(Math.random() * colors.length)];    const left = Math.random() * 100;    const delay = Math.random() * 0.5;    const size = 6 + Math.random() * 8;    const rot = Math.random() * 360;    piece.style.cssText = `left:${left}%;width:${size}px;height:${size*0.6}px;background:${color};animation-delay:${delay}s;transform:rotate(${rot}deg)`;    container.appendChild(piece);  }  setTimeout(() => container.remove(), 3000);}async function loadPage(userId, space) {  const d = new Date();  const today = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');  const userName = window.currentUser ? window.currentUser.name || 'T+¶' : 'T+¶';  const partnerName = window.currentPartner ? window.currentPartner.name : 'Pareja';  const headerAvatar = document.getElementById('headerAvatar');  headerAvatar.textContent = userName.charAt(0).toUpperCase();  const [streak, todayMarks, history, verse] = await Promise.all([    window.streakService.getStreak(space.id),    window.streakService.getTodayMarks(space.id, today),    window.streakService.getHistory(space.id, 7),    window.streakService.getSharedVerse()  ]);  const count = streak ? streak.count : 0;  const best = streak ? (streak.best_count || 0) : 0;  const shieldDays = streak ? (streak.shield_days || 0) : 0;  const shieldsAtLevel = window.streakService.calculateShields(count);  const userMarked = todayMarks.includes(userId);  const partnerMarked = space.mode === 'couple' ? todayMarks.length >= 2 : true;  const nextMilestone = [7, 30, 100, 365, 1000].find(m => count < m) || count + 1;  const progressToNext = count > 0 ? (count / nextMilestone) * 100 : 0;  const circumference = 2 * Math.PI * 72;  const offset = circumference - (progressToNext / 100) * circumference;  let html = '';  html += `    <div style="padding:16px">      <div class="streak-hero-card">        <div class="streak-hero-ring">          <svg width="180" height="180" viewBox="0 0 180 180">            <circle cx="90" cy="90" r="72" fill="none" stroke="#1e1e1e" stroke-width="8"/>            <circle id="streakProgressRing" cx="90" cy="90" r="72" fill="none" stroke="var(--accent)" stroke-width="8"              stroke-dasharray="${circumference}" stroke-dashoffset="${circumference}"              stroke-linecap="round" transform="rotate(-90 90 90)"              style="transition: stroke-dashoffset 0.8s ease"/>          </svg>          <div class="streak-hero-number" id="streakHeroNumber">${count}</div>        </div>        <div class="streak-hero-label">d+°as de racha</div>        <div class="streak-user-chips">          <div class="streak-chip ${userMarked ? 'marked' : ''}">            <div class="chip-avatar">${userName.charAt(0).toUpperCase()}</div>            <div class="chip-name">${userName}</div>            <div class="chip-heart">${userMarked ? 'G•Òn+≈' : '=ÉÒÏ'}</div>          </div>          ${space.mode === 'couple' ? `          <div class="streak-chip ${partnerMarked ? 'marked' : ''}">            <div class="chip-avatar">${partnerName.charAt(0).toUpperCase()}</div>            <div class="chip-name">${partnerName}</div>            <div class="chip-heart">${partnerMarked ? 'G•Òn+≈' : '=ÉÒÏ'}</div>          </div>` : ''}        </div>        <button class="streak-btn-pray ${userMarked ? 'done' : ''}" id="prayBtn" ${userMarked ? 'disabled' : ''}>          ${userMarked ? '<i class="ti ti-check" style="font-size:20px"></i> Ya oraste hoy G£‡' : '<i class="ti ti-flame" style="font-size:20px"></i> Oramos hoy =É÷≈'}        </button>      </div>    </div>  `;  if (streak) {    const shieldIcons = [];    const usedShields = shieldsAtLevel - shieldDays;    for (let i = 0; i < shieldDays; i++) shieldIcons.push('<span class="shield-icon shield-active">=É¢Ìn+≈</span>');    for (let i = 0; i < usedShields; i++) shieldIcons.push('<span class="shield-icon shield-used">=É¢Ìn+≈</span>');    const nextLevel = shieldsAtLevel === 0 ? 10 : shieldsAtLevel === 1 ? 100 : shieldsAtLevel === 5 ? 1000 : null;    html += `<div class="section-label">Escudos</div>      <div style="padding:0 16px;margin-bottom:12px">        <div class="activity-card">          <div class="streak-shields">${shieldIcons.length > 0 ? shieldIcons.join('') : '<span style="color:var(--text-3);font-size:14px">Sin escudos a+¶n</span>'}</div>          ${nextLevel ? `<div style="font-size:12px;color:var(--text-3);margin-top:6px">Siguiente nivel en ${nextLevel} d+°as</div>` : '<div style="font-size:12px;color:var(--text-3);margin-top:6px">-ÌNivel m+Ìximo! =É≈Â</div>'}        </div>      </div>    `;    html += `<div class="section-label">Mejor racha</div>      <div style="padding:0 16px;margin-bottom:12px">        <div class="activity-card">          <div class="streak-best-number">${best} <span class="streak-best-label">d+°as</span></div>        </div>      </div>    `;    html += `<div class="section-label">Devocional compartido</div>      <div style="padding:0 16px;margin-bottom:12px">        <div class="activity-card">          ${verse ? `            <div style="display:flex;flex-direction:column;gap:4px;width:100%">              <div style="font-size:14px;color:var(--accent);font-weight:500">${verse.reference}</div>              <div style="font-size:14px;color:rgba(255,255,255,0.75);line-height:1.6;font-style:italic">"${verse.text}"</div>            </div>          ` : '<div style="font-size:13px;color:var(--text-3)">Cargando...</div>'}        </div>      </div>    `;  }  html += `<div class="section-label">Historial (7 d+°as)</div>    <div style="padding:0 16px;margin-bottom:12px">      <div class="activity-card">        <div class="streak-history-grid">          ${history.map(h => {            const dayName = new Date(h.date + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'short' }).charAt(0).toUpperCase() + new Date(h.date + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'short' }).slice(1,3);            const allMarked = space.mode === 'solo' ? h.userIds.length >= 1 : h.userIds.length >= 2;            const someMarked = h.userIds.length > 0;            const isToday = h.date === today;            return `              <div class="history-day ${isToday ? 'today' : ''}">                <div class="history-dot ${allMarked ? 'done' : someMarked ? 'partial' : 'missed'}"></div>                <div class="history-label">${dayName}</div>              </div>            `;          }).join('')}        </div>      </div>    </div>  `;  document.getElementById('app').innerHTML = html;  setTimeout(() => {    const ring = document.getElementById('streakProgressRing');    if (ring) ring.style.strokeDashoffset = offset;  }, 50);  const prayBtn = document.getElementById('prayBtn');  if (prayBtn && !userMarked) {    prayBtn.addEventListener('click', async () => {      prayBtn.disabled = true;      prayBtn.textContent = 'Registrando...';      try {        await window.streakService.markToday(space.id, userId, today);      } catch (e) {        if (e.message === 'ALREADY_MARKED') {          showToast('Ya marcaste hoy', 'error');        } else {          showToast('Error al marcar', 'error');        }        prayBtn.disabled = false;        prayBtn.innerHTML = '<i class="ti ti-flame" style="font-size:20px"></i> Oramos hoy =É÷≈';        return;      }      const result = await window.streakService.checkAndUpdate(space.id, space.mode, userId, today);      if (result.streakReset) {        showToast('La racha se reinici+¶ =É∆ˆ', 'error');      } else if (result.shieldUsed) {        showToast('Escudo usado -+ racha protegida =É∆¨', 'success');      } else if (result.milestone) {        fireConfetti();        const msg = MILESTONE_MESSAGES[result.milestone] || '-Ì' + result.milestone + ' d+°as! =Éˆ—';        showToast(msg, 'success');      } else {        showToast('-ÌOraci+¶n registrada! =Éˆ—', 'success');      }      await loadPage(userId, space);    });  }}window.addEventListener('DOMContentLoaded', async () => {  const session = await window.auth.ensureSession();  if (!session) { window.location.href = 'index.html'; return; }  const { data: space } = await window.supabase    .from('spaces')    .select('*')    .or(`created_by.eq.${session.user.id},partner_id.eq.${session.user.id}`)    .order('created_at', { ascending: false })    .limit(1)    .maybeSingle();  if (!space) { window.location.href = 'link.html'; return; }  await initLayout();  await loadPage(session.user.id, space);});
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.innerHTML = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+const MILESTONE_MESSAGES = {
+  7: '¬°Una semana orando juntos! üåü',
+  30: '¬°Un mes de fidelidad! üéâ',
+  100: '¬°Cien d√≠as de racha! üèÜ',
+  365: '¬°Un a√±o entero! üéä',
+  1000: '¬°MIL D√çAS! Incre√≠ble üôå'
+};
+
+function fireConfetti() {
+  const colors = ['#e8547a', '#a855f7', '#fbbf24', '#fff', '#f472b6'];
+  const container = document.createElement('div');
+  container.className = 'confetti-container';
+  document.body.appendChild(container);
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const left = Math.random() * 100;
+    const delay = Math.random() * 0.5;
+    const size = 6 + Math.random() * 8;
+    const rot = Math.random() * 360;
+    piece.style.cssText = `left:${left}%;width:${size}px;height:${size*0.6}px;background:${color};animation-delay:${delay}s;transform:rotate(${rot}deg)`;
+    container.appendChild(piece);
+  }
+  setTimeout(() => container.remove(), 3000);
+}
+
+async function loadPage(userId, space) {
+  const d = new Date();
+  const today = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  const userName = window.currentUser ? window.currentUser.name || 'T√∫' : 'T√∫';
+  const partnerName = window.currentPartner ? window.currentPartner.name : 'Pareja';
+
+  const headerAvatar = document.getElementById('headerAvatar');
+  headerAvatar.textContent = userName.charAt(0).toUpperCase();
+
+  const [streak, todayMarks, history, verse] = await Promise.all([
+    window.streakService.getStreak(space.id),
+    window.streakService.getTodayMarks(space.id, today),
+    window.streakService.getHistory(space.id, 7),
+    window.streakService.getSharedVerse()
+  ]);
+
+  const count = streak ? streak.count : 0;
+  const best = streak ? (streak.best_count || 0) : 0;
+  const shieldDays = streak ? (streak.shield_days || 0) : 0;
+  const shieldsAtLevel = window.streakService.calculateShields(count);
+  const userMarked = todayMarks.includes(userId);
+  const partnerMarked = space.mode === 'couple' ? todayMarks.length >= 2 : true;
+
+  const nextMilestone = [7, 30, 100, 365, 1000].find(m => count < m) || count + 1;
+  const progressToNext = count > 0 ? (count / nextMilestone) * 100 : 0;
+  const circumference = 2 * Math.PI * 72;
+  const offset = circumference - (progressToNext / 100) * circumference;
+
+  let html = '';
+
+  html += `
+    <div style="padding:16px">
+      <div class="streak-hero-card">
+        <div class="streak-hero-ring">
+          <svg width="180" height="180" viewBox="0 0 180 180">
+            <circle cx="90" cy="90" r="72" fill="none" stroke="#1e1e1e" stroke-width="8"/>
+            <circle id="streakProgressRing" cx="90" cy="90" r="72" fill="none" stroke="var(--accent)" stroke-width="8"
+              stroke-dasharray="${circumference}" stroke-dashoffset="${circumference}"
+              stroke-linecap="round" transform="rotate(-90 90 90)"
+              style="transition: stroke-dashoffset 0.8s ease"/>
+          </svg>
+          <div class="streak-hero-number" id="streakHeroNumber">${count}</div>
+        </div>
+        <div class="streak-hero-label">d√≠as de racha</div>
+        <div class="streak-user-chips">
+          <div class="streak-chip ${userMarked ? 'marked' : ''}">
+            <div class="chip-avatar">${userName.charAt(0).toUpperCase()}</div>
+            <div class="chip-name">${userName}</div>
+            <div class="chip-heart">${userMarked ? '‚ù§Ô∏è' : 'ü§ç'}</div>
+          </div>
+          ${space.mode === 'couple' ? `
+          <div class="streak-chip ${partnerMarked ? 'marked' : ''}">
+            <div class="chip-avatar">${partnerName.charAt(0).toUpperCase()}</div>
+            <div class="chip-name">${partnerName}</div>
+            <div class="chip-heart">${partnerMarked ? '‚ù§Ô∏è' : 'ü§ç'}</div>
+          </div>` : ''}
+        </div>
+        <button class="streak-btn-pray ${userMarked ? 'done' : ''}" id="prayBtn" ${userMarked ? 'disabled' : ''}>
+          ${userMarked ? '<i class="ti ti-check" style="font-size:20px"></i> Ya oraste hoy ‚úÖ' : '<i class="ti ti-flame" style="font-size:20px"></i> Oramos hoy üôè'}
+        </button>
+      </div>
+    </div>
+  `;
+
+  if (streak) {
+    const shieldIcons = [];
+    const usedShields = shieldsAtLevel - shieldDays;
+    for (let i = 0; i < shieldDays; i++) shieldIcons.push('<span class="shield-icon shield-active">üõ°Ô∏è</span>');
+    for (let i = 0; i < usedShields; i++) shieldIcons.push('<span class="shield-icon shield-used">üõ°Ô∏è</span>');
+    const nextLevel = shieldsAtLevel === 0 ? 10 : shieldsAtLevel === 1 ? 100 : shieldsAtLevel === 5 ? 1000 : null;
+
+    html += `<div class="section-label">Escudos</div>
+      <div style="padding:0 16px;margin-bottom:12px">
+        <div class="activity-card">
+          <div class="streak-shields">${shieldIcons.length > 0 ? shieldIcons.join('') : '<span style="color:var(--text-3);font-size:14px">Sin escudos a√∫n</span>'}</div>
+          ${nextLevel ? `<div style="font-size:12px;color:var(--text-3);margin-top:6px">Siguiente nivel en ${nextLevel} d√≠as</div>` : '<div style="font-size:12px;color:var(--text-3);margin-top:6px">¬°Nivel m√°ximo! üèÜ</div>'}
+        </div>
+      </div>
+    `;
+
+    html += `<div class="section-label">Mejor racha</div>
+      <div style="padding:0 16px;margin-bottom:12px">
+        <div class="activity-card">
+          <div class="streak-best-number">${best} <span class="streak-best-label">d√≠as</span></div>
+        </div>
+      </div>
+    `;
+
+    html += `<div class="section-label">Devocional compartido</div>
+      <div style="padding:0 16px;margin-bottom:12px">
+        <div class="activity-card">
+          ${verse ? `
+            <div style="display:flex;flex-direction:column;gap:4px;width:100%">
+              <div style="font-size:14px;color:var(--accent);font-weight:500">${verse.reference}</div>
+              <div style="font-size:14px;color:rgba(255,255,255,0.75);line-height:1.6;font-style:italic">"${verse.text}"</div>
+            </div>
+          ` : '<div style="font-size:13px;color:var(--text-3)">Cargando...</div>'}
+        </div>
+      </div>
+    `;
+  }
+
+  html += `<div class="section-label">Historial (7 d√≠as)</div>
+    <div style="padding:0 16px;margin-bottom:12px">
+      <div class="activity-card">
+        <div class="streak-history-grid">
+          ${history.map(h => {
+            const dayName = new Date(h.date + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'short' }).charAt(0).toUpperCase() + new Date(h.date + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'short' }).slice(1,3);
+            const allMarked = space.mode === 'solo' ? h.userIds.length >= 1 : h.userIds.length >= 2;
+            const someMarked = h.userIds.length > 0;
+            const isToday = h.date === today;
+            return `
+              <div class="history-day ${isToday ? 'today' : ''}">
+                <div class="history-dot ${allMarked ? 'done' : someMarked ? 'partial' : 'missed'}"></div>
+                <div class="history-label">${dayName}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('app').innerHTML = html;
+
+  setTimeout(() => {
+    const ring = document.getElementById('streakProgressRing');
+    if (ring) ring.style.strokeDashoffset = offset;
+  }, 50);
+
+  const prayBtn = document.getElementById('prayBtn');
+  if (prayBtn && !userMarked) {
+    prayBtn.addEventListener('click', async () => {
+      prayBtn.disabled = true;
+      prayBtn.textContent = 'Registrando...';
+
+      try {
+        await window.streakService.markToday(space.id, userId, today);
+      } catch (e) {
+        if (e.message === 'ALREADY_MARKED') {
+          showToast('Ya marcaste hoy', 'error');
+        } else {
+          showToast('Error al marcar', 'error');
+        }
+        prayBtn.disabled = false;
+        prayBtn.innerHTML = '<i class="ti ti-flame" style="font-size:20px"></i> Oramos hoy üôè';
+        return;
+      }
+
+      const result = await window.streakService.checkAndUpdate(space.id, space.mode, userId, today);
+
+      if (result.streakReset) {
+        showToast('La racha se reinici√≥ üíî', 'error');
+      } else if (result.shieldUsed) {
+        showToast('Escudo usado ¬∑ racha protegida üí™', 'success');
+      } else if (result.milestone) {
+        fireConfetti();
+        const msg = MILESTONE_MESSAGES[result.milestone] || '¬°' + result.milestone + ' d√≠as! üî•';
+        showToast(msg, 'success');
+      } else {
+        showToast('¬°Oraci√≥n registrada! üî•', 'success');
+      }
+
+      await loadPage(userId, space);
+    });
+  }
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const session = await window.auth.ensureSession();
+  if (!session) { window.location.href = 'index.html'; return; }
+
+  const { data: space } = await window.supabase
+    .from('spaces')
+    .select('*')
+    .or(`created_by.eq.${session.user.id},partner_id.eq.${session.user.id}`)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (!space) { window.location.href = 'link.html'; return; }
+
+  await initLayout();
+  await loadPage(session.user.id, space);
+});
