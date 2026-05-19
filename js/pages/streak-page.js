@@ -113,29 +113,21 @@ async function loadPage(userId, space) {
     else if (count < 1000) shieldText = '\uD83D\uDEE1\uFE0F\uD83D\uDEE1\uFE0F 2 d\u00edas de gracia disponibles';
     else shieldText = '\uD83D\uDEE1\uFE0F\uD83D\uDEE1\uFE0F\uD83D\uDEE1\uFE0F 3 d\u00edas de gracia disponibles \u00b7 Nivel m\u00e1ximo';
 
-    html += '<div class="section-label">Escudos</div>
+    html += `<div class="section-label">Escudos</div>
       <div style="padding:0 16px;margin-bottom:12px">
         <div class="activity-card">
-          <div class="streak-shields">' + (shieldIcons.length > 0 ? shieldIcons.join('') : '<span style="color:var(--text-3);font-size:14px">Sin escudos a\u00fan</span>') + '</div>
-          <div style="font-size:12px;color:var(--text-3);margin-top:6px">' + shieldText + '</div>
+          <div class="streak-shields">${shieldIcons.length > 0 ? shieldIcons.join('') : '<span style="color:var(--text-3);font-size:14px">Sin escudos a\u00fan</span>'}</div>
+          <div style="font-size:12px;color:var(--text-3);margin-top:6px">${shieldText}</div>
         </div>
       </div>
-    ';
-
-    html += '<div class="section-label">Mejor racha</div>
-      <div style="padding:0 16px;margin-bottom:12px">
-        <div class="activity-card">
-          ' + (best > 0
-            ? '<div class="streak-best-number">' + best + ' <span class="streak-best-label">d\u00edas \uD83C\uDFC6</span></div>'
-            : '<div style="color:var(--text-3);font-size:14px">A\u00fan no tienes racha hist\u00f3rica</div>') + '
-        </div>
-      </div>
-    ';
+    `;
 
     html += `<div class="section-label">Mejor racha</div>
       <div style="padding:0 16px;margin-bottom:12px">
         <div class="activity-card">
-          <div class="streak-best-number">${best} <span class="streak-best-label">días</span></div>
+          ${best > 0
+            ? '<div class="streak-best-number">' + best + ' <span class="streak-best-label">d\u00edas \uD83C\uDFC6</span></div>'
+            : '<div style="color:var(--text-3);font-size:14px">A\u00fan no tienes racha hist\u00f3rica</div>'}
         </div>
       </div>
     `;
