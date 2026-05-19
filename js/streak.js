@@ -150,8 +150,8 @@ window.streakService = {
   },
 
   calculateShields(count) {
-    if (count >= 1000) return 10;
-    if (count >= 100) return 5;
+    if (count >= 1000) return 3;
+    if (count >= 100) return 2;
     if (count >= 10) return 1;
     return 0;
   },

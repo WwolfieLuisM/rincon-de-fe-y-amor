@@ -99,18 +99,38 @@ async function loadPage(userId, space) {
   if (streak) {
     const shieldIcons = [];
     const usedShields = shieldsAtLevel - shieldDays;
-    for (let i = 0; i < shieldDays; i++) shieldIcons.push('<span class="shield-icon shield-active">🛡️</span>');
-    for (let i = 0; i < usedShields; i++) shieldIcons.push('<span class="shield-icon shield-used">🛡️</span>');
-    const nextLevel = shieldsAtLevel === 0 ? 10 : shieldsAtLevel === 1 ? 100 : shieldsAtLevel === 5 ? 1000 : null;
+    for (let i = 0; i < shieldDays; i++) shieldIcons.push('<span class="shield-icon shield-active">\uD83D\uDEE1\uFE0F</span>');
+    for (let i = 0; i < usedShields; i++) shieldIcons.push('<span class="shield-icon shield-used">\uD83D\uDEE1\uFE0F</span>');
 
-    html += `<div class="section-label">Escudos</div>
+    let nextLevelDays = null;
+    if (count < 10) nextLevelDays = 10 - count;
+    else if (count < 100) nextLevelDays = 100 - count;
+    else if (count < 1000) nextLevelDays = 1000 - count;
+
+    let shieldText = '';
+    if (count < 10) shieldText = 'Sin escudos a\u00fan \u00b7 Siguiente nivel en ' + nextLevelDays + ' d\u00edas';
+    else if (count < 100) shieldText = '\uD83D\uDEE1\uFE0F 1 d\u00eda de gracia disponible';
+    else if (count < 1000) shieldText = '\uD83D\uDEE1\uFE0F\uD83D\uDEE1\uFE0F 2 d\u00edas de gracia disponibles';
+    else shieldText = '\uD83D\uDEE1\uFE0F\uD83D\uDEE1\uFE0F\uD83D\uDEE1\uFE0F 3 d\u00edas de gracia disponibles \u00b7 Nivel m\u00e1ximo';
+
+    html += '<div class="section-label">Escudos</div>
       <div style="padding:0 16px;margin-bottom:12px">
         <div class="activity-card">
-          <div class="streak-shields">${shieldIcons.length > 0 ? shieldIcons.join('') : '<span style="color:var(--text-3);font-size:14px">Sin escudos aún</span>'}</div>
-          ${nextLevel ? `<div style="font-size:12px;color:var(--text-3);margin-top:6px">Siguiente nivel en ${nextLevel} días</div>` : '<div style="font-size:12px;color:var(--text-3);margin-top:6px">¡Nivel máximo! 🏆</div>'}
+          <div class="streak-shields">' + (shieldIcons.length > 0 ? shieldIcons.join('') : '<span style="color:var(--text-3);font-size:14px">Sin escudos a\u00fan</span>') + '</div>
+          <div style="font-size:12px;color:var(--text-3);margin-top:6px">' + shieldText + '</div>
         </div>
       </div>
-    `;
+    ';
+
+    html += '<div class="section-label">Mejor racha</div>
+      <div style="padding:0 16px;margin-bottom:12px">
+        <div class="activity-card">
+          ' + (best > 0
+            ? '<div class="streak-best-number">' + best + ' <span class="streak-best-label">d\u00edas \uD83C\uDFC6</span></div>'
+            : '<div style="color:var(--text-3);font-size:14px">A\u00fan no tienes racha hist\u00f3rica</div>') + '
+        </div>
+      </div>
+    ';
 
     html += `<div class="section-label">Mejor racha</div>
       <div style="padding:0 16px;margin-bottom:12px">
