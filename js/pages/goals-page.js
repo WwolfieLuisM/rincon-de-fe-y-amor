@@ -113,7 +113,6 @@ function setupGoalsRealtime(spaceId, userId) {
       table: 'goals',
       filter: 'space_id=eq.' + spaceId,
     }, (payload) => {
-      if (payload.new.user_id === userId) return;
       const g = payload.new;
       if (g.completed) _completedGoals.unshift(g);
       else _activeGoals.unshift(g);
@@ -141,7 +140,6 @@ function setupGoalsRealtime(spaceId, userId) {
       table: 'goals',
       filter: 'space_id=eq.' + spaceId,
     }, (payload) => {
-      if (payload.new.user_id === userId) return;
       const g = payload.new;
       const wasCompleted = payload.old.completed;
       const isCompleted = g.completed;
@@ -236,7 +234,6 @@ function showGoalModal(goal, space, userId) {
         .from('goals')
         .insert({
           space_id: space.id,
-          user_id: userId,
           title,
           target_date: targetDate || null
         });
