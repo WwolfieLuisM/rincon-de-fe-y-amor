@@ -74,7 +74,7 @@
       setTimeout(() => t.classList.remove('show'), 2500);
     }
 
-    document.addEventListener('DOMContentLoaded', async () => {
+    document.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);
       const tokenHash = urlParams.get('token_hash');
       const type = urlParams.get('type');
@@ -92,30 +92,6 @@
         successMessage.style.display = 'none';
         resetPasswordForm.style.display = 'block';
         pageDescription.textContent = 'Escribe tu nueva contraseña';
-
-        // 🔥 FORZAR LA SESIÓN con el token_hash para evitar "Auth session missing"
-        try {
-          // Método 1: getSession no funciona con token_hash, necesitamos setSession
-          const { data, error: sessionError } = await window.supabase.auth.setSession({
-            access_token: tokenHash,
-            refresh_token: tokenHash
-          });
-          
-          if (sessionError) {
-            console.error('Error setSession:', sessionError);
-            showToast('Error al iniciar sesión. El enlace puede haber expirado. Solicita uno nuevo.', 'error');
-            return;
-          }
-          
-          if (!data?.session) {
-            showToast('No se pudo establecer la sesión. Solicita un nuevo enlace.', 'error');
-            return;
-          }
-        } catch (err) {
-          console.error('Error inesperado:', err);
-          showToast('Error inesperado. Solicita un nuevo enlace.', 'error');
-          return;
-        }
 
         // Botón para actualizar la contraseña
         document.getElementById('updatePasswordBtn').addEventListener('click', async () => {
@@ -135,6 +111,7 @@
             return;
           }
 
+          // ⚠️ NO necesitas setSession. Supabase ya sabe quién es por el token_hash en la URL.
           const { error } = await window.supabase.auth.updateUser({ password: newPassword });
 
           if (error) {
