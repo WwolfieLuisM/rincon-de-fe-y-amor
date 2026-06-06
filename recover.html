@@ -23,26 +23,33 @@
         <h1>Recuperar contraseña</h1>
         <p>Te enviaremos un enlace mágico para acceder y cambiarla</p>
       </div>
+
+      <!-- Formulario para enviar el correo (visible por defecto) -->
       <div class="auth-form" id="authForm">
         <div class="input-group">
           <label class="input-label">Correo electrónico</label>
           <input class="input-field" type="email" id="emailInput" placeholder="tu@correo.com" autocomplete="email">
         </div>
         <button class="btn-primary w-full" id="recoverBtn">Enviar enlace mágico</button>
-        <p id="recoverySentMsg" style="display:none;text-align:center;color:var(--text-3);font-size:13px;margin-top:8px">
-          <i class="ti ti-mail-check" style="color:var(--accent);font-size:16px;vertical-align:middle;margin-right:4px"></i>
-          Revisa tu correo — al hacer clic irás a tu perfil para cambiar la contraseña
-        </p>
         <div class="auth-link">
           <a href="index.html">Volver al inicio de sesión</a>
         </div>
       </div>
+
+      <!-- Mensaje de éxito (se muestra después de enviar) -->
+      <p id="recoverySentMsg" style="display:none;text-align:center;color:var(--text-3);font-size:13px;margin-top:8px">
+        <i class="ti ti-mail-check" style="color:var(--accent);font-size:16px;vertical-align:middle;margin-right:4px"></i>
+        Revisa tu correo — al hacer clic irás a tu perfil para cambiar la contraseña
+      </p>
     </div>
   </div>
+
   <div class="toast" id="toast"></div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.0/dist/umd/supabase.min.js"></script>
   <script src="js/supabase.js?v=7"></script>
   <script src="js/auth.js?v=18"></script>
+
   <script>
     function showToast(msg, type) {
       const t = document.getElementById('toast');
@@ -52,9 +59,81 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      // ============================================
+      // PARTE 1: DETECTAR SI VENIMOS DEL ENLACE DE RECUPERACIÓN
+      // ============================================
+      const urlParams = new URLSearchParams(window.location.search);
+      const tokenHash = urlParams.get('token_hash');
+      const type = urlParams.get('type');
+
+      const authForm = document.getElementById('authForm');
+      const recoverySentMsg = document.getElementById('recoverySentMsg');
+
+      if (tokenHash && type === 'recovery') {
+        // ============================================
+        // CASO: VENIMOS DEL ENLACE DE RECUPERACIÓN
+        // Mostrar formulario para NUEVA CONTRASEÑA
+        // ============================================
+        authForm.style.display = 'none';
+        recoverySentMsg.style.display = 'none';
+
+        // Crear el formulario de nueva contraseña
+        const passwordFormDiv = document.createElement('div');
+        passwordFormDiv.className = 'auth-form';
+        passwordFormDiv.id = 'passwordForm';
+        passwordFormDiv.innerHTML = `
+          <div class="input-group">
+            <label class="input-label">Nueva contraseña</label>
+            <input class="input-field" type="password" id="newPassword" placeholder="••••••••" autocomplete="new-password">
+          </div>
+          <div class="input-group">
+            <label class="input-label">Confirmar contraseña</label>
+            <input class="input-field" type="password" id="confirmPassword" placeholder="••••••••" autocomplete="new-password">
+          </div>
+          <button class="btn-primary w-full" id="updatePasswordBtn">Actualizar contraseña</button>
+          <div class="auth-link">
+            <a href="index.html">Volver al inicio de sesión</a>
+          </div>
+        `;
+        document.querySelector('.auth-card').appendChild(passwordFormDiv);
+
+        // Lógica para actualizar la contraseña
+        document.getElementById('updatePasswordBtn').addEventListener('click', async () => {
+          const newPassword = document.getElementById('newPassword').value;
+          const confirmPassword = document.getElementById('confirmPassword').value;
+
+          if (!newPassword || !confirmPassword) {
+            showToast('Completa ambos campos', 'error');
+            return;
+          }
+          if (newPassword !== confirmPassword) {
+            showToast('Las contraseñas no coinciden', 'error');
+            return;
+          }
+          if (newPassword.length < 6) {
+            showToast('La contraseña debe tener al menos 6 caracteres', 'error');
+            return;
+          }
+
+          const { error } = await window.supabase.auth.updateUser({ password: newPassword });
+
+          if (error) {
+            showToast(window.auth.translateError(error.message), 'error');
+          } else {
+            showToast('✅ Contraseña actualizada correctamente', 'success');
+            setTimeout(() => {
+              window.location.href = 'index.html';
+            }, 2000);
+          }
+        });
+        return; // Salimos, no ejecutamos el resto del código
+      }
+
+      // ============================================
+      // CASO: MODO NORMAL (enviar correo de recuperación)
+      // ============================================
       const emailInput = document.getElementById('emailInput');
       const recoverBtn = document.getElementById('recoverBtn');
-      const recoverySentMsg = document.getElementById('recoverySentMsg');
 
       recoverBtn.addEventListener('click', async () => {
         const email = emailInput.value.trim();
@@ -75,10 +154,12 @@
           return;
         }
 
+        // Mostrar mensaje de éxito
         recoverySentMsg.style.display = 'block';
         showToast('Enlace enviado ✓ revisa tu correo', 'success');
         recoverBtn.textContent = 'Enviar enlace mágico';
         recoverBtn.disabled = false;
+        emailInput.value = '';
       });
 
       emailInput.addEventListener('keydown', (e) => {
