@@ -1,20 +1,20 @@
 // js/auth.js
-// Versión completa con recovery de contraseña funcionando
+// Versión definitiva - Recuperación de contraseña funcionando
 
 (function() {
   'use strict';
 
-  // Inicializar o asegurar que window.auth existe
   if (window.auth) return;
 
   window.auth = {
     // ============================================
-    // RECUPERACIÓN DE CONTRASEÑA (CORREGIDO)
+    // 🔐 RECUPERACIÓN DE CONTRASEÑA (CORREGIDO)
     // ============================================
     async sendRecoveryLink(email) {
       try {
+        // ✅ Usamos la URL COMPLETA, no window.location.origin
         const { data, error } = await window.supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: window.location.origin + '/recover.html'
+          redirectTo: 'https://wwolfieluism.github.io/rincon-de-fe-y-amor/recover.html'
         });
         if (error) throw error;
         return { data, error: null };
@@ -33,7 +33,7 @@
         options: {
           shouldCreateUser: true,
           data: { name },
-          emailRedirectTo: window.location.origin + '/link.html'
+          emailRedirectTo: 'https://wwolfieluism.github.io/rincon-de-fe-y-amor/link.html'
         }
       });
       return { data, error };
@@ -44,7 +44,7 @@
         email,
         options: {
           shouldCreateUser: false,
-          emailRedirectTo: window.location.origin + '/link.html'
+          emailRedirectTo: 'https://wwolfieluism.github.io/rincon-de-fe-y-amor/link.html'
         }
       });
       return { data, error };
@@ -64,7 +64,7 @@
         password,
         options: {
           data: { name },
-          emailRedirectTo: window.location.origin + '/link.html'
+          emailRedirectTo: 'https://wwolfieluism.github.io/rincon-de-fe-y-amor/link.html'
         }
       });
       return { data, error };
