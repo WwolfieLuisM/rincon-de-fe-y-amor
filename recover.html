@@ -10,9 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
-  <link rel="icon" type="image/x-icon" href="img/favicon.ico">
-  <link rel="icon" type="image/png" sizes="32x32" href="img/favicon.png">
 </head>
 <body>
   <div class="auth-bg"></div>
@@ -28,7 +25,7 @@
       <div class="auth-form" id="emailForm">
         <div class="input-group">
           <label class="input-label">Correo electrónico</label>
-          <input class="input-field" type="email" id="emailInput" placeholder="tu@correo.com" autocomplete="email">
+          <input class="input-field" type="email" id="emailInput" placeholder="tu@correo.com">
         </div>
         <button class="btn-primary w-full" id="sendRecoveryBtn">Enviar enlace</button>
         <div class="auth-link">
@@ -37,20 +34,19 @@
       </div>
 
       <!-- Mensaje de éxito -->
-      <p id="successMessage" style="display:none;text-align:center;color:var(--text-3);font-size:13px;margin-top:8px">
-        <i class="ti ti-mail-check" style="color:var(--accent);font-size:16px;vertical-align:middle;margin-right:4px"></i>
-        Revisa tu correo
+      <p id="successMessage" style="display:none;text-align:center;color:#888;font-size:13px;margin-top:8px">
+        ✅ Revisa tu correo
       </p>
 
       <!-- Formulario para CAMBIAR la contraseña (oculto al inicio) -->
       <div class="auth-form" id="resetPasswordForm" style="display:none;">
         <div class="input-group">
           <label class="input-label">Nueva contraseña</label>
-          <input class="input-field" type="password" id="newPassword" placeholder="••••••••" autocomplete="new-password">
+          <input class="input-field" type="password" id="newPassword" placeholder="••••••••">
         </div>
         <div class="input-group">
           <label class="input-label">Confirmar contraseña</label>
-          <input class="input-field" type="password" id="confirmPassword" placeholder="••••••••" autocomplete="new-password">
+          <input class="input-field" type="password" id="confirmPassword" placeholder="••••••••">
         </div>
         <button class="btn-primary w-full" id="updatePasswordBtn">Actualizar contraseña</button>
         <div class="auth-link">
@@ -74,7 +70,7 @@
       setTimeout(() => t.classList.remove('show'), 2500);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const tokenHash = urlParams.get('token_hash');
       const type = urlParams.get('type');
@@ -85,15 +81,23 @@
       const successMessage = document.getElementById('successMessage');
 
       // ============================================
-      // 🔥 CASO 1: VENIMOS DEL ENLACE DE RECUPERACIÓN
+      // CASO 1: VENIMOS DEL ENLACE DEL CORREO
       // ============================================
       if (tokenHash && type === 'recovery') {
+        // Mostrar formulario de nueva contraseña
         emailForm.style.display = 'none';
         successMessage.style.display = 'none';
         resetPasswordForm.style.display = 'block';
         pageDescription.textContent = 'Escribe tu nueva contraseña';
 
-        // Botón para actualizar la contraseña
+        // 🔥 LA LÍNEA MÁGICA: convertir el token en sesión
+        const { error: exchangeError } = await window.supabase.auth.exchangeCodeForSession(tokenHash);
+        if (exchangeError) {
+          showToast('Error al verificar el enlace: ' + exchangeError.message, 'error');
+          return;
+        }
+
+        // Cambiar contraseña
         document.getElementById('updatePasswordBtn').addEventListener('click', async () => {
           const newPassword = document.getElementById('newPassword').value;
           const confirmPassword = document.getElementById('confirmPassword').value;
@@ -111,52 +115,45 @@
             return;
           }
 
-          // ⚠️ NO necesitas setSession. Supabase ya sabe quién es por el token_hash en la URL.
           const { error } = await window.supabase.auth.updateUser({ password: newPassword });
 
           if (error) {
-            console.error('Error updateUser:', error);
             showToast(window.auth.translateError(error.message), 'error');
           } else {
-            showToast('✅ Contraseña actualizada correctamente', 'success');
-            setTimeout(() => {
-              window.location.href = 'index.html';
-            }, 2000);
+            showToast('✅ Contraseña actualizada', 'success');
+            setTimeout(() => window.location.href = 'index.html', 2000);
           }
         });
         return;
       }
 
       // ============================================
-      // 🟢 CASO 2: MODO NORMAL (enviar correo de recuperación)
+      // CASO 2: ENVIAR CORREO DE RECUPERACIÓN
       // ============================================
-      const sendRecoveryBtn = document.getElementById('sendRecoveryBtn');
-      if (sendRecoveryBtn) {
-        sendRecoveryBtn.addEventListener('click', async () => {
-          const email = document.getElementById('emailInput').value.trim();
-          if (!email) {
-            showToast('Ingresa tu correo', 'error');
-            return;
-          }
+      document.getElementById('sendRecoveryBtn').addEventListener('click', async () => {
+        const email = document.getElementById('emailInput').value.trim();
+        if (!email) {
+          showToast('Ingresa tu correo', 'error');
+          return;
+        }
 
-          const btn = document.getElementById('sendRecoveryBtn');
-          btn.disabled = true;
-          btn.textContent = 'Enviando...';
+        const btn = document.getElementById('sendRecoveryBtn');
+        btn.disabled = true;
+        btn.textContent = 'Enviando...';
 
-          const { error } = await window.auth.sendRecoveryLink(email);
+        const { error } = await window.auth.sendRecoveryLink(email);
 
-          if (error) {
-            showToast(window.auth.translateError(error.message), 'error');
-            btn.disabled = false;
-            btn.textContent = 'Enviar enlace';
-            return;
-          }
+        if (error) {
+          showToast(window.auth.translateError(error.message), 'error');
+          btn.disabled = false;
+          btn.textContent = 'Enviar enlace';
+          return;
+        }
 
-          emailForm.style.display = 'none';
-          successMessage.style.display = 'block';
-          showToast('Enlace enviado', 'success');
-        });
-      }
+        emailForm.style.display = 'none';
+        successMessage.style.display = 'block';
+        showToast('Enlace enviado', 'success');
+      });
     });
   </script>
 </body>
