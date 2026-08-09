@@ -57,7 +57,7 @@ const STATIC = [
   '/rincon-de-fe-y-amor/img/icon.svg',
   '/rincon-de-fe-y-amor/img/apple-touch-icon.png',
   '/rincon-de-fe-y-amor/img/favicon.ico',
-  '/rincon-de-fe-y-amor/img/favicon.png',,
+  '/rincon-de-fe-y-amor/img/favicon.png',
   '/rincon-de-fe-y-amor/img/login-bg.webp',
   '/rincon-de-fe-y-amor/img/dashboard-bg.webp',
   '/rincon-de-fe-y-amor/img/prayers-bg.webp',
